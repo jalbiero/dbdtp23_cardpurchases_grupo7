@@ -5,7 +5,7 @@ services:
       - MYSQL_ROOT_PASSWORD=root
       - MYSQL_DATABASE=tpfinal22
     ports:
-      - 3306:3306
+      - 4306:3306
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3306" ]
       interval: 3s

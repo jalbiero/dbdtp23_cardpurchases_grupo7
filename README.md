@@ -11,24 +11,30 @@ Para simplificar el desarrollo los tests unitarios son de integración es decir 
 
 - Desarrollo
   - Docker
-  - Docker compose
+  - Docker compose (ver [pom.xml](pom.xml) para más detalles)
   - Java 19
   - Maven
-  - curl (*)
 - Sólo ejecución (TODO)
   - Docker
   - Docker compose
 
-(*) El desarrollo se hizo bajo Linux (openSUSE 15.4), no se probó en otras plataformas (macOS, Windows), pero debería funcionar sin problemas con una única salvedad en Windows: Al ejecutar la aplicación, docker compose se corre automáticamente desde maven para levantar el docker de MySQL, el cual es validado mediante el comando _curl_ que no está disponible en Windows a menos que sea instalado. El instalador se puede descargar desde [acá](https://curl.se/windows/)
-
+El desarrollo se hizo bajo Linux (openSUSE 15.4), no se probó en otras plataformas (macOS, Windows), pero debería funcionar sin problemas en ambas.
 
 ## Instalación y Ejecución (en modo desarrollo)
 
 ```bash
-$ git clone -b sql_version git@github.com:jalbiero/dbdtp23_cardpurchases.git
+$ git clone -b sql_version git@github.com:jalbiero/dbdtp23_cardpurchases_grupo7.git
 $ cd dbdtp23_cardpurchases
 $ mvn spring-boot:run
 ```
+
+### Puertos TCP usados
+
+- Aplicación: 
+  - **9080** (ej: http://localhost:9080)
+- MySQL (via docker container): 
+  - **4360**
+
 
 ## Decisiones de desarrollo
 
