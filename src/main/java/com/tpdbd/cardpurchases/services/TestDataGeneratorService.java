@@ -9,15 +9,22 @@ import org.springframework.stereotype.Service;
 import com.tpdbd.cardpurchases.model.Bank;
 import com.tpdbd.cardpurchases.model.Card;
 import com.tpdbd.cardpurchases.model.CardHolder;
+import com.tpdbd.cardpurchases.model.CashPayment;
+import com.tpdbd.cardpurchases.model.MonthlyPayments;
 import com.tpdbd.cardpurchases.repositories.BankRepository;
 import com.tpdbd.cardpurchases.repositories.CardHolderRepository;
 import com.tpdbd.cardpurchases.repositories.CardRepository;
+import com.tpdbd.cardpurchases.repositories.PurchaseRepository;
+
+// @formatter:off
 
 @Service
 public class TestDataGeneratorService {
     @Autowired BankRepository bankRepository;
     @Autowired CardHolderRepository cardHolderRepository;
     @Autowired CardRepository cardRepository;
+    @Autowired PurchaseRepository<CashPayment> cashRepository; 
+    @Autowired PurchaseRepository<MonthlyPayments> monthlyRepository; 
  
     public void generateData() {
         Bank[] banks = {
@@ -42,8 +49,20 @@ public class TestDataGeneratorService {
             new Card(banks[1], cardHolders[2], "0012016868683", "967", LocalDate.now(), LocalDate.now().plusMonths(12)),
         };
 
+        CashPayment[] cashPayments = {
+            new CashPayment(cards[0], "", "Zapas Store", "123123123", 1.0f, 500.0f, 0.0f),
+            new CashPayment(cards[0], "", "Burguesas", "118686783", 1.0f, 500.0f, 0.0f)
+        };
+
+        MonthlyPayments[] monthlyPayments = {
+            new MonthlyPayments(cards[1], "", "Aerofly", "686868123", 1.0f, 500.0f, 0.0f, 4),
+            new MonthlyPayments(cards[1], "", "Burguesas", "123756756", 1.0f, 500.0f, 0.0f, 10)
+        };
+
         bankRepository.saveAll(Arrays.asList(banks));
         cardHolderRepository.saveAll(Arrays.asList(cardHolders));
         cardRepository.saveAll(Arrays.asList(cards));
+        cashRepository.saveAll(Arrays.asList(cashPayments));
+        monthlyRepository.saveAll(Arrays.asList(monthlyPayments));
     }
 }

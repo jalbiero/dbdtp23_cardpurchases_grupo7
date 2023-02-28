@@ -2,15 +2,26 @@ package com.tpdbd.cardpurchases.model;
 
 import jakarta.persistence.Entity;
 
-//@Entity
+@Entity
 public class MonthlyPayments extends Purchase {
 
     private float interest;
 
     private int numberOfQuotas;
 
-    public MonthlyPayments(String paymentVoucher, String store, String cuitStore, float amount, float finalAmount, float interest, int numberOfQuotas) {
-        super(paymentVoucher, store, cuitStore, amount, finalAmount);
+    // @formatter:off
+    public MonthlyPayments(
+        Card card, 
+        String paymentVoucher, 
+        String store, 
+        String cuitStore, 
+        float amount,
+        float finalAmount, 
+        float interest, 
+        int numberOfQuotas) 
+     // @formatter:on
+    {
+        super(card, paymentVoucher, store, cuitStore, amount, finalAmount);
         this.interest = interest;
         this.numberOfQuotas = numberOfQuotas;
     }

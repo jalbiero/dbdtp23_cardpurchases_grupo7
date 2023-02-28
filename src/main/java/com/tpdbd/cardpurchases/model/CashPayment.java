@@ -2,14 +2,23 @@ package com.tpdbd.cardpurchases.model;
 
 import jakarta.persistence.Entity;
 
-//@Entity
+@Entity
 public class CashPayment extends Purchase {
 
     private float storeDiscount;
 
-    public CashPayment(String paymentVoucher, String store, String cuitStore, float amount, float finalAmount,
-            float storeDiscount) {
-        super(paymentVoucher, store, cuitStore, amount, finalAmount);
+    // @formatter:off
+    public CashPayment(
+        Card card, 
+        String paymentVoucher, 
+        String store, 
+        String cuitStore, 
+        float amount, 
+        float finalAmount,
+        float storeDiscount) 
+    // @formatter:om
+    {
+        super(card, paymentVoucher, store, cuitStore, amount, finalAmount);
         this.storeDiscount = storeDiscount;
     }
 
