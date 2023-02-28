@@ -6,7 +6,6 @@ import jakarta.persistence.*;
 public class Bank {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    @Column(name = "id_bank")
     private Long id;
 
     private String name;
