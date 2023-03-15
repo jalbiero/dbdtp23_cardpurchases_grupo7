@@ -28,9 +28,15 @@ public abstract class Promotion {
 
     private String comments;
 
-    //public Promotion(Bank bank, String code, String promotionTitle, String nameStore, String cuitStore, LocalDate validityStartDate, LocalDate validityEndDate, String comments) {
-    public Promotion(String code, String promotionTitle, String nameStore, String cuitStore, LocalDate validityStartDate, LocalDate validityEndDate, String comments) {
-        //this.bank = bank;
+    public Promotion() {
+    }
+
+    // public Promotion(Bank bank, String code, String promotionTitle, String
+    // nameStore, String cuitStore, LocalDate validityStartDate, LocalDate
+    // validityEndDate, String comments) {
+    public Promotion(String code, String promotionTitle, String nameStore, String cuitStore,
+            LocalDate validityStartDate, LocalDate validityEndDate, String comments) {
+        // this.bank = bank;
         this.code = code;
         this.promotionTitle = promotionTitle;
         this.nameStore = nameStore;
@@ -41,11 +47,11 @@ public abstract class Promotion {
     }
 
     // public Bank getBank() {
-    //     return bank;
+    // return bank;
     // }
 
     // public void setBank(Bank bank) {
-    //     this.bank = bank;
+    // this.bank = bank;
     // }
 
     public String getCode() {
@@ -106,7 +112,8 @@ public abstract class Promotion {
 
     @Override
     public String toString() {
-        return "Promotion [id=" + id + /*", bank=" + bank.getName() +*/ ", code=" + code + ", promotionTitle=" + promotionTitle
+        return "Promotion [id=" + id + /* ", bank=" + bank.getName() + */ ", code=" + code + ", promotionTitle="
+                + promotionTitle
                 + ", nameStore=" + nameStore + ", cuitStore=" + cuitStore + ", validityStartDate=" + validityStartDate
                 + ", validityEndDate=" + validityEndDate + ", comments=" + comments + "]";
     }

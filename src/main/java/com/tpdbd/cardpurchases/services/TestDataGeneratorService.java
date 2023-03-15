@@ -18,8 +18,6 @@ import com.tpdbd.cardpurchases.repositories.CardHolderRepository;
 import com.tpdbd.cardpurchases.repositories.CardRepository;
 import com.tpdbd.cardpurchases.repositories.PurchaseRepository;
 
-import jakarta.transaction.Transactional;
-
 // @formatter:off
 
 @Service
@@ -30,15 +28,16 @@ public class TestDataGeneratorService {
     @Autowired PurchaseRepository<CashPayment> cashRepository; 
     @Autowired PurchaseRepository<MonthlyPayments> monthlyRepository; 
 
-    //@Transactional
     public void generateData() {
+        // TODO With a few exceptions (e.g. Bank's CUIT) use Datafaker library to add fake data
+
         Bank[] banks = {
-            new Bank("ICBC", "cuit", "address", "phone"),
-            new Bank("Macro", "cuit", "address", "phone"),
-            new Bank("Nación", "cuit", "address", "phone"),
-            new Bank("HSBC", "cuit", "address", "phone"),
-            new Bank("Galicia", "cuit", "address", "phone"),
-            new Bank("Citibank", "cuit", "address", "phone"),
+            new Bank("ICBC", "cuit1", "address", "phone"),
+            new Bank("Macro", "cuit2", "address", "phone"),
+            new Bank("Nación", "cuit3", "address", "phone"),
+            new Bank("HSBC", "cuit4", "address", "phone"),
+            new Bank("Galicia", "cuit5", "address", "phone"),
+            new Bank("Citibank", "cuit6", "address", "phone"),
         };
 
         banks[0]
@@ -74,9 +73,5 @@ public class TestDataGeneratorService {
         cardRepository.saveAll(Arrays.asList(cards));
         cashRepository.saveAll(Arrays.asList(cashPayments));
         monthlyRepository.saveAll(Arrays.asList(monthlyPayments));
-
-        // bankRepository.findById(1l).ifPresent(bank -> {
-        //     System.out.println("Bank: " + bank.toString());
-        // });
     }
 }

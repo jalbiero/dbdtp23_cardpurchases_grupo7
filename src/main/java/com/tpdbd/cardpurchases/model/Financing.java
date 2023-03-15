@@ -10,6 +10,9 @@ public class Financing extends Promotion {
 
     private float interes;
 
+    public Financing() {
+    }
+
     public Financing(
     // @formatter:off
         String code, 
