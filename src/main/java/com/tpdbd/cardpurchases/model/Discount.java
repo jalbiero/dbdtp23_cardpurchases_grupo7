@@ -12,6 +12,9 @@ public class Discount extends Promotion {
 
     private boolean onlyCash;
 
+    public Discount() {
+    }
+
     public Discount(
     // @formatter:off
         String code, 

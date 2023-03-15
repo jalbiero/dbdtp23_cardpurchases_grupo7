@@ -1,8 +1,10 @@
 package com.tpdbd.cardpurchases.services;
 
-public interface CardPurchasesService {
+import com.tpdbd.cardpurchases.model.Discount;
 
+public interface CardPurchasesService {
     // 1 Agregar una nueva promoción de tipo descuento a un banco dado
+    void addDiscountPromotion(String bankCuit, Discount discount);
 
     // 2 Editar las fecha de vencimiento de un pago con cierto código.
 
