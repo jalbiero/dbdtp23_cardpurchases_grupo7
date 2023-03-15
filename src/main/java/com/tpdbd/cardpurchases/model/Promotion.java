@@ -2,7 +2,17 @@ package com.tpdbd.cardpurchases.model;
 
 import java.time.LocalDate;
 
+import jakarta.persistence.*;
+
+@Entity
+@Inheritance
 public abstract class Promotion {
+    @Id
+    @GeneratedValue
+    private Long id;
+
+    // @ManyToOne(cascade = CascadeType.ALL)
+    // private Bank bank;
 
     private String code;
 
@@ -18,7 +28,9 @@ public abstract class Promotion {
 
     private String comments;
 
+    //public Promotion(Bank bank, String code, String promotionTitle, String nameStore, String cuitStore, LocalDate validityStartDate, LocalDate validityEndDate, String comments) {
     public Promotion(String code, String promotionTitle, String nameStore, String cuitStore, LocalDate validityStartDate, LocalDate validityEndDate, String comments) {
+        //this.bank = bank;
         this.code = code;
         this.promotionTitle = promotionTitle;
         this.nameStore = nameStore;
@@ -27,6 +39,14 @@ public abstract class Promotion {
         this.validityEndDate = validityEndDate;
         this.comments = comments;
     }
+
+    // public Bank getBank() {
+    //     return bank;
+    // }
+
+    // public void setBank(Bank bank) {
+    //     this.bank = bank;
+    // }
 
     public String getCode() {
         return code;
@@ -82,5 +102,12 @@ public abstract class Promotion {
 
     public void setComments(String comments) {
         this.comments = comments;
+    }
+
+    @Override
+    public String toString() {
+        return "Promotion [id=" + id + /*", bank=" + bank.getName() +*/ ", code=" + code + ", promotionTitle=" + promotionTitle
+                + ", nameStore=" + nameStore + ", cuitStore=" + cuitStore + ", validityStartDate=" + validityStartDate
+                + ", validityEndDate=" + validityEndDate + ", comments=" + comments + "]";
     }
 }

@@ -6,9 +6,14 @@ import jakarta.persistence.*;
 @Entity
 public class Card {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    @Column(name = "id_card")
+    @GeneratedValue
     private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Bank bank;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private CardHolder cardHolder;
 
     private String number;
 
@@ -20,12 +25,40 @@ public class Card {
 
     private LocalDate expirationDate;
 
-    public Card(String number, String ccv, String cardholderNameInCard, LocalDate since, LocalDate expirationDate) {
+    public Card(
+    // @formatter:off        
+        Bank bank,
+        CardHolder cardHolder, 
+        String number, 
+        String ccv, 
+        LocalDate since,
+        LocalDate expirationDate) 
+    // @formatter:on
+    {
+        this.bank = bank;
+        this.cardHolder = cardHolder;
         this.number = number;
         this.ccv = ccv;
-        this.cardholderNameInCard = cardholderNameInCard;
+        this.cardholderNameInCard = cardHolder.getCompleteName();
         this.since = since;
         this.expirationDate = expirationDate;
+    }
+
+    public Bank getBank() {
+        return bank;
+    }
+
+    public void setBank(Bank bank) {
+        this.bank = bank;
+    }
+
+    public CardHolder getCardHolder() {
+        return cardHolder;
+    }
+
+    public void setCardHolder(CardHolder cardHolder) {
+        this.cardHolder = cardHolder;
+        this.cardholderNameInCard = cardHolder.getCompleteName();
     }
 
     public String getNumber() {
