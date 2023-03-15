@@ -3,7 +3,7 @@ package com.tpdbd.cardpurchases.model;
 import java.time.LocalDate;
 import jakarta.persistence.Entity;
 
-//@Entity
+@Entity
 public class Discount extends Promotion {
 
     private float discountPercentage;
@@ -12,8 +12,20 @@ public class Discount extends Promotion {
 
     private boolean onlyCash;
 
-    public Discount(String code, String promotionTitle, String nameStore, String cuitStore, LocalDate validityStartDate,
-            LocalDate validityEndDate, String comments, float discountPercentage, float priceCap, boolean onlyCash) {
+    public Discount(
+    // @formatter:off
+        String code, 
+        String promotionTitle, 
+        String nameStore, 
+        String cuitStore, 
+        LocalDate validityStartDate,
+        LocalDate validityEndDate, 
+        String comments, 
+        float discountPercentage, 
+        float priceCap, 
+        boolean onlyCash) 
+    // @formatter:on
+    {
         super(code, promotionTitle, nameStore, cuitStore, validityStartDate, validityEndDate, comments);
         this.discountPercentage = discountPercentage;
         this.priceCap = priceCap;

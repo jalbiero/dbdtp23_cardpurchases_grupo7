@@ -9,8 +9,8 @@ public class MonthlyPayments extends Purchase {
 
     private int numberOfQuotas;
 
-    // @formatter:off
     public MonthlyPayments(
+    // @formatter:off
         Card card, 
         String paymentVoucher, 
         String store, 
@@ -19,7 +19,7 @@ public class MonthlyPayments extends Purchase {
         float finalAmount, 
         float interest, 
         int numberOfQuotas) 
-     // @formatter:on
+    // @formatter:on
     {
         super(card, paymentVoucher, store, cuitStore, amount, finalAmount);
         this.interest = interest;

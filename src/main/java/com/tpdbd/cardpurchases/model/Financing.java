@@ -3,15 +3,26 @@ package com.tpdbd.cardpurchases.model;
 import java.time.LocalDate;
 import jakarta.persistence.Entity;
 
-//@Entity
+@Entity
 public class Financing extends Promotion {
 
     private int numberOfQuotas;
 
     private float interes;
 
-    public Financing(String code, String promotionTitle, String nameStore, String cuitStore, LocalDate validityStartDate,
-            LocalDate validityEndDate, String comments, int numberOfQuotas, float interes) {
+    public Financing(
+    // @formatter:off
+        String code, 
+        String promotionTitle, 
+        String nameStore, 
+        String cuitStore, 
+        LocalDate validityStartDate,
+        LocalDate validityEndDate, 
+        String comments, 
+        int numberOfQuotas, 
+        float interes) 
+    // @formatter:on
+    {
         super(code, promotionTitle, nameStore, cuitStore, validityStartDate, validityEndDate, comments);
         this.numberOfQuotas = numberOfQuotas;
         this.interes = interes;

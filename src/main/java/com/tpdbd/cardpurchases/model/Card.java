@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 @Entity
 public class Card {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -25,14 +25,14 @@ public class Card {
 
     private LocalDate expirationDate;
 
-    // @formatter:off
     public Card(
-            Bank bank,
-            CardHolder cardHolder, 
-            String number, 
-            String ccv, 
-            LocalDate since,
-            LocalDate expirationDate) 
+    // @formatter:off        
+        Bank bank,
+        CardHolder cardHolder, 
+        String number, 
+        String ccv, 
+        LocalDate since,
+        LocalDate expirationDate) 
     // @formatter:on
     {
         this.bank = bank;

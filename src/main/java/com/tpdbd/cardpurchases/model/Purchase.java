@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 @Inheritance
 public abstract class Purchase {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue
     private Long id;
 
     @ManyToOne
@@ -22,15 +22,15 @@ public abstract class Purchase {
 
     private float finalAmount;
 
-     // @formatter:off
     public Purchase(
+    // @formatter:off        
         Card card, 
         String paymentVoucher, 
         String store, 
         String cuitStore, 
         float amount, 
         float finalAmount) 
-     // @formatter:on
+    // @formatter:on
     {
         this.card = card;
         this.paymentVoucher = paymentVoucher;

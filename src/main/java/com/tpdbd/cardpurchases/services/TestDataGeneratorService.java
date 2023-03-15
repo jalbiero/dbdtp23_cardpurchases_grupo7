@@ -10,11 +10,15 @@ import com.tpdbd.cardpurchases.model.Bank;
 import com.tpdbd.cardpurchases.model.Card;
 import com.tpdbd.cardpurchases.model.CardHolder;
 import com.tpdbd.cardpurchases.model.CashPayment;
+import com.tpdbd.cardpurchases.model.Discount;
+import com.tpdbd.cardpurchases.model.Financing;
 import com.tpdbd.cardpurchases.model.MonthlyPayments;
 import com.tpdbd.cardpurchases.repositories.BankRepository;
 import com.tpdbd.cardpurchases.repositories.CardHolderRepository;
 import com.tpdbd.cardpurchases.repositories.CardRepository;
 import com.tpdbd.cardpurchases.repositories.PurchaseRepository;
+
+import jakarta.transaction.Transactional;
 
 // @formatter:off
 
@@ -25,7 +29,8 @@ public class TestDataGeneratorService {
     @Autowired CardRepository cardRepository;
     @Autowired PurchaseRepository<CashPayment> cashRepository; 
     @Autowired PurchaseRepository<MonthlyPayments> monthlyRepository; 
- 
+
+    //@Transactional
     public void generateData() {
         Bank[] banks = {
             new Bank("ICBC", "cuit", "address", "phone"),
@@ -35,6 +40,11 @@ public class TestDataGeneratorService {
             new Bank("Galicia", "cuit", "address", "phone"),
             new Bank("Citibank", "cuit", "address", "phone"),
         };
+
+        banks[0]
+            .addPromotion(new Discount("0001", "Rebaja 20% contado", "Zapas Store", "123123123", LocalDate.now(), LocalDate.now().plusMonths(3), "", 0.20f, 1000f, true))
+            .addPromotion(new Discount("0002", "Rebaja 25% contado", "Tienda T", "112313123", LocalDate.now(), LocalDate.now().plusMonths(1), "", 0.25f, 1000f, true))
+            .addPromotion(new Financing("0003", "3 cuotas sin interés", "Deportes D", "186787723", LocalDate.now(), LocalDate.now().plusMonths(3), "", 3, 0));
 
         CardHolder[] cardHolders = {
             new CardHolder("Juan Perez", "20000000", "21-20000000-8", "Avenida de mayo 10", "+541145678900", LocalDate.of(2010, 1, 20)),
@@ -64,5 +74,9 @@ public class TestDataGeneratorService {
         cardRepository.saveAll(Arrays.asList(cards));
         cashRepository.saveAll(Arrays.asList(cashPayments));
         monthlyRepository.saveAll(Arrays.asList(monthlyPayments));
+
+        // bankRepository.findById(1l).ifPresent(bank -> {
+        //     System.out.println("Bank: " + bank.toString());
+        // });
     }
 }

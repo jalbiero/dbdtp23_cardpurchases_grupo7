@@ -1,10 +1,13 @@
 package com.tpdbd.cardpurchases.model;
 
 import java.time.LocalDate;
-import jakarta.persistence.Entity;
+import jakarta.persistence.*;
 
-//@Entity
+@Entity
 public class Payment {
+    @Id
+    @GeneratedValue
+    private Long id;
 
     private String code;
 
@@ -20,7 +23,17 @@ public class Payment {
 
     private float totalPrice;
 
-    public Payment(String code, String month, String year, LocalDate firstExpiration, LocalDate secondExpiration, float surchase, float totalPrice) {
+    public Payment(
+    // @formatter:off        
+        String code, 
+        String month, 
+        String year, 
+        LocalDate firstExpiration, 
+        LocalDate secondExpiration,
+        float surchase, 
+        float totalPrice) 
+    // @formatter:on
+    {
         this.code = code;
         this.month = month;
         this.year = year;

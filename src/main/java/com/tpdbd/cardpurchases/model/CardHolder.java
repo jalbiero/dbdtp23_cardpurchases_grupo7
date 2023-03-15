@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 @Entity
 public class CardHolder {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue
     private Long id;
 
     private String completeName;
@@ -21,15 +21,15 @@ public class CardHolder {
 
     private LocalDate entry;
 
-    // @formatter:off
     public CardHolder(
+    // @formatter:off
         String completeName, 
         String dni, 
         String cuil, 
         String address, 
         String telephone, 
         LocalDate entry) 
-    // @formatter:off
+    // @formatter:on
     {
         this.completeName = completeName;
         this.dni = dni;

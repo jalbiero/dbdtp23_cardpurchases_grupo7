@@ -1,10 +1,13 @@
 package com.tpdbd.cardpurchases.model;
 
-import jakarta.persistence.Entity;
+import jakarta.persistence.*;
 
-//@Entity
+@Entity
 public class Quota {
-
+    @Id
+    @GeneratedValue
+    private Long id;
+    
     private  int number;
 
     private float price;
