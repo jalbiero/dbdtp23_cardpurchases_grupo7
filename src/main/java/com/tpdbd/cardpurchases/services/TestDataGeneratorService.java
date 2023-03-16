@@ -1,7 +1,13 @@
 package com.tpdbd.cardpurchases.services;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
+import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,12 +19,35 @@ import com.tpdbd.cardpurchases.model.CashPayment;
 import com.tpdbd.cardpurchases.model.Discount;
 import com.tpdbd.cardpurchases.model.Financing;
 import com.tpdbd.cardpurchases.model.MonthlyPayments;
+import com.tpdbd.cardpurchases.model.Promotion;
 import com.tpdbd.cardpurchases.repositories.BankRepository;
 import com.tpdbd.cardpurchases.repositories.CardHolderRepository;
 import com.tpdbd.cardpurchases.repositories.CardRepository;
 import com.tpdbd.cardpurchases.repositories.PurchaseRepository;
 
+import net.datafaker.Faker;
+
 // @formatter:off
+
+class Sequence {
+    private int value;
+
+    public Sequence() {
+        this(0);
+    }
+
+    public Sequence(int initialValue) {
+        value = initialValue;
+    }
+
+    String getNextValue() {
+        return Integer.toString(value++);
+    }
+
+    // String getNext(String format) {
+    //     return String.format(format, getNext());
+    // }
+}
 
 @Service
 public class TestDataGeneratorService {
@@ -28,34 +57,85 @@ public class TestDataGeneratorService {
     @Autowired PurchaseRepository<CashPayment> cashRepository; 
     @Autowired PurchaseRepository<MonthlyPayments> monthlyRepository; 
 
+
     public void generateData() {
-        // TODO With a few exceptions (e.g. Bank's CUIT) use Datafaker library to add fake data
+        // Argentine data in a repeatable way
+        var faker = new Faker(new Locale("es", "AR"), new Random(0));
 
-        Bank[] banks = {
-            new Bank("ICBC", "cuit1", "address", "phone"),
-            new Bank("Macro", "cuit2", "address", "phone"),
-            new Bank("Nación", "cuit3", "address", "phone"),
-            new Bank("HSBC", "cuit4", "address", "phone"),
-            new Bank("Galicia", "cuit5", "address", "phone"),
-            new Bank("Citibank", "cuit6", "address", "phone"),
-        };
+        var cuitGenerator = new Sequence();
+        var promotionCode = new Sequence();
 
-        banks[0]
-            .addPromotion(new Discount("0001", "Rebaja 20% contado", "Zapas Store", "123123123", LocalDate.now(), LocalDate.now().plusMonths(3), "", 0.20f, 1000f, true))
-            .addPromotion(new Discount("0002", "Rebaja 25% contado", "Tienda T", "112313123", LocalDate.now(), LocalDate.now().plusMonths(1), "", 0.25f, 1000f, true))
-            .addPromotion(new Financing("0003", "3 cuotas sin interés", "Deportes D", "186787723", LocalDate.now(), LocalDate.now().plusMonths(3), "", 3, 0));
+        // BANKS, For the sake of clearity, add Banks first and later their promotions
+        List<Bank> banks = faker.collection(
+            () -> new Bank(
+                faker.company().name(), 
+                cuitGenerator.getNextValue(), 
+                faker.address().fullAddress(), 
+                faker.phoneNumber().phoneNumber())
+        )
+        .len(10)
+        .generate();
 
-        CardHolder[] cardHolders = {
-            new CardHolder("Juan Perez", "20000000", "21-20000000-8", "Avenida de mayo 10", "+541145678900", LocalDate.of(2010, 1, 20)),
-            new CardHolder("María Martínez",  "22000000", "21-22000000-8", "9 de julio 15", "+541147778900", LocalDate.of(2015, 4, 20)),
-            new CardHolder("Pedro Fernández", "34200023", "24-34200023-5", "Santa Fé 1530", "+541145646320", LocalDate.of(2014, 2, 25))
-        };
+        // PROMOTIONS
+        banks.forEach(bank -> {
+            List<Discount> discounts = faker.collection(
+                () -> new Discount(
+                    promotionCode.getNextValue(), 
+                    faker.company().catchPhrase(), 
+                    faker.company().name(), 
+                    cuitGenerator.getNextValue(), 
+                    LocalDate.now(), 
+                    LocalDate.now().plusMonths(faker.number().numberBetween(1, 6)), 
+                    "No comments", 
+                    0.20f, 
+                    1000f, 
+                    true)
+            )
+            .len(0, 5)
+            .generate();
+
+            List<Financing> financings = faker.collection(
+                () -> new Financing(
+                    promotionCode.getNextValue(), 
+                    faker.company().catchPhrase(), 
+                    faker.company().name(), 
+                    cuitGenerator.getNextValue(), 
+                    LocalDate.now(), 
+                    LocalDate.now().plusMonths(faker.number().numberBetween(1, 6)), 
+                    "No comments", 
+                    faker.number().numberBetween(1, 6), 
+                    (float)faker.number().randomDouble(2, 1, 10)) // interest between 1% and 10%
+            )
+            .len(0, 5)
+            .generate();
+
+            discounts.forEach(promo -> bank.addPromotion(promo));
+            financings.forEach(promo -> bank.addPromotion(promo));
+        });
+
+        // CARD HOLDERS
+        List<CardHolder> cardHolders = faker.collection(
+            () -> new CardHolder(
+                faker.name().fullName(),
+                faker.idNumber().valid(),
+                Integer.toString(faker.number().positive()), 
+                faker.address().fullAddress(), 
+                faker.phoneNumber().cellPhone(), 
+                LocalDate.of( 
+                    faker.number().numberBetween(2000, 2015),
+                    faker.number().numberBetween(1, 12),
+                    faker.number().numberBetween(1, 30)))
+        )
+        .len(10)
+        .generate();
+
+        // TOOO Complete the following:
 
         Card[] cards = {
-            new Card(banks[0], cardHolders[0], "0012012300123", "123", LocalDate.now(), LocalDate.now().plusMonths(36)),
-            new Card(banks[1], cardHolders[0], "0012012312313", "999", LocalDate.now(), LocalDate.now().plusMonths(12)),
-            new Card(banks[0], cardHolders[1], "0067868682313", "432", LocalDate.now(), LocalDate.now().plusMonths(24)),
-            new Card(banks[1], cardHolders[2], "0012016868683", "967", LocalDate.now(), LocalDate.now().plusMonths(12)),
+            new Card(banks.get(0), cardHolders.get(0), "0012012300123", "123", LocalDate.now(), LocalDate.now().plusMonths(36)),
+            new Card(banks.get(1), cardHolders.get(0), "0012012312313", "999", LocalDate.now(), LocalDate.now().plusMonths(12)),
+            new Card(banks.get(0), cardHolders.get(1), "0067868682313", "432", LocalDate.now(), LocalDate.now().plusMonths(24)),
+            new Card(banks.get(1), cardHolders.get(2), "0012016868683", "967", LocalDate.now(), LocalDate.now().plusMonths(12)),
         };
 
         CashPayment[] cashPayments = {
@@ -68,8 +148,8 @@ public class TestDataGeneratorService {
             new MonthlyPayments(cards[1], "", "Burguesas", "123756756", 1.0f, 500.0f, 0.0f, 10)
         };
 
-        bankRepository.saveAll(Arrays.asList(banks));
-        cardHolderRepository.saveAll(Arrays.asList(cardHolders));
+        bankRepository.saveAll(banks);
+        cardHolderRepository.saveAll(cardHolders);
         cardRepository.saveAll(Arrays.asList(cards));
         cashRepository.saveAll(Arrays.asList(cashPayments));
         monthlyRepository.saveAll(Arrays.asList(monthlyPayments));

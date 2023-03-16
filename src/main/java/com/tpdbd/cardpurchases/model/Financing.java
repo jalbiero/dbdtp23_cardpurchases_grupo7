@@ -8,7 +8,7 @@ public class Financing extends Promotion {
 
     private int numberOfQuotas;
 
-    private float interes;
+    private float interest;
 
     public Financing() {
     }
@@ -23,12 +23,12 @@ public class Financing extends Promotion {
         LocalDate validityEndDate, 
         String comments, 
         int numberOfQuotas, 
-        float interes) 
+        float interest) 
     // @formatter:on
     {
         super(code, promotionTitle, nameStore, cuitStore, validityStartDate, validityEndDate, comments);
         this.numberOfQuotas = numberOfQuotas;
-        this.interes = interes;
+        this.interest = interest;
     }
 
     public int getNumberOfQuotas() {
@@ -39,11 +39,11 @@ public class Financing extends Promotion {
         this.numberOfQuotas = numberOfQuotas;
     }
 
-    public float getInteres() {
-        return interes;
+    public float getInterest() {
+        return interest;
     }
 
-    public void setInteres(float interes) {
-        this.interes = interes;
+    public void setInterest(float interest) {
+        this.interest = interest;
     }
 }
