@@ -154,10 +154,13 @@ public class TestDataGeneratorService {
                         promotedStore.name(), 
                         promotedStore.cuit(), 
                         LocalDate.now(), 
-                        LocalDate.now().plusMonths(this.faker.number().numberBetween(1, 6)), 
+                        // valid between 1 and 6 months
+                        LocalDate.now().plusMonths(this.faker.number().numberBetween(1, 6)),  
                         faker.theItCrowd().characters(),
-                        0.20f, 
-                        1000f, 
+                        // discount between 1% and 15%
+                        faker.number().numberBetween(1, 15) / 100.f, 
+                        // cap price betwee 5000-10000
+                        faker.number().numberBetween(5_000, 10_000), 
                         true));
     
                     bank.addPromotion(new Financing(
@@ -166,10 +169,13 @@ public class TestDataGeneratorService {
                         promotedStore.name(), 
                         promotedStore.cuit(), 
                         LocalDate.now(), 
+                        // valid between 1 and 6 months
                         LocalDate.now().plusMonths(this.faker.number().numberBetween(1, 6)), 
                         faker.theItCrowd().actors(),
+                        // number of quotas (1 to 6)
                         this.faker.number().numberBetween(1, 6), 
-                        (float)this.faker.number().randomDouble(2, 1, 10))); // interest between 1% and 10%
+                        // interest between 1% and 10%
+                        this.faker.number().numberBetween(1, 10) / 100.f)); 
                 });
             });
 
@@ -225,12 +231,13 @@ public class TestDataGeneratorService {
                     var cashPromo = card.getBank().getPromotions().stream()
                         .filter(promo -> 
                             promo.getCuitStore() == store.cuit() &&
-                            promo instanceof Discount) // TODO Is there a better way to do this?
+                            promo instanceof Discount) 
+                        .map(promo -> (Discount) promo)
                         .findAny();
                     
                     var voucher = cashPromo.isPresent() ? cashPromo.get().getCode() : null;                        
                     var amount = (float)this.faker.number().randomDouble(2, 1000, 50000);
-                    var storeDiscount = cashPromo.isPresent() ? ((Discount)cashPromo.get()).getDiscountPercentage() : 0.0f;
+                    var storeDiscount = cashPromo.isPresent() ? cashPromo.get().getDiscountPercentage() : 0.0f;
                     var finalAmount = amount * (1 - storeDiscount);
 
                     payments.add(new CashPayment(
@@ -248,17 +255,47 @@ public class TestDataGeneratorService {
     }
 
     private List<MonthlyPayments> generateMonthlyPayments(List<Store> stores, List<Card> cards) {
-        MonthlyPayments[] monthlyPayments = {
-            new MonthlyPayments(cards.get(1), "", "Aerofly", "686868123", 1.0f, 500.0f, 0.0f, 4),
-            new MonthlyPayments(cards.get(1), "", "Burguesas", "123756756", 1.0f, 500.0f, 0.0f, 10)
-        };
+        // MonthlyPayments[] monthlyPayments = {
+        //     new MonthlyPayments(cards.get(1), "", "Aerofly", "686868123", 1.0f, 500.0f, 0.0f, 4),
+        //     new MonthlyPayments(cards.get(1), "", "Burguesas", "123756756", 1.0f, 500.0f, 0.0f, 10)
+        // };
 
-        return Arrays.asList(monthlyPayments);
+        // return Arrays.asList(monthlyPayments);
+
+        var payments = new ArrayList<MonthlyPayments>();
+
+        cards.forEach(card -> {
+            var numOfPayments = this.random.nextInt(MAX_NUM_OF_PAYMENTS_PER_CARD) + 1;
+
+            getRandomItemsFrom(stores, numOfPayments)
+                .forEach(store -> {
+                    // Check if the store has a promotion for the card bank
+                    var financingPromo = card.getBank().getPromotions().stream()
+                        .filter(promo -> 
+                            promo.getCuitStore() == store.cuit() &&
+                            promo instanceof Financing) 
+                        .map(promo -> (Financing) promo)
+                        .findAny();
+                    
+                    var voucher = financingPromo.isPresent() ? financingPromo.get().getCode() : null;                        
+                    var amount = (float)this.faker.number().randomDouble(2, 1000, 50000);
+                    var interest = financingPromo.isPresent() ? financingPromo.get().getInterest() : 0.f;
+                    var finalAmount = amount * (1 + interest); // TODO I am not sure about this
+                    var numOfQuotas = financingPromo.isPresent() ? financingPromo.get().getNumberOfQuotas(): 0;
+
+                    payments.add(new MonthlyPayments(
+                        card, 
+                        voucher,
+                        store.name(), 
+                        store.cuit(), 
+                        amount, 
+                        finalAmount,
+                        interest,
+                        numOfQuotas));
+                });
+        });
+
+        return payments;
     }
 
-    // List<Promotion> getAvailablePromotions(List<Bank> banks) {
-    //     banks.forEach(bank -> {
-
-    //     });
-    // }
 }
