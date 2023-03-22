@@ -19,7 +19,7 @@ public class Payment {
 
     private LocalDate secondExpiration;
 
-    private float surchase; // TODO "Purchase or Surchase" ?
+    private float surchase; // TODO "Purchase or Surcharge" ?
 
     private float totalPrice;
 
