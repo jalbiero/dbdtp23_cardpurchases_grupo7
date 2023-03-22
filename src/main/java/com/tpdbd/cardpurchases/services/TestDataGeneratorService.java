@@ -4,11 +4,9 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
 import java.util.TreeSet;
-import java.util.function.Function;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,6 +30,9 @@ import net.datafaker.Faker;
 
 // @formatter:off
 
+/** 
+ * Very simple sequence generator
+ */
 class Sequence {
     private int value;
 
@@ -48,6 +49,9 @@ class Sequence {
     }
 }
 
+/**
+ * Store entity
+ */
 record Store(String name, String cuit) {
 }
 
@@ -59,7 +63,7 @@ public class TestDataGeneratorService {
     @Autowired PurchaseRepository<CashPayment> cashRepository; 
     @Autowired PurchaseRepository<MonthlyPayments> monthlyRepository; 
 
-    // TODO Add these constants to property file
+    // TODO Add these constants to the property file
     public static int NUM_OF_BANKS = 10;
     public static int NUM_OF_PROMOTIONS_PER_BANK = 15;
     public static int NUM_OF_STORES = 50;
@@ -122,6 +126,10 @@ public class TestDataGeneratorService {
         return result;
     }
 
+    /**
+     * Generates a random list of stores where card holders can buy
+     * @return
+     */
     private List<Store> generateStores() {
         return faker.collection(() -> new Store(
                 this.faker.company().name(), 
@@ -132,7 +140,7 @@ public class TestDataGeneratorService {
     }
 
     /**
-     * Generates a list of Banks (and their Promotions)
+     * Generates a random list of Banks (and their Promotions)
      * @return
      */
     private List<Bank> generateBanks(List<Store> stores) {
@@ -187,6 +195,10 @@ public class TestDataGeneratorService {
         return banks;
     }
 
+    /**
+     * Generates a random list of card holders
+     * @return
+     */
     private List<CardHolder> generateCardHolders() {
         return this.faker.collection(() -> new CardHolder(
                 this.faker.name().fullName(),
@@ -203,6 +215,12 @@ public class TestDataGeneratorService {
             .generate();
     }
 
+    /**
+     * Generates cards for all card holders in some random banks
+     * @param banks
+     * @param cardHolders
+     * @return
+     */
     private List<Card> generateCards(List<Bank> banks, List<CardHolder> cardHolders) {
         var cards = new ArrayList<Card>();
 
@@ -231,10 +249,10 @@ public class TestDataGeneratorService {
      */
     private List<CashPayment> generateCashPayments(List<Store> stores, List<Card> cards) {
         return generatePayments(stores, cards, Discount.class, 
-            (card, store, promo) -> {
-                var voucher = promo.isPresent() ? promo.get().getCode() : null;                        
+            (store, card, promo) -> {
+                var voucher = promo.map(Discount::getCode).orElse(null);                        
                 var amount = (float)this.faker.number().randomDouble(2, 1000, 50000);
-                var storeDiscount = promo.isPresent() ? promo.get().getDiscountPercentage() : 0.0f;
+                var storeDiscount = promo.map(Discount::getDiscountPercentage).orElse(0.0f);
                 var finalAmount = amount * (1 - storeDiscount);
 
                 return new CashPayment(
@@ -256,12 +274,12 @@ public class TestDataGeneratorService {
      */
     private List<MonthlyPayments> generateMonthlyPayments(List<Store> stores, List<Card> cards) {
         return generatePayments(stores, cards, Financing.class, 
-            (card, store, promo) -> {
-                var voucher = promo.isPresent() ? promo.get().getCode() : null;                        
+            (store, card, promo) -> {
+                var voucher = promo.map(Financing::getCode).orElse(null);
                 var amount = (float)this.faker.number().randomDouble(2, 1000, 50000);
-                var interest = promo.isPresent() ? promo.get().getInterest() : 0.f;
+                var interest = promo.map(Financing::getInterest).orElse(0.f);
                 var finalAmount = amount * (1 + interest); // TODO I am not sure about this
-                var numOfQuotas = promo.isPresent() ? promo.get().getNumberOfQuotas(): 0;
+                var numOfQuotas = promo.map(Financing::getNumberOfQuotas).orElse(0);
 
                 return new MonthlyPayments(
                     card, 
@@ -289,7 +307,7 @@ public class TestDataGeneratorService {
         List<T> generatePayments(List<Store> stores, 
                                  List<Card> cards, 
                                  Class<U> promotionClass,
-                                 TriFunction<Card, Store, Optional<U>, T> paymentCreator) 
+                                 TriFunction<Store, Card, Optional<U>, T> paymentCreator) 
     {
         var payments = new ArrayList<T>();
 
@@ -307,7 +325,7 @@ public class TestDataGeneratorService {
                         .findAny();
 
                     // 'store' is necessary because 'promotion' can be empty
-                    payments.add(paymentCreator.apply(card, store, promotion));
+                    payments.add(paymentCreator.apply(store, card, promotion));
                 });
         });
 
