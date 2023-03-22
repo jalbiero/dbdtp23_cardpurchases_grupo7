@@ -1,6 +1,7 @@
 package com.tpdbd.cardpurchases.model;
 
 import java.util.LinkedHashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import jakarta.persistence.*;
@@ -19,18 +20,22 @@ public class Bank {
 
     private String telephone;
 
-    @OneToMany(cascade=CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL)
     private Set<Promotion> promotions;
 
     public Bank() {
     }
 
     public Bank(String name, String cuit, String address, String telephone) {
+        this(name, cuit, address, telephone, new LinkedHashSet<Promotion>());
+    }
+
+    public Bank(String name, String cuit, String address, String telephone, Set<Promotion> promotions) {
         this.name = name;
         this.cuit = cuit;
         this.address = address;
         this.telephone = telephone;
-        this.promotions = new LinkedHashSet<Promotion>();
+        this.promotions = promotions;
     }
 
     public String getName() {
@@ -71,14 +76,13 @@ public class Bank {
 
     public Bank addPromotion(Promotion promotion) {
         this.promotions.add(promotion);
-        return this;
+        return this; // to allow chaining multiple addPromotion
     }
-
 
     @Override
     public String toString() {
         return "Bank [id=" + id + ", name=" + name + ", cuit=" + cuit + ", address=" + address + ", telephone="
                 + telephone + ", promotions=" + promotions + "]";
     }
- 
+
 }

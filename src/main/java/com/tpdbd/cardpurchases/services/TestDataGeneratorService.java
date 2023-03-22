@@ -1,9 +1,15 @@
 package com.tpdbd.cardpurchases.services;
 
 import java.time.LocalDate;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
+import java.util.Random;
+import java.util.TreeSet;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import com.tpdbd.cardpurchases.model.Bank;
@@ -13,65 +19,315 @@ import com.tpdbd.cardpurchases.model.CashPayment;
 import com.tpdbd.cardpurchases.model.Discount;
 import com.tpdbd.cardpurchases.model.Financing;
 import com.tpdbd.cardpurchases.model.MonthlyPayments;
+import com.tpdbd.cardpurchases.model.Promotion;
+import com.tpdbd.cardpurchases.model.Purchase;
 import com.tpdbd.cardpurchases.repositories.BankRepository;
 import com.tpdbd.cardpurchases.repositories.CardHolderRepository;
 import com.tpdbd.cardpurchases.repositories.CardRepository;
 import com.tpdbd.cardpurchases.repositories.PurchaseRepository;
+import com.tpdbd.cardpurchases.util.TriFunction;
+
+import net.datafaker.Faker;
 
 // @formatter:off
 
+/** 
+ * Very simple sequence generator
+ */
+class Sequence {
+    private int value;
+
+    public Sequence() {
+        this(0);
+    }
+
+    public Sequence(int initialValue) {
+        value = initialValue;
+    }
+
+    String getNextValue() {
+        return Integer.toString(value++);
+    }
+}
+
+/**
+ * Store entity
+ */
+record Store(String name, String cuit) {
+}
+
 @Service
 public class TestDataGeneratorService {
-    @Autowired BankRepository bankRepository;
-    @Autowired CardHolderRepository cardHolderRepository;
-    @Autowired CardRepository cardRepository;
-    @Autowired PurchaseRepository<CashPayment> cashRepository; 
-    @Autowired PurchaseRepository<MonthlyPayments> monthlyRepository; 
+    @Autowired private Environment environment;
+    @Autowired private BankRepository bankRepository;
+    @Autowired private CardHolderRepository cardHolderRepository;
+    @Autowired private CardRepository cardRepository;
+    @Autowired private PurchaseRepository<CashPayment> cashRepository; 
+    @Autowired private PurchaseRepository<MonthlyPayments> monthlyRepository; 
+
+    private Random random = new Random(0); // all is "repeatable"
+    private Faker faker; 
+
+    private Sequence cuitGenerator = new Sequence();
+    private Sequence promotionCode = new Sequence();
+
+    public TestDataGeneratorService() {
+        var locale = new Locale.Builder()
+            .setLanguage("es")
+            .setRegion("AR")
+            .build();
+        
+        this.faker = new Faker(locale, this.random);
+    }
 
     public void generateData() {
-        // TODO With a few exceptions (e.g. Bank's CUIT) use Datafaker library to add fake data
+        var stores = generateStores();
+        var banks = generateBanks(stores);
+        var cardHolders = generateCardHolders();
+        var cards = generateCards(banks, cardHolders);
+        var cashPayments = generateCashPayments(stores, cards);
+        var monthlyPayments = generateMonthlyPayments(stores, cards);
 
-        Bank[] banks = {
-            new Bank("ICBC", "cuit1", "address", "phone"),
-            new Bank("Macro", "cuit2", "address", "phone"),
-            new Bank("Nación", "cuit3", "address", "phone"),
-            new Bank("HSBC", "cuit4", "address", "phone"),
-            new Bank("Galicia", "cuit5", "address", "phone"),
-            new Bank("Citibank", "cuit6", "address", "phone"),
-        };
+        bankRepository.saveAll(banks);
+        cardHolderRepository.saveAll(cardHolders);
+        cardRepository.saveAll(cards);
+        cashRepository.saveAll(cashPayments);
+        monthlyRepository.saveAll(monthlyPayments);
+    }
 
-        banks[0]
-            .addPromotion(new Discount("0001", "Rebaja 20% contado", "Zapas Store", "123123123", LocalDate.now(), LocalDate.now().plusMonths(3), "", 0.20f, 1000f, true))
-            .addPromotion(new Discount("0002", "Rebaja 25% contado", "Tienda T", "112313123", LocalDate.now(), LocalDate.now().plusMonths(1), "", 0.25f, 1000f, true))
-            .addPromotion(new Financing("0003", "3 cuotas sin interés", "Deportes D", "186787723", LocalDate.now(), LocalDate.now().plusMonths(3), "", 3, 0));
+    //
+    // Internal helpers
+    //
 
-        CardHolder[] cardHolders = {
-            new CardHolder("Juan Perez", "20000000", "21-20000000-8", "Avenida de mayo 10", "+541145678900", LocalDate.of(2010, 1, 20)),
-            new CardHolder("María Martínez",  "22000000", "21-22000000-8", "9 de julio 15", "+541147778900", LocalDate.of(2015, 4, 20)),
-            new CardHolder("Pedro Fernández", "34200023", "24-34200023-5", "Santa Fé 1530", "+541145646320", LocalDate.of(2014, 2, 25))
-        };
+    private int getParam(String name) {
+        return this.environment.getProperty(
+            String.format("application.testData.%s", name), Integer.class, 0);
+    }
 
-        Card[] cards = {
-            new Card(banks[0], cardHolders[0], "0012012300123", "123", LocalDate.now(), LocalDate.now().plusMonths(36)),
-            new Card(banks[1], cardHolders[0], "0012012312313", "999", LocalDate.now(), LocalDate.now().plusMonths(12)),
-            new Card(banks[0], cardHolders[1], "0067868682313", "432", LocalDate.now(), LocalDate.now().plusMonths(24)),
-            new Card(banks[1], cardHolders[2], "0012016868683", "967", LocalDate.now(), LocalDate.now().plusMonths(12)),
-        };
+    /**
+     * Get random items from a list, very simple implementation for small lists
+     * @param <T>
+     * @param data
+     * @param numOfItems
+     * @return
+     */
+    private <T> List<T> getRandomItemsFrom(List<T> data, int numOfItems) {
+        var uniqueIndexes = new TreeSet<Integer>();
+        var result = new ArrayList<T>();
 
-        CashPayment[] cashPayments = {
-            new CashPayment(cards[0], "", "Zapas Store", "123123123", 1.0f, 500.0f, 0.0f),
-            new CashPayment(cards[0], "", "Burguesas", "118686783", 1.0f, 500.0f, 0.0f)
-        };
+        this.random.ints(0, data.size())
+            .takeWhile(index -> !uniqueIndexes.contains(index))
+            .forEach(index -> {
+                uniqueIndexes.add(index);
+                result.add(data.get(index));
+            });
 
-        MonthlyPayments[] monthlyPayments = {
-            new MonthlyPayments(cards[1], "", "Aerofly", "686868123", 1.0f, 500.0f, 0.0f, 4),
-            new MonthlyPayments(cards[1], "", "Burguesas", "123756756", 1.0f, 500.0f, 0.0f, 10)
-        };
+        return result;
+    }
 
-        bankRepository.saveAll(Arrays.asList(banks));
-        cardHolderRepository.saveAll(Arrays.asList(cardHolders));
-        cardRepository.saveAll(Arrays.asList(cards));
-        cashRepository.saveAll(Arrays.asList(cashPayments));
-        monthlyRepository.saveAll(Arrays.asList(monthlyPayments));
+    /**
+     * Generates a random list of stores where card holders can buy
+     * @return
+     */
+    private List<Store> generateStores() {
+        return faker.collection(() -> new Store(
+                this.faker.company().name(), 
+                this.cuitGenerator.getNextValue())
+            )
+            .len(getParam("numOfStores"))
+            .generate();
+    }
+
+    /**
+     * Generates a random list of Banks (and their Promotions)
+     * @return
+     */
+    private List<Bank> generateBanks(List<Store> stores) {
+        // For the sake of clearity, generates Banks first and later 
+        // their promotions for each one of them
+        List<Bank> banks = this.faker.collection(() -> new Bank(
+                this.faker.company().name(), 
+                this.cuitGenerator.getNextValue(), 
+                this.faker.address().fullAddress(), 
+                this.faker.phoneNumber().phoneNumber())
+            )
+            .len(getParam("numOfBanks"))
+            .generate();
+
+        banks.forEach(bank -> {
+            // Asumption: 
+            //   Each Bank will emit both type of promotion (Discount and 
+            //   Financing) for each promoted Store
+            getRandomItemsFrom(stores, getParam("numOfPromotionsPerBank"))
+                .forEach(promotedStore -> {
+                    bank.addPromotion(new Discount(
+                        this.promotionCode.getNextValue(), 
+                        this.faker.company().catchPhrase(), 
+                        promotedStore.name(), 
+                        promotedStore.cuit(), 
+                        LocalDate.now(), 
+                        // valid between 1 and 6 months
+                        LocalDate.now().plusMonths(this.faker.number().numberBetween(1, 6)),  
+                        faker.theItCrowd().characters(),
+                        // discount between 1% and 15%
+                        faker.number().numberBetween(1, 15) / 100.f, 
+                        // cap price betwee 5000-10000
+                        faker.number().numberBetween(5_000, 10_000), 
+                        true));
+    
+                    bank.addPromotion(new Financing(
+                        this.promotionCode.getNextValue(), 
+                        this.faker.company().catchPhrase(), 
+                        promotedStore.name(), 
+                        promotedStore.cuit(), 
+                        LocalDate.now(), 
+                        // valid between 1 and 6 months
+                        LocalDate.now().plusMonths(this.faker.number().numberBetween(1, 6)), 
+                        faker.theItCrowd().actors(),
+                        // number of quotas (1 to 6)
+                        this.faker.number().numberBetween(1, 6), 
+                        // interest between 1% and 10%
+                        this.faker.number().numberBetween(1, 10) / 100.f)); 
+                });
+            });
+
+        return banks;
+    }
+
+    /**
+     * Generates a random list of card holders
+     * @return
+     */
+    private List<CardHolder> generateCardHolders() {
+        return this.faker.collection(() -> new CardHolder(
+                this.faker.name().fullName(),
+                this.faker.idNumber().valid(),
+                Integer.toString(this.faker.number().positive()), 
+                this.faker.address().fullAddress(), 
+                this.faker.phoneNumber().cellPhone(), 
+                LocalDate.of( 
+                    this.faker.number().numberBetween(2000, 2015),
+                    this.faker.number().numberBetween(1, 12),
+                    this.faker.number().numberBetween(1, 30)))
+            )
+            .len(getParam("numOfCardHolders"))
+            .generate();
+    }
+
+    /**
+     * Generates cards for all card holders in some random banks
+     * @param banks
+     * @param cardHolders
+     * @return
+     */
+    private List<Card> generateCards(List<Bank> banks, List<CardHolder> cardHolders) {
+        var cards = new ArrayList<Card>();
+
+        cardHolders.forEach(cardHolder -> {
+            getRandomItemsFrom(banks, getParam("maxNumOfCardsPerUser"))
+                .forEach(bank -> {
+                    cards.add(new Card(
+                        bank,
+                        cardHolder,
+                        this.faker.business().creditCardNumber(),
+                        this.faker.business().securityCode(),
+                        LocalDate.now(),
+                        LocalDate.now().plusMonths(36)
+                    ));
+                });
+            });
+
+        return cards;
+    }
+
+    /**
+     * Generates some cash payments for each card in some random stores
+     * @param stores
+     * @param cards
+     * @return
+     */
+    private List<CashPayment> generateCashPayments(List<Store> stores, List<Card> cards) {
+        return generatePayments(stores, cards, Discount.class, 
+            (store, card, promo) -> {
+                var voucher = promo.map(Discount::getCode).orElse(null);                        
+                var amount = (float)this.faker.number().randomDouble(2, 1000, 50000);
+                var storeDiscount = promo.map(Discount::getDiscountPercentage).orElse(0.0f);
+                var finalAmount = amount * (1 - storeDiscount);
+
+                return new CashPayment(
+                    card, 
+                    voucher,
+                    store.name(), 
+                    store.cuit(), 
+                    amount, 
+                    finalAmount,
+                    storeDiscount);
+            });
+    }
+
+    /**
+     * Generates some monthly payments for each card in some random stores
+     * @param stores
+     * @param cards
+     * @return
+     */
+    private List<MonthlyPayments> generateMonthlyPayments(List<Store> stores, List<Card> cards) {
+        return generatePayments(stores, cards, Financing.class, 
+            (store, card, promo) -> {
+                var voucher = promo.map(Financing::getCode).orElse(null);
+                var amount = (float)this.faker.number().randomDouble(2, 1000, 50000);
+                var interest = promo.map(Financing::getInterest).orElse(0.f);
+                var finalAmount = amount * (1 + interest); // TODO I am not sure about this
+                var numOfQuotas = promo.map(Financing::getNumberOfQuotas).orElse(0);
+
+                return new MonthlyPayments(
+                    card, 
+                    voucher,
+                    store.name(), 
+                    store.cuit(), 
+                    amount, 
+                    finalAmount,
+                    interest,
+                    numOfQuotas);
+            });
+    }
+
+    /**
+     * Defines the payment template algorithm, it can generates cash or monthy payments
+     * @param <T>
+     * @param <U>
+     * @param stores
+     * @param cards
+     * @param promotionClass
+     * @param paymentCreator
+     * @return
+     */
+    private <T extends Purchase, U extends Promotion> 
+        List<T> generatePayments(List<Store> stores, 
+                                 List<Card> cards, 
+                                 Class<U> promotionClass,
+                                 TriFunction<Store, Card, Optional<U>, T> paymentCreator) 
+    {
+        var payments = new ArrayList<T>();
+
+        cards.forEach(card -> {
+            var numOfPayments = this.random.nextInt(getParam("maxNumOfPaymentsPerCard")) + 1;
+
+            getRandomItemsFrom(stores, numOfPayments)
+                .forEach(store -> {
+                    // Check if the store has a promotion for the card bank
+                    var promotion = card.getBank().getPromotions().stream()
+                        .filter(promo -> 
+                            promo.getCuitStore() == store.cuit() &&
+                            promotionClass.isInstance(promo)) 
+                        .map(promo -> promotionClass.cast(promo))
+                        .findAny();
+
+                    // 'store' is necessary because 'promotion' can be empty
+                    payments.add(paymentCreator.apply(store, card, promotion));
+                });
+        });
+
+        return payments;
     }
 }

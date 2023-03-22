@@ -14,7 +14,7 @@ public abstract class Promotion {
     // @ManyToOne(cascade = CascadeType.ALL)
     // private Bank bank;
 
-    private String code;
+    private String code; // TODO Check if this 'code' is the 'paymentVoucher' in Purchase class
 
     private String promotionTitle;
 

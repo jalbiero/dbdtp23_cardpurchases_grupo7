@@ -20,7 +20,7 @@ public class CardpurchasesApplication {
 
 	@EventListener(ApplicationReadyEvent.class)
 	public void onApplicationReady() {
-		if (environment.getProperty("application.addTestDataAtStartup", Boolean.class, false))
+		if (environment.getProperty("application.testData.addAtStartup", Boolean.class, false))
 			tdgService.generateData();
 	}
 
