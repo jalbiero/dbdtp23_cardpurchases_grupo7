@@ -2,11 +2,13 @@ package com.tpdbd.cardpurchases.services;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Random;
 import java.util.TreeSet;
+import java.util.function.Function;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,10 +20,13 @@ import com.tpdbd.cardpurchases.model.CashPayment;
 import com.tpdbd.cardpurchases.model.Discount;
 import com.tpdbd.cardpurchases.model.Financing;
 import com.tpdbd.cardpurchases.model.MonthlyPayments;
+import com.tpdbd.cardpurchases.model.Promotion;
+import com.tpdbd.cardpurchases.model.Purchase;
 import com.tpdbd.cardpurchases.repositories.BankRepository;
 import com.tpdbd.cardpurchases.repositories.CardHolderRepository;
 import com.tpdbd.cardpurchases.repositories.CardRepository;
 import com.tpdbd.cardpurchases.repositories.PurchaseRepository;
+import com.tpdbd.cardpurchases.util.TriFunction;
 
 import net.datafaker.Faker;
 
@@ -218,51 +223,75 @@ public class TestDataGeneratorService {
         return cards;
     }
 
-    // TODO Refactor this function, is not clear enough
+    /**
+     * Generates some cash payments for each card in some random stores
+     * @param stores
+     * @param cards
+     * @return
+     */
     private List<CashPayment> generateCashPayments(List<Store> stores, List<Card> cards) {
-        var payments = new ArrayList<CashPayment>();
+        return generatePayments(stores, cards, Discount.class, 
+            (card, store, promo) -> {
+                var voucher = promo.isPresent() ? promo.get().getCode() : null;                        
+                var amount = (float)this.faker.number().randomDouble(2, 1000, 50000);
+                var storeDiscount = promo.isPresent() ? promo.get().getDiscountPercentage() : 0.0f;
+                var finalAmount = amount * (1 - storeDiscount);
 
-        cards.forEach(card -> {
-            var numOfPayments = this.random.nextInt(MAX_NUM_OF_PAYMENTS_PER_CARD) + 1;
-
-            getRandomItemsFrom(stores, numOfPayments)
-                .forEach(store -> {
-                    // Check if the store has a promotion for the card bank
-                    var cashPromo = card.getBank().getPromotions().stream()
-                        .filter(promo -> 
-                            promo.getCuitStore() == store.cuit() &&
-                            promo instanceof Discount) 
-                        .map(promo -> (Discount) promo)
-                        .findAny();
-                    
-                    var voucher = cashPromo.isPresent() ? cashPromo.get().getCode() : null;                        
-                    var amount = (float)this.faker.number().randomDouble(2, 1000, 50000);
-                    var storeDiscount = cashPromo.isPresent() ? cashPromo.get().getDiscountPercentage() : 0.0f;
-                    var finalAmount = amount * (1 - storeDiscount);
-
-                    payments.add(new CashPayment(
-                        card, 
-                        voucher,
-                        store.name(), 
-                        store.cuit(), 
-                        amount, 
-                        finalAmount,
-                        storeDiscount));
-                });
-        });
-
-        return payments;
+                return new CashPayment(
+                    card, 
+                    voucher,
+                    store.name(), 
+                    store.cuit(), 
+                    amount, 
+                    finalAmount,
+                    storeDiscount);
+            });
     }
 
+    /**
+     * Generates some monthly payments for each card in some random stores
+     * @param stores
+     * @param cards
+     * @return
+     */
     private List<MonthlyPayments> generateMonthlyPayments(List<Store> stores, List<Card> cards) {
-        // MonthlyPayments[] monthlyPayments = {
-        //     new MonthlyPayments(cards.get(1), "", "Aerofly", "686868123", 1.0f, 500.0f, 0.0f, 4),
-        //     new MonthlyPayments(cards.get(1), "", "Burguesas", "123756756", 1.0f, 500.0f, 0.0f, 10)
-        // };
+        return generatePayments(stores, cards, Financing.class, 
+            (card, store, promo) -> {
+                var voucher = promo.isPresent() ? promo.get().getCode() : null;                        
+                var amount = (float)this.faker.number().randomDouble(2, 1000, 50000);
+                var interest = promo.isPresent() ? promo.get().getInterest() : 0.f;
+                var finalAmount = amount * (1 + interest); // TODO I am not sure about this
+                var numOfQuotas = promo.isPresent() ? promo.get().getNumberOfQuotas(): 0;
 
-        // return Arrays.asList(monthlyPayments);
+                return new MonthlyPayments(
+                    card, 
+                    voucher,
+                    store.name(), 
+                    store.cuit(), 
+                    amount, 
+                    finalAmount,
+                    interest,
+                    numOfQuotas);
+            });
+    }
 
-        var payments = new ArrayList<MonthlyPayments>();
+    /**
+     * Defines the payment template algorithm, it can generates cash or monthy payments
+     * @param <T>
+     * @param <U>
+     * @param stores
+     * @param cards
+     * @param promotionClass
+     * @param paymentCreator
+     * @return
+     */
+    private <T extends Purchase, U extends Promotion> 
+        List<T> generatePayments(List<Store> stores, 
+                                 List<Card> cards, 
+                                 Class<U> promotionClass,
+                                 TriFunction<Card, Store, Optional<U>, T> paymentCreator) 
+    {
+        var payments = new ArrayList<T>();
 
         cards.forEach(card -> {
             var numOfPayments = this.random.nextInt(MAX_NUM_OF_PAYMENTS_PER_CARD) + 1;
@@ -270,32 +299,18 @@ public class TestDataGeneratorService {
             getRandomItemsFrom(stores, numOfPayments)
                 .forEach(store -> {
                     // Check if the store has a promotion for the card bank
-                    var financingPromo = card.getBank().getPromotions().stream()
+                    var promotion = card.getBank().getPromotions().stream()
                         .filter(promo -> 
                             promo.getCuitStore() == store.cuit() &&
-                            promo instanceof Financing) 
-                        .map(promo -> (Financing) promo)
+                            promotionClass.isInstance(promo)) 
+                        .map(promo -> promotionClass.cast(promo))
                         .findAny();
-                    
-                    var voucher = financingPromo.isPresent() ? financingPromo.get().getCode() : null;                        
-                    var amount = (float)this.faker.number().randomDouble(2, 1000, 50000);
-                    var interest = financingPromo.isPresent() ? financingPromo.get().getInterest() : 0.f;
-                    var finalAmount = amount * (1 + interest); // TODO I am not sure about this
-                    var numOfQuotas = financingPromo.isPresent() ? financingPromo.get().getNumberOfQuotas(): 0;
 
-                    payments.add(new MonthlyPayments(
-                        card, 
-                        voucher,
-                        store.name(), 
-                        store.cuit(), 
-                        amount, 
-                        finalAmount,
-                        interest,
-                        numOfQuotas));
+                    // 'store' is necessary because 'promotion' can be empty
+                    payments.add(paymentCreator.apply(card, store, promotion));
                 });
         });
 
         return payments;
     }
-
 }
