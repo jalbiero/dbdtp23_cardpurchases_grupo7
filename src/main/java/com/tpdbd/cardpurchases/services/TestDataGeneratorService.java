@@ -9,6 +9,7 @@ import java.util.Random;
 import java.util.TreeSet;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import com.tpdbd.cardpurchases.model.Bank;
@@ -57,19 +58,12 @@ record Store(String name, String cuit) {
 
 @Service
 public class TestDataGeneratorService {
-    @Autowired BankRepository bankRepository;
-    @Autowired CardHolderRepository cardHolderRepository;
-    @Autowired CardRepository cardRepository;
-    @Autowired PurchaseRepository<CashPayment> cashRepository; 
-    @Autowired PurchaseRepository<MonthlyPayments> monthlyRepository; 
-
-    // TODO Add these constants to the property file
-    public static int NUM_OF_BANKS = 10;
-    public static int NUM_OF_PROMOTIONS_PER_BANK = 15;
-    public static int NUM_OF_STORES = 50;
-    public static int NUM_OF_CARD_HOLDERS = 50;
-    public static int MAX_NUM_OF_CARDS_PER_USER = 3;
-    public static int MAX_NUM_OF_PAYMENTS_PER_CARD = 15;
+    @Autowired private Environment environment;
+    @Autowired private BankRepository bankRepository;
+    @Autowired private CardHolderRepository cardHolderRepository;
+    @Autowired private CardRepository cardRepository;
+    @Autowired private PurchaseRepository<CashPayment> cashRepository; 
+    @Autowired private PurchaseRepository<MonthlyPayments> monthlyRepository; 
 
     private Random random = new Random(0); // all is "repeatable"
     private Faker faker; 
@@ -105,6 +99,11 @@ public class TestDataGeneratorService {
     // Internal helpers
     //
 
+    private int getParam(String name) {
+        return this.environment.getProperty(
+            String.format("application.testData.%s", name), Integer.class, 0);
+    }
+
     /**
      * Get random items from a list, very simple implementation for small lists
      * @param <T>
@@ -135,7 +134,7 @@ public class TestDataGeneratorService {
                 this.faker.company().name(), 
                 this.cuitGenerator.getNextValue())
             )
-            .len(NUM_OF_STORES)
+            .len(getParam("numOfStores"))
             .generate();
     }
 
@@ -152,14 +151,14 @@ public class TestDataGeneratorService {
                 this.faker.address().fullAddress(), 
                 this.faker.phoneNumber().phoneNumber())
             )
-            .len(NUM_OF_BANKS)
+            .len(getParam("numOfBanks"))
             .generate();
 
         banks.forEach(bank -> {
             // Asumption: 
             //   Each Bank will emit both type of promotion (Discount and 
             //   Financing) for each promoted Store
-            getRandomItemsFrom(stores, NUM_OF_PROMOTIONS_PER_BANK)
+            getRandomItemsFrom(stores, getParam("numOfPromotionsPerBank"))
                 .forEach(promotedStore -> {
                     bank.addPromotion(new Discount(
                         this.promotionCode.getNextValue(), 
@@ -211,7 +210,7 @@ public class TestDataGeneratorService {
                     this.faker.number().numberBetween(1, 12),
                     this.faker.number().numberBetween(1, 30)))
             )
-            .len(NUM_OF_CARD_HOLDERS)
+            .len(getParam("numOfCardHolders"))
             .generate();
     }
 
@@ -225,7 +224,7 @@ public class TestDataGeneratorService {
         var cards = new ArrayList<Card>();
 
         cardHolders.forEach(cardHolder -> {
-            getRandomItemsFrom(banks, MAX_NUM_OF_CARDS_PER_USER)
+            getRandomItemsFrom(banks, getParam("maxNumOfCardsPerUser"))
                 .forEach(bank -> {
                     cards.add(new Card(
                         bank,
@@ -312,7 +311,7 @@ public class TestDataGeneratorService {
         var payments = new ArrayList<T>();
 
         cards.forEach(card -> {
-            var numOfPayments = this.random.nextInt(MAX_NUM_OF_PAYMENTS_PER_CARD) + 1;
+            var numOfPayments = this.random.nextInt(getParam("maxNumOfPaymentsPerCard")) + 1;
 
             getRandomItemsFrom(stores, numOfPayments)
                 .forEach(store -> {
