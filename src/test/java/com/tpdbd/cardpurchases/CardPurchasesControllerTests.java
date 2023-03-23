@@ -98,7 +98,7 @@ public class CardPurchasesControllerTests {
             .then()
                 .statusCode(200);
 
-        // Check if the promotion was added for the given bank
+        // Check if the promotion was added to the given bank
         given()
             .when()
                 .get(String.format("/tests/banks/%s", cuit))
