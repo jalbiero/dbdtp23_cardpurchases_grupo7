@@ -1,7 +1,6 @@
 package com.tpdbd.cardpurchases.model;
 
 import java.util.LinkedHashSet;
-import java.util.Optional;
 import java.util.Set;
 
 import jakarta.persistence.*;
