@@ -88,11 +88,11 @@ public class TestDataGeneratorService {
         var cashPayments = generateCashPayments(stores, cards);
         var monthlyPayments = generateMonthlyPayments(stores, cards);
 
-        bankRepository.saveAll(banks);
-        cardHolderRepository.saveAll(cardHolders);
-        cardRepository.saveAll(cards);
-        cashRepository.saveAll(cashPayments);
-        monthlyRepository.saveAll(monthlyPayments);
+        this.bankRepository.saveAll(banks);
+        this.cardHolderRepository.saveAll(cardHolders);
+        this.cardRepository.saveAll(cards);
+        this.cashRepository.saveAll(cashPayments);
+        this.monthlyRepository.saveAll(monthlyPayments);
     }
 
     //
