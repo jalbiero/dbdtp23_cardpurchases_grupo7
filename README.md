@@ -38,4 +38,9 @@ $ mvn spring-boot:run
 
 ## Decisiones de desarrollo
 
-TODO
+- Por cuestiones de claridad las siguientes clases fueron renombradas (ya que al representar compras se confundían con los pagos de las mismas)
+  - `CashPayment` a `CashPurchase`
+  - `MonthlyPayment` a `CreditPurchase`
+
+- TODO 
+  
