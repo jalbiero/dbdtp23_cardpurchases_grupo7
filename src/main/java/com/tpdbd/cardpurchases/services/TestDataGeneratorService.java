@@ -15,10 +15,10 @@ import org.springframework.stereotype.Service;
 import com.tpdbd.cardpurchases.model.Bank;
 import com.tpdbd.cardpurchases.model.Card;
 import com.tpdbd.cardpurchases.model.CardHolder;
-import com.tpdbd.cardpurchases.model.CashPayment;
+import com.tpdbd.cardpurchases.model.CashPurchase;
 import com.tpdbd.cardpurchases.model.Discount;
 import com.tpdbd.cardpurchases.model.Financing;
-import com.tpdbd.cardpurchases.model.MonthlyPayments;
+import com.tpdbd.cardpurchases.model.CreditPurchase;
 import com.tpdbd.cardpurchases.model.Promotion;
 import com.tpdbd.cardpurchases.model.Purchase;
 import com.tpdbd.cardpurchases.repositories.BankRepository;
@@ -62,8 +62,8 @@ public class TestDataGeneratorService {
     @Autowired private BankRepository bankRepository;
     @Autowired private CardHolderRepository cardHolderRepository;
     @Autowired private CardRepository cardRepository;
-    @Autowired private PurchaseRepository<CashPayment> cashRepository; 
-    @Autowired private PurchaseRepository<MonthlyPayments> monthlyRepository; 
+    @Autowired private PurchaseRepository<CashPurchase> cashRepository; 
+    @Autowired private PurchaseRepository<CreditPurchase> monthlyRepository; 
 
     private Random random = new Random(0); // all is "repeatable"
     private Faker faker; 
@@ -85,8 +85,8 @@ public class TestDataGeneratorService {
         var banks = generateBanks(stores);
         var cardHolders = generateCardHolders();
         var cards = generateCards(banks, cardHolders);
-        var cashPayments = generateCashPayments(stores, cards);
-        var monthlyPayments = generateMonthlyPayments(stores, cards);
+        var cashPayments = generateCashPurchases(stores, cards);
+        var monthlyPayments = generateCreditPurchases(stores, cards);
 
         this.bankRepository.saveAll(banks);
         this.cardHolderRepository.saveAll(cardHolders);
@@ -241,20 +241,20 @@ public class TestDataGeneratorService {
     }
 
     /**
-     * Generates some cash payments for each card in some random stores
+     * Generates some cash purchases for each card in some random stores
      * @param stores
      * @param cards
      * @return
      */
-    private List<CashPayment> generateCashPayments(List<Store> stores, List<Card> cards) {
-        return generatePayments(stores, cards, Discount.class, 
+    private List<CashPurchase> generateCashPurchases(List<Store> stores, List<Card> cards) {
+        return generatePurchases(stores, cards, Discount.class, 
             (store, card, promo) -> {
                 var voucher = promo.map(Discount::getCode).orElse(null);                        
                 var amount = (float)this.faker.number().randomDouble(2, 1000, 50000);
                 var storeDiscount = promo.map(Discount::getDiscountPercentage).orElse(0.0f);
                 var finalAmount = amount * (1 - storeDiscount);
 
-                return new CashPayment(
+                return new CashPurchase(
                     card, 
                     voucher,
                     store.name(), 
@@ -266,13 +266,13 @@ public class TestDataGeneratorService {
     }
 
     /**
-     * Generates some monthly payments for each card in some random stores
+     * Generates some credit purchase for each card in some random stores
      * @param stores
      * @param cards
      * @return
      */
-    private List<MonthlyPayments> generateMonthlyPayments(List<Store> stores, List<Card> cards) {
-        return generatePayments(stores, cards, Financing.class, 
+    private List<CreditPurchase> generateCreditPurchases(List<Store> stores, List<Card> cards) {
+        return generatePurchases(stores, cards, Financing.class, 
             (store, card, promo) -> {
                 var voucher = promo.map(Financing::getCode).orElse(null);
                 var amount = (float)this.faker.number().randomDouble(2, 1000, 50000);
@@ -280,7 +280,7 @@ public class TestDataGeneratorService {
                 var finalAmount = amount * (1 + interest); // TODO I am not sure about this
                 var numOfQuotas = promo.map(Financing::getNumberOfQuotas).orElse(0);
 
-                return new MonthlyPayments(
+                return new CreditPurchase(
                     card, 
                     voucher,
                     store.name(), 
@@ -293,7 +293,7 @@ public class TestDataGeneratorService {
     }
 
     /**
-     * Defines the payment template algorithm, it can generates cash or monthy payments
+     * Defines the purchase template algorithm, it can generates cash or credit purchases
      * @param <T>
      * @param <U>
      * @param stores
@@ -303,15 +303,15 @@ public class TestDataGeneratorService {
      * @return
      */
     private <T extends Purchase, U extends Promotion> 
-        List<T> generatePayments(List<Store> stores, 
-                                 List<Card> cards, 
-                                 Class<U> promotionClass,
-                                 TriFunction<Store, Card, Optional<U>, T> paymentCreator) 
+        List<T> generatePurchases(List<Store> stores, 
+                                  List<Card> cards, 
+                                  Class<U> promotionClass,
+                                  TriFunction<Store, Card, Optional<U>, T> purchaseCreator) 
     {
         var payments = new ArrayList<T>();
 
         cards.forEach(card -> {
-            var numOfPayments = this.random.nextInt(getParam("maxNumOfPaymentsPerCard")) + 1;
+            var numOfPayments = this.random.nextInt(getParam("maxNumOfPurchasesPerCard")) + 1;
 
             getRandomItemsFrom(stores, numOfPayments)
                 .forEach(store -> {
@@ -324,7 +324,7 @@ public class TestDataGeneratorService {
                         .findAny();
 
                     // 'store' is necessary because 'promotion' can be empty
-                    payments.add(paymentCreator.apply(store, card, promotion));
+                    payments.add(purchaseCreator.apply(store, card, promotion));
                 });
         });
 

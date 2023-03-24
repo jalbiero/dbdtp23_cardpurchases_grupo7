@@ -3,11 +3,11 @@ package com.tpdbd.cardpurchases.model;
 import jakarta.persistence.Entity;
 
 @Entity
-public class CashPayment extends Purchase {
+public class CashPurchase extends Purchase {
 
     private float storeDiscount;
 
-    public CashPayment(
+    public CashPurchase(
     // @formatter:off        
         Card card, 
         String paymentVoucher, 
