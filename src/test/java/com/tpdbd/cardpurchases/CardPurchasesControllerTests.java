@@ -113,5 +113,20 @@ public class CardPurchasesControllerTests {
                 .body("promotions.discountPercentage", Matchers.hasItem(DISCOUNT))
                 .body("promotions.priceCap", Matchers.hasItem(PCAP));
     }
-}
 
+    //@Test
+    public void testUpdatePaymentDate() {
+         // Select some payment code
+         var cuit = given()
+            .get("/tests/payments/codes")
+            .jsonPath()
+            .getObject("codes[0]", String.class);
+
+        given()
+            .when()
+                .put(String.format("/payments/%s", cuit))
+                // TODO Complete data to be updated
+            .then()
+                .statusCode(200);
+    }
+}
