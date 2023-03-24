@@ -3,13 +3,13 @@ package com.tpdbd.cardpurchases.model;
 import jakarta.persistence.Entity;
 
 @Entity
-public class MonthlyPayments extends Purchase {
+public class CreditPurchase extends Purchase {
 
     private float interest;
 
     private int numberOfQuotas;
 
-    public MonthlyPayments(
+    public CreditPurchase(
     // @formatter:off
         Card card, 
         String paymentVoucher, 
