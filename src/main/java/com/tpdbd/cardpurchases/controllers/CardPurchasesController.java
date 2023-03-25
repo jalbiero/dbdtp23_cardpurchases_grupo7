@@ -8,8 +8,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.tpdbd.cardpurchases.controllers.util.Params;
 import com.tpdbd.cardpurchases.model.Discount;
 import com.tpdbd.cardpurchases.services.CardPurchasesService;
+
 
 @RestController
 public class CardPurchasesController {
@@ -27,7 +29,8 @@ public class CardPurchasesController {
     }
 
     @PutMapping("/payments/{code}/updateDates")
-    void paymentsUpdateDates(@PathVariable String code /*, @RequestBody Discount discount*/) {
-        //this.service.
+    void paymentsUpdateDates(@PathVariable String code, @RequestBody Params.PaymentDates paymentDates) {
+        System.out.println("PARAMS: " + paymentDates);
+        this.service.paymentsUpdateDates(code, paymentDates.firstExpiration(), paymentDates.secondExpiration());
     }
 }

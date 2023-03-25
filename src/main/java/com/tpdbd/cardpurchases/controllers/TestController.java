@@ -11,16 +11,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.tpdbd.cardpurchases.model.Bank;
-import com.tpdbd.cardpurchases.services.CardPurchasesService;
+import com.tpdbd.cardpurchases.model.Payment;
+import com.tpdbd.cardpurchases.services.TestService;
 
 /**
  * This controller has all endpoints necessary for manual or automated testing
  */
 @RestController
-@RequestMapping("/tests")
+@RequestMapping("/test")
 public class TestController {
     @Autowired
-    private CardPurchasesService service;
+    private TestService service;
 
     @GetMapping("/")
     String index() {
@@ -28,14 +29,27 @@ public class TestController {
     }
 
     @GetMapping("/banks/cuits")
-    Map<String, List<String>> testGetBanks() {
+    Map<String, List<String>> getBanksCuits() {
         var result = new LinkedHashMap<String, List<String>>();
-        result.put("cuits", this.service.testsBanksGetCuits());
+        result.put("cuits", this.service.getBankCuits());
         return result;
     }
 
     @GetMapping("/banks/{cuit}")
-    Bank testGetBank(@PathVariable String cuit) {
-        return this.service.testsBanksGetBank(cuit);
+    Bank getBank(@PathVariable String cuit) {
+        return this.service.getBank(cuit);
     }
+
+    @GetMapping("/payments/codes")
+    Map<String, List<String>> getPaymentCodes() {
+        var result = new LinkedHashMap<String, List<String>>();
+        result.put("codes", this.service.getPaymentCodes());
+        return result;
+    }
+
+    @GetMapping("/payments/{code}")
+    Payment getPayment(@PathVariable String code) {
+        return this.service.getPayment(code);
+    }
+
 }
