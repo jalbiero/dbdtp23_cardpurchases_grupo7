@@ -23,6 +23,10 @@ public class Payment {
 
     private float totalPrice;
 
+    public Payment() {
+        
+    }
+
     public Payment(
     // @formatter:off        
         String code, 

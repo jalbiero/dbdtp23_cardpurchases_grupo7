@@ -1,6 +1,7 @@
 package com.tpdbd.cardpurchases.services;
 
 import java.time.LocalDate;
+import java.time.Year;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -18,12 +19,14 @@ import com.tpdbd.cardpurchases.model.CardHolder;
 import com.tpdbd.cardpurchases.model.CashPurchase;
 import com.tpdbd.cardpurchases.model.Discount;
 import com.tpdbd.cardpurchases.model.Financing;
+import com.tpdbd.cardpurchases.model.Payment;
 import com.tpdbd.cardpurchases.model.CreditPurchase;
 import com.tpdbd.cardpurchases.model.Promotion;
 import com.tpdbd.cardpurchases.model.Purchase;
 import com.tpdbd.cardpurchases.repositories.BankRepository;
 import com.tpdbd.cardpurchases.repositories.CardHolderRepository;
 import com.tpdbd.cardpurchases.repositories.CardRepository;
+import com.tpdbd.cardpurchases.repositories.PaymentRepository;
 import com.tpdbd.cardpurchases.repositories.PurchaseRepository;
 import com.tpdbd.cardpurchases.util.TriFunction;
 
@@ -36,17 +39,27 @@ import net.datafaker.Faker;
  */
 class Sequence {
     private int value;
+    private String prefix;
 
     public Sequence() {
-        this(0);
+        this(0, "");
     }
 
     public Sequence(int initialValue) {
-        value = initialValue;
+        this(initialValue, "");
+    }
+
+    public Sequence(String prefix) {
+        this(0, prefix);
+    }
+
+    public Sequence(int initialValue, String prefix) {
+        this.value = initialValue;
+        this.prefix= prefix;
     }
 
     String getNextValue() {
-        return Integer.toString(value++);
+        return String.format("%s%d", this.prefix, this.value++);
     }
 }
 
@@ -63,13 +76,15 @@ public class TestDataGeneratorService {
     @Autowired private CardHolderRepository cardHolderRepository;
     @Autowired private CardRepository cardRepository;
     @Autowired private PurchaseRepository<CashPurchase> cashRepository; 
-    @Autowired private PurchaseRepository<CreditPurchase> monthlyRepository; 
+    @Autowired private PurchaseRepository<CreditPurchase> creaditRepository; 
+    @Autowired private PaymentRepository paymentRepository; 
 
     private Random random = new Random(0); // all is "repeatable"
     private Faker faker; 
 
     private Sequence cuitGenerator = new Sequence();
-    private Sequence promotionCode = new Sequence();
+    private Sequence promotionCode = new Sequence("promo");
+    private Sequence paymentCode = new Sequence("payment");
 
     public TestDataGeneratorService() {
         var locale = new Locale.Builder()
@@ -85,14 +100,19 @@ public class TestDataGeneratorService {
         var banks = generateBanks(stores);
         var cardHolders = generateCardHolders();
         var cards = generateCards(banks, cardHolders);
-        var cashPayments = generateCashPurchases(stores, cards);
-        var monthlyPayments = generateCreditPurchases(stores, cards);
+        var cashPurchases = generateCashPurchases(stores, cards);
+        var creditPurchases = generateCreditPurchases(stores, cards);
+
+        // TODO Generation of payments is incomplete due to some doubts in the model
+        var cashPayments = generatePayments(cashPurchases);
+        //var creditPayments = generatePayments(creditPurchases);
 
         this.bankRepository.saveAll(banks);
         this.cardHolderRepository.saveAll(cardHolders);
         this.cardRepository.saveAll(cards);
-        this.cashRepository.saveAll(cashPayments);
-        this.monthlyRepository.saveAll(monthlyPayments);
+        this.cashRepository.saveAll(cashPurchases);
+        this.creaditRepository.saveAll(creditPurchases);
+        this.paymentRepository.saveAll(cashPayments);
     }
 
     //
@@ -126,7 +146,7 @@ public class TestDataGeneratorService {
     }
 
     /**
-     * Generates a random list of stores where card holders can buy
+     * Generates a random list of stores where card holders can shop
      * @return
      */
     private List<Store> generateStores() {
@@ -143,7 +163,7 @@ public class TestDataGeneratorService {
      * @return
      */
     private List<Bank> generateBanks(List<Store> stores) {
-        // For the sake of clearity, generates Banks first and later 
+        // For the sake of clearity, it generates Banks first and later 
         // their promotions for each one of them
         List<Bank> banks = this.faker.collection(() -> new Bank(
                 this.faker.company().name(), 
@@ -156,7 +176,7 @@ public class TestDataGeneratorService {
 
         banks.forEach(bank -> {
             // Asumption: 
-            //   Each Bank will emit both type of promotion (Discount and 
+            //   Each Bank will emit both type of promotions (Discount and 
             //   Financing) for each promoted Store
             getRandomItemsFrom(stores, getParam("numOfPromotionsPerBank"))
                 .forEach(promotedStore -> {
@@ -266,7 +286,7 @@ public class TestDataGeneratorService {
     }
 
     /**
-     * Generates some credit purchase for each card in some random stores
+     * Generates some credit purchases for each card in some random stores
      * @param stores
      * @param cards
      * @return
@@ -308,12 +328,12 @@ public class TestDataGeneratorService {
                                   Class<U> promotionClass,
                                   TriFunction<Store, Card, Optional<U>, T> purchaseCreator) 
     {
-        var payments = new ArrayList<T>();
+        var purchases = new ArrayList<T>();
 
         cards.forEach(card -> {
-            var numOfPayments = this.random.nextInt(getParam("maxNumOfPurchasesPerCard")) + 1;
+            var numOfPurchases = this.random.nextInt(getParam("maxNumOfPurchasesPerCard")) + 1;
 
-            getRandomItemsFrom(stores, numOfPayments)
+            getRandomItemsFrom(stores, numOfPurchases)
                 .forEach(store -> {
                     // Check if the store has a promotion for the card bank
                     var promotion = card.getBank().getPromotions().stream()
@@ -324,8 +344,30 @@ public class TestDataGeneratorService {
                         .findAny();
 
                     // 'store' is necessary because 'promotion' can be empty
-                    payments.add(purchaseCreator.apply(store, card, promotion));
+                    purchases.add(purchaseCreator.apply(store, card, promotion));
                 });
+        });
+
+        return purchases;
+    }
+
+    /**
+     * Generates cash payments for each purchase (cash or credit)
+     * @return
+     */
+    List<Payment> generatePayments(List<CashPurchase> cashPurchases) {
+        var payments = new ArrayList<Payment>();
+
+        // TODO Many doubts about the Payment attributes
+        cashPurchases.forEach(purchase -> {
+            payments.add(new Payment(
+                this.paymentCode.getNextValue(), 
+                Integer.toString(this.faker.number().numberBetween(1, 12)),
+                Integer.toString(this.faker.number().numberBetween(2015, Year.now().getValue() -1)),
+                LocalDate.now(),
+                LocalDate.now(),
+                0.f,
+                0.f));
         });
 
         return payments;

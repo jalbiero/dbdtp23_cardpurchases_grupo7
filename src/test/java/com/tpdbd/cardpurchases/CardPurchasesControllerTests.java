@@ -8,6 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import com.tpdbd.cardpurchases.controllers.util.Params;
 import com.tpdbd.cardpurchases.model.Discount;
 
 import io.restassured.RestAssured;
@@ -46,7 +47,7 @@ public class CardPurchasesControllerTests {
     public void testGetBanksCuits() {
         given()
             .when()
-                .get("/tests/banks/cuits")
+                .get("/test/banks/cuits")
             .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
@@ -54,15 +55,15 @@ public class CardPurchasesControllerTests {
     }
 
     @Test
-    public void testBanksGetBank() {
+    public void testGetBank() {
         var cuit = given()
-                .get("/tests/banks/cuits")
+                .get("/test/banks/cuits")
                 .jsonPath()
                 .getObject("cuits[0]", String.class);
 
         given()
             .when()
-                .get(String.format("/tests/banks/%s", cuit))
+                .get(String.format("/test/banks/%s", cuit))
             .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
@@ -81,7 +82,7 @@ public class CardPurchasesControllerTests {
 
         // Select some bank
         var cuit = given()
-                .get("/tests/banks/cuits")
+                .get("/test/banks/cuits")
                 .jsonPath()
                 .getObject("cuits[0]", String.class);
 
@@ -92,8 +93,8 @@ public class CardPurchasesControllerTests {
 
         given()
             .when()
+                .contentType(ContentType.JSON)    
                 .body(discount)
-                .contentType(ContentType.JSON)
                 .post(String.format("/banks/%s/addDiscountPromotion", cuit))
             .then()
                 .statusCode(200);
@@ -101,7 +102,7 @@ public class CardPurchasesControllerTests {
         // Check if the promotion was added to the given bank
         given()
             .when()
-                .get(String.format("/tests/banks/%s", cuit))
+                .get(String.format("/test/banks/%s", cuit))
             .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
@@ -113,5 +114,39 @@ public class CardPurchasesControllerTests {
                 .body("promotions.discountPercentage", Matchers.hasItem(DISCOUNT))
                 .body("promotions.priceCap", Matchers.hasItem(PCAP));
     }
-}
 
+    @Test
+    public void testPaymentsUpdateDate() {
+        final var NEW_DATES = new Params.PaymentDates(
+            LocalDate.of(2030, 12, 31), LocalDate.of(2040, 10, 15));
+
+        // Select some payment code
+         var code = given()
+            .get("/test/payments/codes")
+            .jsonPath()
+            .getObject("codes[0]", String.class);
+
+        // Update dates
+        given()
+            .when()
+                .contentType(ContentType.JSON)    
+                .body(NEW_DATES)
+                .put(String.format("/payments/%s/updateDates", code))
+            .then()
+                .statusCode(200);
+
+        // Check payment
+        given()
+            .when()
+                .get(String.format("/test/payments/%s", code))
+            .then()
+                .statusCode(200)
+                .contentType(ContentType.JSON)
+                .body(
+                    "firstExpiration", 
+                    Matchers.equalTo(NEW_DATES.firstExpiration().toString()))
+                .body(
+                    "secondExpiration", 
+                    Matchers.equalTo(NEW_DATES.secondExpiration().toString()));
+    }
+}
