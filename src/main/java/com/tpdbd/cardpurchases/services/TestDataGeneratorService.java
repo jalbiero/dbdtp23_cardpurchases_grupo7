@@ -102,6 +102,8 @@ public class TestDataGeneratorService {
         var cards = generateCards(banks, cardHolders);
         var cashPurchases = generateCashPurchases(stores, cards);
         var creditPurchases = generateCreditPurchases(stores, cards);
+
+        // TODO Generation of payments is incomplete due to some doubts in the model
         var cashPayments = generatePayments(cashPurchases);
         //var creditPayments = generatePayments(creditPurchases);
 
@@ -144,7 +146,7 @@ public class TestDataGeneratorService {
     }
 
     /**
-     * Generates a random list of stores where card holders can buy
+     * Generates a random list of stores where card holders can shop
      * @return
      */
     private List<Store> generateStores() {
@@ -161,7 +163,7 @@ public class TestDataGeneratorService {
      * @return
      */
     private List<Bank> generateBanks(List<Store> stores) {
-        // For the sake of clearity, generates Banks first and later 
+        // For the sake of clearity, it generates Banks first and later 
         // their promotions for each one of them
         List<Bank> banks = this.faker.collection(() -> new Bank(
                 this.faker.company().name(), 
@@ -174,7 +176,7 @@ public class TestDataGeneratorService {
 
         banks.forEach(bank -> {
             // Asumption: 
-            //   Each Bank will emit both type of promotion (Discount and 
+            //   Each Bank will emit both type of promotions (Discount and 
             //   Financing) for each promoted Store
             getRandomItemsFrom(stores, getParam("numOfPromotionsPerBank"))
                 .forEach(promotedStore -> {
@@ -284,7 +286,7 @@ public class TestDataGeneratorService {
     }
 
     /**
-     * Generates some credit purchase for each card in some random stores
+     * Generates some credit purchases for each card in some random stores
      * @param stores
      * @param cards
      * @return
@@ -356,7 +358,7 @@ public class TestDataGeneratorService {
     List<Payment> generatePayments(List<CashPurchase> cashPurchases) {
         var payments = new ArrayList<Payment>();
 
-        // TODO Many dubts about the Payment attributes
+        // TODO Many doubts about the Payment attributes
         cashPurchases.forEach(purchase -> {
             payments.add(new Payment(
                 this.paymentCode.getNextValue(), 
