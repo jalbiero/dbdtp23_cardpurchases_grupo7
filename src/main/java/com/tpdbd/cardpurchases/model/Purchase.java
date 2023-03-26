@@ -1,5 +1,8 @@
 package com.tpdbd.cardpurchases.model;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -22,6 +25,32 @@ public abstract class Purchase {
 
     private float finalAmount;
 
+    @OneToMany(cascade = CascadeType.ALL)
+    private Set<Quota> quotas;
+
+    public Purchase() {
+    }
+
+    public Purchase(
+    // @formatter:off        
+        Card card, 
+        String paymentVoucher, 
+        String store, 
+        String cuitStore, 
+        float amount, 
+        float finalAmount,
+        Set<Quota> quotas) 
+    // @formatter:on
+    {
+        this.card = card;
+        this.paymentVoucher = paymentVoucher;
+        this.store = store;
+        this.cuitStore = cuitStore;
+        this.amount = amount;
+        this.finalAmount = finalAmount;
+        this.quotas = new LinkedHashSet<Quota>();
+    }
+
     public Purchase(
     // @formatter:off        
         Card card, 
@@ -32,12 +61,7 @@ public abstract class Purchase {
         float finalAmount) 
     // @formatter:on
     {
-        this.card = card;
-        this.paymentVoucher = paymentVoucher;
-        this.store = store;
-        this.cuitStore = cuitStore;
-        this.amount = amount;
-        this.finalAmount = finalAmount;
+        this(card, paymentVoucher, store, cuitStore, amount, finalAmount, new LinkedHashSet<Quota>());
     }
 
     public Card getCard() {
@@ -49,7 +73,7 @@ public abstract class Purchase {
     }
 
     public String getPaymentVoucher() {
-        return paymentVoucher;
+        return this.paymentVoucher;
     }
 
     public void setPaymentVoucher(String paymentVoucher) {
@@ -57,7 +81,7 @@ public abstract class Purchase {
     }
 
     public String getStore() {
-        return store;
+        return this.store;
     }
 
     public void setStore(String store) {
@@ -73,7 +97,7 @@ public abstract class Purchase {
     }
 
     public float getAmount() {
-        return amount;
+        return this.amount;
     }
 
     public void setAmount(float amount) {
@@ -81,10 +105,19 @@ public abstract class Purchase {
     }
 
     public float getFinalAmount() {
-        return finalAmount;
+        return this.finalAmount;
     }
 
     public void setFinalAmount(float finalAmount) {
         this.finalAmount = finalAmount;
     }
+
+    public Set<Quota> getQuotas() {
+        return this.quotas;
+    }
+
+    public boolean addQuota(Quota quota) {
+        return this.quotas.add(quota);
+    }
 }
+
