@@ -2,6 +2,7 @@ package com.tpdbd.cardpurchases.model;
 
 import java.util.Optional;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 
 @Entity
@@ -14,22 +15,31 @@ public class Quota {
 
     private float price;
 
-    private String month;
+    private int month;
 
-    private String year;
+    private int year;
 
     @ManyToOne
     @JoinColumn
+    @Nullable
     private Payment payment;
 
     public Quota() {
     }
 
-    public Quota(int number, float price, String month, String year) {
+    public Quota(int number, float price, int month, int year) {
         this(number, price, month, year, null);
     }
 
-    public Quota(int number, float price, String month, String year, Payment payment) {
+    public Quota(
+    // @formatter:off
+        int number, 
+        float price, 
+        int month, 
+        int year, 
+        Payment payment)
+    // @formatter:on
+    {
         this.number = number;
         this.price = price;
         this.month = month;
@@ -53,19 +63,19 @@ public class Quota {
         this.price = price;
     }
 
-    public String getMonth() {
+    public int getMonth() {
         return this.month;
     }
 
-    public void setMonth(String month) {
+    public void setMonth(int month) {
         this.month = month;
     }
 
-    public String getYear() {
+    public int getYear() {
         return this.year;
     }
 
-    public void setYear(String year) {
+    public void setYear(int year) {
         this.year = year;
     }
 
