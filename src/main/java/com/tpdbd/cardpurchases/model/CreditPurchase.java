@@ -1,5 +1,8 @@
 package com.tpdbd.cardpurchases.model;
 
+import java.util.Set;
+
+import jakarta.annotation.Nullable;
 import jakarta.persistence.Entity;
 
 @Entity
@@ -7,27 +10,30 @@ public class CreditPurchase extends Purchase {
 
     private float interest;
 
-    private int numberOfQuotas;
+    //private int numberOfQuotas;
+
+    public CreditPurchase() {
+    }
 
     public CreditPurchase(
     // @formatter:off
         Card card, 
-        String paymentVoucher, 
+        @Nullable String paymentVoucher, 
         String store, 
         String cuitStore, 
         float amount,
         float finalAmount, 
         float interest, 
-        int numberOfQuotas) 
+        Set<Quota> quotas) 
     // @formatter:on
     {
-        super(card, paymentVoucher, store, cuitStore, amount, finalAmount);
+        super(card, paymentVoucher, store, cuitStore, amount, finalAmount, quotas);
         this.interest = interest;
-        this.numberOfQuotas = numberOfQuotas;
+        //this.numberOfQuotas = quotas.size();
     }
 
     public float getInterest() {
-        return interest;
+        return this.interest;
     }
 
     public void setInterest(float interest) {
@@ -35,10 +41,11 @@ public class CreditPurchase extends Purchase {
     }
 
     public int getNumberOfQuotas() {
-        return numberOfQuotas;
+        //return numberOfQuotas;
+        return this.getQuotas().size();
     }
 
-    public void setNumberOfQuotas(int numberOfQuotas) {
-        this.numberOfQuotas = numberOfQuotas;
-    }
+    // public void setNumberOfQuotas(int numberOfQuotas) {
+    //     this.numberOfQuotas = numberOfQuotas;
+    // }
 }
