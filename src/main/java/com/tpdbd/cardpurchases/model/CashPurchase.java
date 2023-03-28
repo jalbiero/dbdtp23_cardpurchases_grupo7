@@ -2,6 +2,7 @@ package com.tpdbd.cardpurchases.model;
 
 import java.util.Set;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.Entity;
 
 @Entity
@@ -15,7 +16,7 @@ public class CashPurchase extends Purchase {
     public CashPurchase(
     // @formatter:off        
         Card card, 
-        String paymentVoucher, 
+        @Nullable String paymentVoucher, 
         String store, 
         String cuitStore, 
         float amount, 
@@ -30,7 +31,7 @@ public class CashPurchase extends Purchase {
     public CashPurchase(
     // @formatter:off        
         Card card, 
-        String paymentVoucher, 
+        @Nullable String paymentVoucher, 
         String store, 
         String cuitStore, 
         float amount, 
