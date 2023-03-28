@@ -48,6 +48,7 @@ $ mvn spring-boot:run
   - Para aislar la funcionalidad pedida de lo que se necesita para probarla se decidió dividir las capas de controladores y servicios en 2 partes:
     1. El controlador `CardPurchasesController` y su servicio asociado `CardPurchasesService` implementan solamente lo que se pide como tarea.
     2. El controlador `TestController` y su servicio asociado `TestService` implementan funcionalidad necesaria para probar lo pedido en la tarea. En una aplicación completa lo pedido sería sólo una parte del total, el cual se complementaría con lo que está en `TestController/TestService`.
+- En la clase `Quota`, por conveniencia, se cambiaron los tipos de datos de los attributos `month`y `year`, ambos originalmente `String` a `int`
 
 - TODO 
   
