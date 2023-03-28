@@ -9,11 +9,14 @@ public class Payment {
     @GeneratedValue
     private Long id;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Purchase purchase;
+
     private String code;
 
-    private String month;
+    private int month;
 
-    private String year;
+    private int year;
 
     private LocalDate firstExpiration;
 
@@ -22,16 +25,15 @@ public class Payment {
     private float surchase; // TODO "Purchase or Surcharge" ?
 
     private float totalPrice;
-
+   
     public Payment() {
-        
     }
 
     public Payment(
     // @formatter:off        
         String code, 
-        String month, 
-        String year, 
+        int month, 
+        int year, 
         LocalDate firstExpiration, 
         LocalDate secondExpiration,
         float surchase, 
@@ -47,27 +49,35 @@ public class Payment {
         this.totalPrice = totalPrice;
     }
 
+    public Purchase getPurchase() {
+        return this.purchase;
+    }
+
+    public void setPurchase(Purchase purchase) {
+        this.purchase = purchase;
+    }
+
     public String getCode() {
-        return code;
+        return this.code;
     }
 
     public void setCode(String code) {
         this.code = code;
     }
 
-    public String getMonth() {
-        return month;
+    public int getMonth() {
+        return this.month;
     }
 
-    public void setMonth(String month) {
+    public void setMonth(int month) {
         this.month = month;
     }
 
-    public String getYear() {
-        return year;
+    public int getYear() {
+        return this.year;
     }
 
-    public void setYear(String year) {
+    public void setYear(int year) {
         this.year = year;
     }
 
