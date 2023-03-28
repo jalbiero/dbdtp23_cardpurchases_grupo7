@@ -10,7 +10,9 @@ public class Discount extends Promotion {
 
     private float priceCap;
 
-    private boolean onlyCash;
+    // TODO What's the meaning of this attribute? It's suppsed that a "Discount"
+    // promotion only applies to cash purchases
+    private boolean onlyCash; 
 
     public Discount() {
     }
