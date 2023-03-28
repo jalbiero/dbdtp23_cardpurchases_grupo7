@@ -1,8 +1,11 @@
 package com.tpdbd.cardpurchases.model;
 
+import java.util.Collections;
 import java.util.LinkedHashSet;
+import java.util.Optional;
 import java.util.Set;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 
 @Entity
@@ -15,6 +18,7 @@ public abstract class Purchase {
     @ManyToOne
     private Card card;
 
+    @Column(nullable = true)
     private String paymentVoucher;
 
     private String store;
@@ -34,7 +38,7 @@ public abstract class Purchase {
     public Purchase(
     // @formatter:off        
         Card card, 
-        String paymentVoucher, 
+        @Nullable String paymentVoucher, 
         String store, 
         String cuitStore, 
         float amount, 
@@ -48,13 +52,13 @@ public abstract class Purchase {
         this.cuitStore = cuitStore;
         this.amount = amount;
         this.finalAmount = finalAmount;
-        this.quotas = new LinkedHashSet<Quota>();
+        this.quotas = quotas;
     }
 
     public Purchase(
     // @formatter:off        
         Card card, 
-        String paymentVoucher, 
+        @Nullable String paymentVoucher, 
         String store, 
         String cuitStore, 
         float amount, 
@@ -72,8 +76,8 @@ public abstract class Purchase {
         this.card = card;
     }
 
-    public String getPaymentVoucher() {
-        return this.paymentVoucher;
+    public Optional<String> getPaymentVoucher() {
+        return Optional.ofNullable(this.paymentVoucher);
     }
 
     public void setPaymentVoucher(String paymentVoucher) {
@@ -113,11 +117,15 @@ public abstract class Purchase {
     }
 
     public Set<Quota> getQuotas() {
-        return this.quotas;
+        return Collections.unmodifiableSet(this.quotas);
     }
 
     public boolean addQuota(Quota quota) {
         return this.quotas.add(quota);
+    }
+
+    public boolean removeQuota(Quota quota) {
+        return this.quotas.remove(quota);
     }
 }
 
