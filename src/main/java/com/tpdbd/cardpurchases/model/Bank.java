@@ -1,5 +1,6 @@
 package com.tpdbd.cardpurchases.model;
 
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -70,12 +71,15 @@ public class Bank {
     }
 
     public Set<Promotion> getPromotions() {
-        return promotions;
+        return Collections.unmodifiableSet(this.promotions);
     }
 
-    public Bank addPromotion(Promotion promotion) {
-        this.promotions.add(promotion);
-        return this; // to allow chaining multiple addPromotion
+    public boolean addPromotion(Promotion promotion) {
+        return this.promotions.add(promotion);
+    }
+
+    public boolean removePromotion(Promotion promotion) {
+        return this.promotions.remove(promotion);
     }
 
     @Override
