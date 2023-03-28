@@ -1,13 +1,19 @@
 package com.tpdbd.cardpurchases.services;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.Year;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Random;
+import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Function;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -19,10 +25,10 @@ import com.tpdbd.cardpurchases.model.CardHolder;
 import com.tpdbd.cardpurchases.model.CashPurchase;
 import com.tpdbd.cardpurchases.model.Discount;
 import com.tpdbd.cardpurchases.model.Financing;
-import com.tpdbd.cardpurchases.model.Payment;
 import com.tpdbd.cardpurchases.model.CreditPurchase;
 import com.tpdbd.cardpurchases.model.Promotion;
 import com.tpdbd.cardpurchases.model.Purchase;
+import com.tpdbd.cardpurchases.model.Quota;
 import com.tpdbd.cardpurchases.repositories.BankRepository;
 import com.tpdbd.cardpurchases.repositories.CardHolderRepository;
 import com.tpdbd.cardpurchases.repositories.CardRepository;
@@ -30,6 +36,7 @@ import com.tpdbd.cardpurchases.repositories.PaymentRepository;
 import com.tpdbd.cardpurchases.repositories.PurchaseRepository;
 import com.tpdbd.cardpurchases.util.TriFunction;
 
+import jakarta.annotation.Nullable;
 import net.datafaker.Faker;
 
 // @formatter:off
@@ -104,7 +111,7 @@ public class TestDataGeneratorService {
         var creditPurchases = generateCreditPurchases(stores, cards);
 
         // TODO Generation of payments is incomplete due to some doubts in the model
-        var cashPayments = generatePayments(cashPurchases);
+        //var cashPayments = generatePayments(cashPurchases);
         //var creditPayments = generatePayments(creditPurchases);
 
         this.bankRepository.saveAll(banks);
@@ -112,16 +119,64 @@ public class TestDataGeneratorService {
         this.cardRepository.saveAll(cards);
         this.cashRepository.saveAll(cashPurchases);
         this.creaditRepository.saveAll(creditPurchases);
-        this.paymentRepository.saveAll(cashPayments);
+        //this.paymentRepository.saveAll(cashPayments);
     }
 
     //
     // Internal helpers
     //
 
-    private int getParam(String name) {
+    private <T> T getParam(String name, Class<T> retType, T defValue) {
         return this.environment.getProperty(
-            String.format("application.testData.%s", name), Integer.class, 0);
+            String.format("application.testData.%s", name), retType, defValue);
+    }
+
+    private int getIntParam(String name) {
+        return getParam(name, Integer.class, 0);
+    }
+
+    private String getStrParam(String name) {
+        return getParam(name, String.class, "");
+    }
+
+    /**
+     * Get a fake date based on limits given by property file. This 
+     * function is a wrapper over Faker.date().between(...) because the
+     * library still uses the old Date class :-(
+     * @param minDate Use this date instead of the one from configuration
+     * @param maxDate Use this date instead of the one from configuration
+     * @return
+     */
+    private LocalDate getFakeDate(@Nullable LocalDate minDate, @Nullable LocalDate maxDate) {
+        Function<String, Date> getDate = (param) -> {
+            try {
+                var sdf = new SimpleDateFormat("dd/MM/yyyy");
+                return sdf.parse(getStrParam(param));  
+            }
+            catch (ParseException e) {
+                return new Date();
+            }
+        };
+
+        var fromDate = minDate == null
+            ? getDate.apply("minDate")
+            : Date.from(minDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+        var toDate = maxDate == null
+            ? getDate.apply("maxDate")
+            : Date.from(maxDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+        return LocalDate.ofInstant(
+            this.faker.date().between(fromDate, toDate).toInstant(), 
+            ZoneId.systemDefault());
+    }
+
+    private LocalDate getFakeDate() {
+        return getFakeDate(null, null);
+    }
+
+    private LocalDate getFakeDate(LocalDate minDate) {
+        return getFakeDate(minDate, null);
     }
 
     /**
@@ -154,7 +209,7 @@ public class TestDataGeneratorService {
                 this.faker.company().name(), 
                 this.cuitGenerator.getNextValue())
             )
-            .len(getParam("numOfStores"))
+            .len(getIntParam("numOfStores"))
             .generate();
     }
 
@@ -171,38 +226,42 @@ public class TestDataGeneratorService {
                 this.faker.address().fullAddress(), 
                 this.faker.phoneNumber().phoneNumber())
             )
-            .len(getParam("numOfBanks"))
+            .len(getIntParam("numOfBanks"))
             .generate();
 
         banks.forEach(bank -> {
             // Asumption: 
             //   Each Bank will emit both type of promotions (Discount and 
             //   Financing) for each promoted Store
-            getRandomItemsFrom(stores, getParam("numOfPromotionsPerBank"))
+            getRandomItemsFrom(stores, getIntParam("numOfPromotionsPerBank"))
                 .forEach(promotedStore -> {
+                    var validityStart = getFakeDate();
+                    var validityEnd = getFakeDate(validityStart);
+
                     bank.addPromotion(new Discount(
                         this.promotionCode.getNextValue(), 
                         this.faker.company().catchPhrase(), 
                         promotedStore.name(), 
                         promotedStore.cuit(), 
-                        LocalDate.now(), 
-                        // valid between 1 and 6 months
-                        LocalDate.now().plusMonths(this.faker.number().numberBetween(1, 6)),  
+                        validityStart,
+                        validityEnd, 
                         faker.theItCrowd().characters(),
                         // discount between 1% and 15%
                         faker.number().numberBetween(1, 15) / 100.f, 
-                        // cap price betwee 5000-10000
+                        // cap price between 5000-10000
                         faker.number().numberBetween(5_000, 10_000), 
                         true));
+
+                    validityStart = getFakeDate();
+                    validityEnd = getFakeDate(validityStart);
     
                     bank.addPromotion(new Financing(
                         this.promotionCode.getNextValue(), 
                         this.faker.company().catchPhrase(), 
                         promotedStore.name(), 
                         promotedStore.cuit(), 
-                        LocalDate.now(), 
-                        // valid between 1 and 6 months
-                        LocalDate.now().plusMonths(this.faker.number().numberBetween(1, 6)), 
+                        validityStart,
+                        validityEnd, 
                         faker.theItCrowd().actors(),
                         // number of quotas (1 to 6)
                         this.faker.number().numberBetween(1, 6), 
@@ -225,12 +284,9 @@ public class TestDataGeneratorService {
                 Integer.toString(this.faker.number().positive()), 
                 this.faker.address().fullAddress(), 
                 this.faker.phoneNumber().cellPhone(), 
-                LocalDate.of( 
-                    this.faker.number().numberBetween(2000, 2015),
-                    this.faker.number().numberBetween(1, 12),
-                    this.faker.number().numberBetween(1, 30)))
+                getFakeDate())
             )
-            .len(getParam("numOfCardHolders"))
+            .len(getIntParam("numOfCardHolders"))
             .generate();
     }
 
@@ -244,15 +300,18 @@ public class TestDataGeneratorService {
         var cards = new ArrayList<Card>();
 
         cardHolders.forEach(cardHolder -> {
-            getRandomItemsFrom(banks, getParam("maxNumOfCardsPerUser"))
+            getRandomItemsFrom(banks, getIntParam("maxNumOfCardsPerUser"))
                 .forEach(bank -> {
+                    var since = getFakeDate(cardHolder.getEntry());
+                    var expiration = this.faker.number().numberBetween(1, getIntParam("maxCardExpirationYears"));
+
                     cards.add(new Card(
                         bank,
                         cardHolder,
                         this.faker.business().creditCardNumber(),
                         this.faker.business().securityCode(),
-                        LocalDate.now(),
-                        LocalDate.now().plusMonths(36)
+                        since,
+                        since.plusYears(expiration)
                     ));
                 });
             });
@@ -267,21 +326,40 @@ public class TestDataGeneratorService {
      * @return
      */
     private List<CashPurchase> generateCashPurchases(List<Store> stores, List<Card> cards) {
-        return generatePurchases(stores, cards, Discount.class, 
+        return generatePurchases(
+            stores, 
+            cards, 
+            Discount.class, 
             (store, card, promo) -> {
-                var voucher = promo.map(Discount::getCode).orElse(null);                        
-                var amount = (float)this.faker.number().randomDouble(2, 1000, 50000);
-                var storeDiscount = promo.map(Discount::getDiscountPercentage).orElse(0.0f);
-                var finalAmount = amount * (1 - storeDiscount);
+                var voucher = promo.map(Discount::getCode).orElse(null);
+                var priceCap = promo.map(Discount::getPriceCap).orElse(0.f);                       
+                var storeDiscount = promo.map(Discount::getDiscountPercentage).orElse(0.f);
+                // TODO Discount::isOnlyCash, see comments about its underlying attribute
 
-                return new CashPurchase(
+                var amount = (float)this.faker.number().randomDouble(2, 1000, 50000);
+                var finalDiscount = amount <= priceCap ? storeDiscount : 0.f;
+                var finalAmount = amount * (1 - finalDiscount);
+
+                var purchaseDate = getFakeDate(card.getSince());
+                var paymentDate = purchaseDate.plusMonths(1);
+
+                var quota = new Quota(
+                    1, 
+                    finalAmount, 
+                    paymentDate.getMonthValue(),
+                    paymentDate.getYear());
+
+                var purchase = new CashPurchase(
                     card, 
                     voucher,
                     store.name(), 
                     store.cuit(), 
                     amount, 
                     finalAmount,
-                    storeDiscount);
+                    storeDiscount,
+                    quota);
+
+                 return purchase;
             });
     }
 
@@ -295,10 +373,18 @@ public class TestDataGeneratorService {
         return generatePurchases(stores, cards, Financing.class, 
             (store, card, promo) -> {
                 var voucher = promo.map(Financing::getCode).orElse(null);
-                var amount = (float)this.faker.number().randomDouble(2, 1000, 50000);
                 var interest = promo.map(Financing::getInterest).orElse(0.f);
-                var finalAmount = amount * (1 + interest); // TODO I am not sure about this
                 var numOfQuotas = promo.map(Financing::getNumberOfQuotas).orElse(0);
+
+                var amount = (float)this.faker.number().randomDouble(2, 1000, 50000);
+
+                // TODO I am not sure about this:
+                //    1- does interest depends on the number of quotas?
+                //    2- Is is just a plain interest aplicable to amount? (like below)
+                var finalAmount = amount * (1 + interest); 
+                
+                // The number of quotas must be less than months(card.getExpiration() - card.getSince())
+                var quotas = generateQuotas(numOfQuotas, card.getSince(), finalAmount);
 
                 return new CreditPurchase(
                     card, 
@@ -308,7 +394,7 @@ public class TestDataGeneratorService {
                     amount, 
                     finalAmount,
                     interest,
-                    numOfQuotas);
+                    quotas);
             });
     }
 
@@ -331,7 +417,7 @@ public class TestDataGeneratorService {
         var purchases = new ArrayList<T>();
 
         cards.forEach(card -> {
-            var numOfPurchases = this.random.nextInt(getParam("maxNumOfPurchasesPerCard")) + 1;
+            var numOfPurchases = this.random.nextInt(getIntParam("maxNumOfPurchasesPerCard")) + 1;
 
             getRandomItemsFrom(stores, numOfPurchases)
                 .forEach(store -> {
@@ -351,25 +437,26 @@ public class TestDataGeneratorService {
         return purchases;
     }
 
-    /**
-     * Generates cash payments for each purchase (cash or credit)
-     * @return
-     */
-    List<Payment> generatePayments(List<CashPurchase> cashPurchases) {
-        var payments = new ArrayList<Payment>();
+    private Set<Quota> generateQuotas(int numOfQuotas, LocalDate since, float finalAmount) {
+        var quotas = new LinkedHashSet<Quota>();
 
-        // TODO Many doubts about the Payment attributes
-        cashPurchases.forEach(purchase -> {
-            payments.add(new Payment(
-                this.paymentCode.getNextValue(), 
-                Integer.toString(this.faker.number().numberBetween(1, 12)),
-                Integer.toString(this.faker.number().numberBetween(2015, Year.now().getValue() -1)),
-                LocalDate.now(),
-                LocalDate.now(),
-                0.f,
-                0.f));
-        });
+        if (numOfQuotas == 0) 
+            return quotas;
 
-        return payments;
+        var shopDate = getFakeDate(since);
+        var amountPerQuota = finalAmount / numOfQuotas;
+
+        for (int i=1; i <= numOfQuotas; i++) {
+            // Each quota is set to the following month of the previous one
+            var quotaDate = shopDate.plusMonths(i);
+
+            quotas.add(new Quota(
+                i, 
+                amountPerQuota, 
+                quotaDate.getMonthValue(),
+                quotaDate.getYear()));
+        }
+
+        return quotas;
     }
 }
