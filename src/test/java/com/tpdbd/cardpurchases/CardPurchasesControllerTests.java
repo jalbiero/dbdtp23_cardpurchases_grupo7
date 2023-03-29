@@ -9,7 +9,6 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.tpdbd.cardpurchases.controllers.util.Params;
-import com.tpdbd.cardpurchases.model.Discount;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -87,7 +86,7 @@ public class CardPurchasesControllerTests {
                 .getObject("cuits[0]", String.class);
 
         // Add a new promotion
-        var discount = new Discount(
+        var discount = new Params.Discount(
             CODE, TITLE, NAME, CUIT, LocalDate.now(), LocalDate.now().plusMonths(3), 
             COMMENT, DISCOUNT, PCAP, true);
 

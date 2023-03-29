@@ -2,17 +2,20 @@ package com.tpdbd.cardpurchases.services;
 
 import java.time.LocalDate;
 
-import com.tpdbd.cardpurchases.model.Discount;
+import com.tpdbd.cardpurchases.controllers.util.Params;
+
 
 public interface CardPurchasesService {
     // 1 Agregar una nueva promoción de tipo descuento a un banco dado
-    void banksAddDiscountPromotion(String cuit, Discount discount);
+    void banksAddDiscountPromotion(String cuit, Params.Discount discount);
 
     // 2 Editar las fecha de vencimiento de un pago con cierto código.
     void paymentsUpdateDates(String code, LocalDate firstExpiration, LocalDate secondExpiration);
 
     // 3 Generar el total de pago de un mes dado, informando las compras
     // correspondientes
+
+    // TODO ¿Total de pago por tarjeta o por usuario o por banco o global a todo?
 
     // 4 Obtener el listado de tarjetas que vencen en los siguientes 30 días.
 

@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.tpdbd.cardpurchases.controllers.util.Params;
-import com.tpdbd.cardpurchases.model.Discount;
 import com.tpdbd.cardpurchases.services.CardPurchasesService;
 
 
@@ -24,7 +23,7 @@ public class CardPurchasesController {
     }
 
     @PostMapping("/banks/{cuit}/addDiscountPromotion")
-    void banksAddDiscountPromotion(@PathVariable String cuit, @RequestBody Discount discount) {
+    void banksAddDiscountPromotion(@PathVariable String cuit, @RequestBody Params.Discount discount) {
         this.service.banksAddDiscountPromotion(cuit, discount);
     }
 
