@@ -11,6 +11,9 @@ public class Quota {
     @GeneratedValue
     private Long id;
 
+    @ManyToOne
+    private Purchase purchase;
+
     private int number;
 
     private float price;
@@ -20,19 +23,20 @@ public class Quota {
     private int year;
 
     @ManyToOne
-    @JoinColumn
+    @JoinColumn(nullable = true)
     @Nullable
     private Payment payment;
 
     public Quota() {
     }
 
-    public Quota(int number, float price, int month, int year) {
-        this(number, price, month, year, null);
+    public Quota(Purchase purchase, int number, float price, int month, int year) {
+        this(purchase, number, price, month, year, null);
     }
 
     public Quota(
     // @formatter:off
+        Purchase purchase,
         int number, 
         float price, 
         int month, 
@@ -45,6 +49,14 @@ public class Quota {
         this.month = month;
         this.year = year;
         this.payment = payment;
+    }
+
+    public Purchase getPurchase() {
+        return this.purchase;
+    }
+
+    public void setPurchase(Purchase purchase) {
+        this.purchase = purchase;
     }
 
     public int getNumber() {
@@ -85,5 +97,11 @@ public class Quota {
 
     public void setPayment(Payment payment) {
         this.payment = payment;
+    }
+
+    @Override
+    public String toString() {
+        return "Quota [id=" + id + ", purchase=" + purchase + ", number=" + number + ", price=" + price + ", month="
+                + month + ", year=" + year + ", payment=" + payment + "]";
     }
 }

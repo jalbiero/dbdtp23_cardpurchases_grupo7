@@ -42,8 +42,7 @@ public abstract class Purchase {
         String store, 
         String cuitStore, 
         float amount, 
-        float finalAmount,
-        Set<Quota> quotas) 
+        float finalAmount) 
     // @formatter:on
     {
         this.card = card;
@@ -52,20 +51,7 @@ public abstract class Purchase {
         this.cuitStore = cuitStore;
         this.amount = amount;
         this.finalAmount = finalAmount;
-        this.quotas = quotas;
-    }
-
-    public Purchase(
-    // @formatter:off        
-        Card card, 
-        @Nullable String paymentVoucher, 
-        String store, 
-        String cuitStore, 
-        float amount, 
-        float finalAmount) 
-    // @formatter:on
-    {
-        this(card, paymentVoucher, store, cuitStore, amount, finalAmount, new LinkedHashSet<Quota>());
+        this.quotas = new LinkedHashSet<Quota>();
     }
 
     public Card getCard() {
@@ -127,5 +113,11 @@ public abstract class Purchase {
     public boolean removeQuota(Quota quota) {
         return this.quotas.remove(quota);
     }
-}
 
+    @Override
+    public String toString() {
+        return "Purchase [id=" + id + ", card=" + card + ", paymentVoucher=" + paymentVoucher + ", store=" + store
+                + ", cuitStore=" + cuitStore + ", amount=" + amount + ", finalAmount=" + finalAmount + ", quotas="
+                + quotas + "]";
+    }
+}

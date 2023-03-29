@@ -4,6 +4,8 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -21,21 +23,18 @@ public class Bank {
     private String telephone;
 
     @OneToMany(cascade = CascadeType.ALL)
+    @JsonManagedReference
     private Set<Promotion> promotions;
 
     public Bank() {
     }
 
     public Bank(String name, String cuit, String address, String telephone) {
-        this(name, cuit, address, telephone, new LinkedHashSet<Promotion>());
-    }
-
-    public Bank(String name, String cuit, String address, String telephone, Set<Promotion> promotions) {
         this.name = name;
         this.cuit = cuit;
         this.address = address;
         this.telephone = telephone;
-        this.promotions = promotions;
+        this.promotions = new LinkedHashSet<Promotion>();
     }
 
     public String getName() {
@@ -87,5 +86,5 @@ public class Bank {
         return "Bank [id=" + id + ", name=" + name + ", cuit=" + cuit + ", address=" + address + ", telephone="
                 + telephone + ", promotions=" + promotions + "]";
     }
-
+   
 }

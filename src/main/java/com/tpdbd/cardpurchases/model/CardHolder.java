@@ -21,6 +21,9 @@ public class CardHolder {
 
     private LocalDate entry;
 
+    public CardHolder() {
+    }
+
     public CardHolder(
     // @formatter:off
         String completeName, 
@@ -85,5 +88,11 @@ public class CardHolder {
 
     public void setEntry(LocalDate entry) {
         this.entry = entry;
+    }
+
+    @Override
+    public String toString() {
+        return "CardHolder [id=" + id + ", completeName=" + completeName + ", dni=" + dni + ", cuil=" + cuil
+                + ", address=" + address + ", telephone=" + telephone + ", entry=" + entry + "]";
     }
 }

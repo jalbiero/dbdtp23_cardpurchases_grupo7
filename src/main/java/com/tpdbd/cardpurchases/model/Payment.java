@@ -1,6 +1,10 @@
 package com.tpdbd.cardpurchases.model;
 
 import java.time.LocalDate;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -8,9 +12,6 @@ public class Payment {
     @Id
     @GeneratedValue
     private Long id;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Purchase purchase;
 
     private String code;
 
@@ -25,7 +26,10 @@ public class Payment {
     private float surchase; // TODO "Purchase or Surcharge" ?
 
     private float totalPrice;
-   
+
+    @OneToMany(cascade = CascadeType.ALL)
+    private Set<Quota> quotas;
+
     public Payment() {
     }
 
@@ -47,14 +51,7 @@ public class Payment {
         this.secondExpiration = secondExpiration;
         this.surchase = surchase;
         this.totalPrice = totalPrice;
-    }
-
-    public Purchase getPurchase() {
-        return this.purchase;
-    }
-
-    public void setPurchase(Purchase purchase) {
-        this.purchase = purchase;
+        this.quotas = new LinkedHashSet<Quota>();
     }
 
     public String getCode() {
@@ -82,7 +79,7 @@ public class Payment {
     }
 
     public LocalDate getFirstExpiration() {
-        return firstExpiration;
+        return this.firstExpiration;
     }
 
     public void setFirstExpiration(LocalDate firstExpiration) {
@@ -90,7 +87,7 @@ public class Payment {
     }
 
     public LocalDate getSecondExpiration() {
-        return secondExpiration;
+        return this.secondExpiration;
     }
 
     public void setSecondExpiration(LocalDate secondExpiration) {
@@ -98,7 +95,7 @@ public class Payment {
     }
 
     public float getSurchase() {
-        return surchase;
+        return this.surchase;
     }
 
     public void setSurchase(float surchase) {
@@ -106,10 +103,30 @@ public class Payment {
     }
 
     public float getTotalPrice() {
-        return totalPrice;
+        return this.totalPrice;
     }
 
     public void setTotalPrice(float totalPrice) {
         this.totalPrice = totalPrice;
     }
+
+    public Set<Quota> getQuotas() {
+        return Collections.unmodifiableSet(this.quotas);
+    }
+
+    public void addPurchase(Quota quota) {
+        this.quotas.add(quota);
+    }
+
+    public void removePurchase(Quota quota) {
+        this.quotas.remove(quota);
+    }
+
+    @Override
+    public String toString() {
+        return "Payment [id=" + id + ", code=" + code + ", month=" + month + ", year=" + year + ", firstExpiration="
+                + firstExpiration + ", secondExpiration=" + secondExpiration + ", surchase=" + surchase
+                + ", totalPrice=" + totalPrice + ", quotas=" + quotas + "]";
+    }
+
 }

@@ -1,6 +1,7 @@
 package com.tpdbd.cardpurchases.model;
 
 import java.time.LocalDate;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -24,6 +25,9 @@ public class Card {
     private LocalDate since;
 
     private LocalDate expirationDate;
+
+    public Card() {
+    }
 
     public Card(
     // @formatter:off        
@@ -99,5 +103,12 @@ public class Card {
 
     public void setExpirationDate(LocalDate expirationDate) {
         this.expirationDate = expirationDate;
+    }
+
+    @Override
+    public String toString() {
+        return "Card [id=" + id + ", bank=" + bank + ", cardHolder=" + cardHolder + ", number=" + number + ", ccv="
+                + ccv + ", cardholderNameInCard=" + cardholderNameInCard + ", since=" + since + ", expirationDate="
+                + expirationDate + "]";
     }
 }

@@ -1,7 +1,5 @@
 package com.tpdbd.cardpurchases.model;
 
-import java.util.Set;
-
 import jakarta.annotation.Nullable;
 import jakarta.persistence.Entity;
 
@@ -10,7 +8,7 @@ public class CreditPurchase extends Purchase {
 
     private float interest;
 
-    //private int numberOfQuotas;
+    private int numberOfQuotas;
 
     public CreditPurchase() {
     }
@@ -23,13 +21,13 @@ public class CreditPurchase extends Purchase {
         String cuitStore, 
         float amount,
         float finalAmount, 
-        float interest, 
-        Set<Quota> quotas) 
+        float interest,
+        int numberOfQuotas)
     // @formatter:on
     {
-        super(card, paymentVoucher, store, cuitStore, amount, finalAmount, quotas);
+        super(card, paymentVoucher, store, cuitStore, amount, finalAmount);
         this.interest = interest;
-        //this.numberOfQuotas = quotas.size();
+        this.numberOfQuotas = numberOfQuotas;
     }
 
     public float getInterest() {
@@ -41,11 +39,21 @@ public class CreditPurchase extends Purchase {
     }
 
     public int getNumberOfQuotas() {
-        //return numberOfQuotas;
-        return this.getQuotas().size();
+        return this.numberOfQuotas;
     }
 
+    @Override
+    public boolean addQuota(Quota quota) {
+        if (getQuotas().size() < this.numberOfQuotas)
+            return super.addQuota(quota);
+
+        return false;
+    }
+
+    // TODO Just for now, the number of quotas cannot be changed, because if the
+    // number is less than getQuotas().size() it will be necessary to remove some
+    // quotas, which ones?
     // public void setNumberOfQuotas(int numberOfQuotas) {
-    //     this.numberOfQuotas = numberOfQuotas;
+    // this.numberOfQuotas = numberOfQuotas;
     // }
 }
