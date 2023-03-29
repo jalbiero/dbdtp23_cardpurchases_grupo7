@@ -7,7 +7,20 @@ import java.time.LocalDate;
  * 'model' are not enough)
  */
 public interface Params {
+    record Discount(
+        String code, 
+        String promotionTitle, 
+        String nameStore, 
+        String cuitStore, 
+        LocalDate validityStartDate,
+        LocalDate validityEndDate, 
+        String comments, 
+        float discountPercentage, 
+        float priceCap, 
+        boolean onlyCash) {}
 
-    record PaymentDates(LocalDate firstExpiration, LocalDate secondExpiration) {}
+    record PaymentDates(
+        LocalDate firstExpiration, 
+        LocalDate secondExpiration) {}
     
 }
