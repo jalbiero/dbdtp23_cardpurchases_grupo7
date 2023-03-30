@@ -4,16 +4,17 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Random;
-import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -25,6 +26,7 @@ import com.tpdbd.cardpurchases.model.CardHolder;
 import com.tpdbd.cardpurchases.model.CashPurchase;
 import com.tpdbd.cardpurchases.model.Discount;
 import com.tpdbd.cardpurchases.model.Financing;
+import com.tpdbd.cardpurchases.model.Payment;
 import com.tpdbd.cardpurchases.model.CreditPurchase;
 import com.tpdbd.cardpurchases.model.Promotion;
 import com.tpdbd.cardpurchases.model.Purchase;
@@ -34,46 +36,26 @@ import com.tpdbd.cardpurchases.repositories.CardHolderRepository;
 import com.tpdbd.cardpurchases.repositories.CardRepository;
 import com.tpdbd.cardpurchases.repositories.PaymentRepository;
 import com.tpdbd.cardpurchases.repositories.PurchaseRepository;
+import com.tpdbd.cardpurchases.util.SequenceGenerator;
 import com.tpdbd.cardpurchases.util.TriFunction;
 
 import jakarta.annotation.Nullable;
+import jakarta.transaction.Transactional;
 import net.datafaker.Faker;
 
 // @formatter:off
 
-/** 
- * Very simple sequence generator
- */
-class Sequence {
-    private int value;
-    private String prefix;
-
-    public Sequence() {
-        this(0, "");
-    }
-
-    public Sequence(int initialValue) {
-        this(initialValue, "");
-    }
-
-    public Sequence(String prefix) {
-        this(0, prefix);
-    }
-
-    public Sequence(int initialValue, String prefix) {
-        this.value = initialValue;
-        this.prefix= prefix;
-    }
-
-    String getNextValue() {
-        return String.format("%s%d", this.prefix, this.value++);
-    }
-}
 
 /**
  * Store entity
  */
 record Store(String name, String cuit) {
+}
+
+/**
+ * Key for groupping payments
+ */
+record PaymentPeriod(Integer month, Integer year) {
 }
 
 @Service
@@ -83,15 +65,15 @@ public class TestDataGeneratorService {
     @Autowired private CardHolderRepository cardHolderRepository;
     @Autowired private CardRepository cardRepository;
     @Autowired private PurchaseRepository<CashPurchase> cashRepository; 
-    @Autowired private PurchaseRepository<CreditPurchase> creaditRepository; 
+    @Autowired private PurchaseRepository<CreditPurchase> creditRepository; 
     @Autowired private PaymentRepository paymentRepository; 
 
     private Random random = new Random(0); // all is "repeatable"
     private Faker faker; 
 
-    private Sequence cuitGenerator = new Sequence();
-    private Sequence promotionCode = new Sequence("promo");
-    private Sequence paymentCode = new Sequence("payment");
+    private SequenceGenerator cuitGenerator = new SequenceGenerator();
+    private SequenceGenerator promotionCode = new SequenceGenerator("promo");
+    private SequenceGenerator paymentCode = new SequenceGenerator("payment");
 
     public TestDataGeneratorService() {
         var locale = new Locale.Builder()
@@ -102,6 +84,7 @@ public class TestDataGeneratorService {
         this.faker = new Faker(locale, this.random);
     }
 
+    @Transactional
     public void generateData() {
         var stores = generateStores();
         var banks = generateBanks(stores);
@@ -109,17 +92,14 @@ public class TestDataGeneratorService {
         var cards = generateCards(banks, cardHolders);
         var cashPurchases = generateCashPurchases(stores, cards);
         var creditPurchases = generateCreditPurchases(stores, cards);
-
-        // TODO Generation of payments is incomplete due to some doubts in the model
-        //var cashPayments = generatePayments(cashPurchases);
-        //var creditPayments = generatePayments(creditPurchases);
+        var payments = generatePayments2(Stream.concat(cashPurchases.stream(), creditPurchases.stream()));
 
         this.bankRepository.saveAll(banks);
         this.cardHolderRepository.saveAll(cardHolders);
         this.cardRepository.saveAll(cards);
         this.cashRepository.saveAll(cashPurchases);
-        this.creaditRepository.saveAll(creditPurchases);
-        //this.paymentRepository.saveAll(cashPayments);
+        this.creditRepository.saveAll(creditPurchases);
+        //this.paymentRepository.saveAll(payments);
     }
 
     //
@@ -154,6 +134,11 @@ public class TestDataGeneratorService {
                 return sdf.parse(getStrParam(param));  
             }
             catch (ParseException e) {
+                // TODO Add a proper logger instead of this console output
+                System.err.println((
+                    String.format("Invalid syntax for parameter = %s, value = %s, error = %s", 
+                        param, getStrParam(param), e)));
+
                 return new Date();
             }
         };
@@ -180,21 +165,31 @@ public class TestDataGeneratorService {
     }
 
     /**
-     * Get random items from a list, very simple implementation for small lists
+     * Get random items from a list. It is a very simple implementation especially 
+     * suitable for 'numOfItems' to be much smaller than data.size() (otherwise this 
+     * function will be very slow, see internal todo)
      * @param <T>
      * @param data
      * @param numOfItems
      * @return
      */
-    private <T> List<T> getRandomItemsFrom(List<T> data, int numOfItems) {
+    public <T> List<T> getRandomItemsFrom(List<T> data, int numOfItems) {
         var uniqueIndexes = new TreeSet<Integer>();
         var result = new ArrayList<T>();
 
+        if (data.size() < numOfItems)
+            return data;
+
+        // TODO For numOfItems / data.size() > 0.5 the implementation
+        //      should be the opposite: select the items to be removed from 'data'
+
         this.random.ints(0, data.size())
-            .takeWhile(index -> !uniqueIndexes.contains(index))
+            .takeWhile(index -> uniqueIndexes.size() < numOfItems)
             .forEach(index -> {
-                uniqueIndexes.add(index);
-                result.add(data.get(index));
+                if (!uniqueIndexes.contains(index)) {
+                    uniqueIndexes.add(index);
+                    result.add(data.get(index));
+                }
             });
 
         return result;
@@ -231,14 +226,18 @@ public class TestDataGeneratorService {
 
         banks.forEach(bank -> {
             // Asumption: 
-            //   Each Bank will emit both type of promotions (Discount and 
-            //   Financing) for each promoted Store
-            getRandomItemsFrom(stores, getIntParam("numOfPromotionsPerBank"))
+            //   - Each Bank will emit both types of promotions (Discount and 
+            //     Financing) for each promoted Store, so at most, maxNumOfPromotionsPerBank * 2.
+            //   - All banks use the same generator of promotion codes, so 
+            //     promotions across all banks have a unique code.
+            getRandomItemsFrom(stores, this.faker.number().numberBetween(1, getIntParam("maxNumOfPromotionsPerBank")))
                 .forEach(promotedStore -> {
                     var validityStart = getFakeDate();
                     var validityEnd = getFakeDate(validityStart);
 
+                    // TODO If 
                     bank.addPromotion(new Discount(
+                        bank,
                         this.promotionCode.getNextValue(), 
                         this.faker.company().catchPhrase(), 
                         promotedStore.name(), 
@@ -246,16 +245,15 @@ public class TestDataGeneratorService {
                         validityStart,
                         validityEnd, 
                         faker.theItCrowd().characters(),
-                        // discount between 1% and 15%
-                        faker.number().numberBetween(1, 15) / 100.f, 
-                        // cap price between 5000-10000
-                        faker.number().numberBetween(5_000, 10_000), 
+                        faker.number().numberBetween(1, getIntParam("maxDiscount")) / 100.f, 
+                        faker.number().numberBetween(getIntParam("minCapPrice"), getIntParam("maxCapPrice")), 
                         true));
 
                     validityStart = getFakeDate();
                     validityEnd = getFakeDate(validityStart);
     
                     bank.addPromotion(new Financing(
+                        bank,
                         this.promotionCode.getNextValue(), 
                         this.faker.company().catchPhrase(), 
                         promotedStore.name(), 
@@ -263,10 +261,8 @@ public class TestDataGeneratorService {
                         validityStart,
                         validityEnd, 
                         faker.theItCrowd().actors(),
-                        // number of quotas (1 to 6)
-                        this.faker.number().numberBetween(1, 6), 
-                        // interest between 1% and 10%
-                        this.faker.number().numberBetween(1, 10) / 100.f)); 
+                        this.faker.number().numberBetween(1, getIntParam("maxNumOfQuotas")), 
+                        this.faker.number().numberBetween(1, getIntParam("maxInterest")) / 100.f)); 
                 });
             });
 
@@ -340,15 +336,6 @@ public class TestDataGeneratorService {
                 var finalDiscount = amount <= priceCap ? storeDiscount : 0.f;
                 var finalAmount = amount * (1 - finalDiscount);
 
-                var purchaseDate = getFakeDate(card.getSince());
-                var paymentDate = purchaseDate.plusMonths(1);
-
-                var quota = new Quota(
-                    1, 
-                    finalAmount, 
-                    paymentDate.getMonthValue(),
-                    paymentDate.getYear());
-
                 var purchase = new CashPurchase(
                     card, 
                     voucher,
@@ -356,10 +343,11 @@ public class TestDataGeneratorService {
                     store.cuit(), 
                     amount, 
                     finalAmount,
-                    storeDiscount,
-                    quota);
+                    storeDiscount);
 
-                 return purchase;
+                generateQuotasTo(purchase, 1, finalAmount);
+
+                return purchase;
             });
     }
 
@@ -383,10 +371,7 @@ public class TestDataGeneratorService {
                 //    2- Is is just a plain interest aplicable to amount? (like below)
                 var finalAmount = amount * (1 + interest); 
                 
-                // The number of quotas must be less than months(card.getExpiration() - card.getSince())
-                var quotas = generateQuotas(numOfQuotas, card.getSince(), finalAmount);
-
-                return new CreditPurchase(
+                var purchase = new CreditPurchase(
                     card, 
                     voucher,
                     store.name(), 
@@ -394,7 +379,11 @@ public class TestDataGeneratorService {
                     amount, 
                     finalAmount,
                     interest,
-                    quotas);
+                    numOfQuotas);
+
+                generateQuotasTo(purchase, numOfQuotas, finalAmount);
+
+                return purchase;
             });
     }
 
@@ -437,26 +426,100 @@ public class TestDataGeneratorService {
         return purchases;
     }
 
-    private Set<Quota> generateQuotas(int numOfQuotas, LocalDate since, float finalAmount) {
-        var quotas = new LinkedHashSet<Quota>();
-
+    private void generateQuotasTo(Purchase purchase, int numOfQuotas, float finalAmount) {
         if (numOfQuotas == 0) 
-            return quotas;
+            return;
 
-        var shopDate = getFakeDate(since);
+        var shopDate = getFakeDate(purchase.getCard().getSince());
         var amountPerQuota = finalAmount / numOfQuotas;
 
-        for (int i=1; i <= numOfQuotas; i++) {
-            // Each quota is set to the following month of the previous one
-            var quotaDate = shopDate.plusMonths(i);
+        // Adjust the number of quotas if they exceed the expiration date of the credit card
+        var monthsForExpiration = ChronoUnit.MONTHS.between(purchase.getCard().getExpirationDate(), shopDate);
+        var finalNumOfQuotas = numOfQuotas > monthsForExpiration ? monthsForExpiration : numOfQuotas;
 
-            quotas.add(new Quota(
+        for (int i=1; i <= finalNumOfQuotas; i++) {
+            // Each quota is set to the following month of the previous one
+            var paymentDate = shopDate.plusMonths(i);
+
+            purchase.addQuota(new Quota(
+                purchase,
                 i, 
                 amountPerQuota, 
-                quotaDate.getMonthValue(),
-                quotaDate.getYear()));
+                paymentDate.getMonthValue(),
+                paymentDate.getYear()));
         }
+    }
 
-        return quotas;
+    /**
+     * Generates payments, grouping quotas for the same card and period of time
+     * @param purchases
+     * @return
+     */
+    private List<Payment> generatePayments(Stream<Purchase> purchases) {
+        var payments = new ArrayList<Payment>();
+
+        purchases
+            .collect(Collectors.groupingBy(Purchase::getCard))
+            .values()
+            .forEach((purchasesByCard) -> {
+                purchasesByCard.stream()
+                    .flatMap(purchase -> purchase.getQuotas().stream())
+                    .collect(
+                        Collectors.groupingBy(
+                            quota -> new PaymentPeriod(quota.getMonth(), quota.getYear()), 
+                            Collectors.summingDouble(Quota::getPrice)))
+                    .forEach((period, totalPrice) -> {
+                        payments.add(new Payment(
+                            this.paymentCode.getNextValue(),
+                            period.month(),
+                            period.year(),
+                            LocalDate.of(period.year(), period.month(), 15),
+                            LocalDate.of(period.year(), period.month(), 25),
+                            5.f, // TODO %5
+                            totalPrice.floatValue()
+                        ));
+                    });
+            });
+
+        return payments;
+    }
+
+    private List<Payment> generatePayments2(Stream<Purchase> purchases) {
+        var payments = new ArrayList<Payment>();
+
+        purchases
+            .collect(Collectors.groupingBy(Purchase::getCard))
+            .values()
+            .forEach((purchasesByCard) -> {
+                purchasesByCard.stream()
+                    .flatMap(purchase -> purchase.getQuotas().stream())
+                    .collect(Collectors.groupingBy(quota -> 
+                        new PaymentPeriod(quota.getMonth(), quota.getYear())))
+                    .forEach((period, quotas) -> {
+                        var totalPrice = quotas.stream()
+                            .map(Quota::getPrice)
+                            .reduce(0.f, (accum, price) -> accum + price);
+
+                        var payment = new Payment(
+                            this.paymentCode.getNextValue(),
+                            period.month(),
+                            period.year(),
+                            LocalDate.of(period.year(), period.month(), 15),
+                            LocalDate.of(period.year(), period.month(), 25),
+                            5.f, // TODO 5%
+                            totalPrice);
+
+                        // Set the bi-directional relationship
+                        // TODO Check if this is entirely necessary
+                        quotas.forEach(quota -> {
+                            //payment.addQuota(quota);
+                            quota.setPayment(payment);
+                        });
+
+                        payments.add(payment);
+                    }); 
+            });
+
+        return payments;
     }
 }
