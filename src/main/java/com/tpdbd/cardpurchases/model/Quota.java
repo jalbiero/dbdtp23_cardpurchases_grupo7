@@ -11,7 +11,7 @@ public class Quota {
     @GeneratedValue
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     private Purchase purchase;
 
     private int number;
@@ -22,7 +22,7 @@ public class Quota {
 
     private int year;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(nullable = true)
     @Nullable
     private Payment payment;
@@ -44,6 +44,7 @@ public class Quota {
         Payment payment)
     // @formatter:on
     {
+        this.purchase = purchase;
         this.number = number;
         this.price = price;
         this.month = month;
