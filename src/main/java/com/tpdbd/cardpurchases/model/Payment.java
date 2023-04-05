@@ -114,11 +114,11 @@ public class Payment {
         return Collections.unmodifiableSet(this.quotas);
     }
 
-    public void addPurchase(Quota quota) {
+    public void addQuota(Quota quota) {
         this.quotas.add(quota);
     }
 
-    public void removePurchase(Quota quota) {
+    public void removeQuota(Quota quota) {
         this.quotas.remove(quota);
     }
 
