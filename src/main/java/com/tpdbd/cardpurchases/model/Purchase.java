@@ -1,5 +1,11 @@
 package com.tpdbd.cardpurchases.model;
 
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.Optional;
+import java.util.Set;
+
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 
 @Entity
@@ -12,6 +18,7 @@ public abstract class Purchase {
     @ManyToOne
     private Card card;
 
+    @Column(nullable = true)
     private String paymentVoucher;
 
     private String store;
@@ -22,10 +29,16 @@ public abstract class Purchase {
 
     private float finalAmount;
 
+    @OneToMany(cascade = CascadeType.ALL)
+    private Set<Quota> quotas;
+
+    public Purchase() {
+    }
+
     public Purchase(
     // @formatter:off        
         Card card, 
-        String paymentVoucher, 
+        @Nullable String paymentVoucher, 
         String store, 
         String cuitStore, 
         float amount, 
@@ -38,6 +51,7 @@ public abstract class Purchase {
         this.cuitStore = cuitStore;
         this.amount = amount;
         this.finalAmount = finalAmount;
+        this.quotas = new LinkedHashSet<Quota>();
     }
 
     public Card getCard() {
@@ -48,8 +62,8 @@ public abstract class Purchase {
         this.card = card;
     }
 
-    public String getPaymentVoucher() {
-        return paymentVoucher;
+    public Optional<String> getPaymentVoucher() {
+        return Optional.ofNullable(this.paymentVoucher);
     }
 
     public void setPaymentVoucher(String paymentVoucher) {
@@ -57,7 +71,7 @@ public abstract class Purchase {
     }
 
     public String getStore() {
-        return store;
+        return this.store;
     }
 
     public void setStore(String store) {
@@ -73,7 +87,7 @@ public abstract class Purchase {
     }
 
     public float getAmount() {
-        return amount;
+        return this.amount;
     }
 
     public void setAmount(float amount) {
@@ -81,10 +95,29 @@ public abstract class Purchase {
     }
 
     public float getFinalAmount() {
-        return finalAmount;
+        return this.finalAmount;
     }
 
     public void setFinalAmount(float finalAmount) {
         this.finalAmount = finalAmount;
+    }
+
+    public Set<Quota> getQuotas() {
+        return Collections.unmodifiableSet(this.quotas);
+    }
+
+    public boolean addQuota(Quota quota) {
+        return this.quotas.add(quota);
+    }
+
+    public boolean removeQuota(Quota quota) {
+        return this.quotas.remove(quota);
+    }
+
+    @Override
+    public String toString() {
+        return "Purchase [id=" + id + ", card=" + card + ", paymentVoucher=" + paymentVoucher + ", store=" + store
+                + ", cuitStore=" + cuitStore + ", amount=" + amount + ", finalAmount=" + finalAmount + ", quotas="
+                + quotas + "]";
     }
 }

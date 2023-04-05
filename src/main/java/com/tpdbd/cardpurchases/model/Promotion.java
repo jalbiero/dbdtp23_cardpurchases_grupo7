@@ -2,6 +2,8 @@ package com.tpdbd.cardpurchases.model;
 
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -11,10 +13,12 @@ public abstract class Promotion {
     @GeneratedValue
     private Long id;
 
-    // @ManyToOne(cascade = CascadeType.ALL)
-    // private Bank bank;
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JsonBackReference
+    private Bank bank;
 
-    private String code; // TODO Check if this 'code' is the 'paymentVoucher' in Purchase class
+    // TODO Check if this 'code' is the 'paymentVoucher' in Purchase class
+    private String code;
 
     private String promotionTitle;
 
@@ -31,12 +35,19 @@ public abstract class Promotion {
     public Promotion() {
     }
 
-    // public Promotion(Bank bank, String code, String promotionTitle, String
-    // nameStore, String cuitStore, LocalDate validityStartDate, LocalDate
-    // validityEndDate, String comments) {
-    public Promotion(String code, String promotionTitle, String nameStore, String cuitStore,
-            LocalDate validityStartDate, LocalDate validityEndDate, String comments) {
-        // this.bank = bank;
+    public Promotion(
+    // @formatter:off            
+        Bank bank, 
+        String code, 
+        String promotionTitle, 
+        String nameStore, 
+        String cuitStore, 
+        LocalDate validityStartDate, 
+        LocalDate validityEndDate, 
+        String comments) 
+    // @formatter:on
+    {
+        this.bank = bank;
         this.code = code;
         this.promotionTitle = promotionTitle;
         this.nameStore = nameStore;
@@ -46,13 +57,13 @@ public abstract class Promotion {
         this.comments = comments;
     }
 
-    // public Bank getBank() {
-    // return bank;
-    // }
+    public Bank getBank() {
+        return bank;
+    }
 
-    // public void setBank(Bank bank) {
-    // this.bank = bank;
-    // }
+    public void setBank(Bank bank) {
+        this.bank = bank;
+    }
 
     public String getCode() {
         return code;
@@ -112,8 +123,7 @@ public abstract class Promotion {
 
     @Override
     public String toString() {
-        return "Promotion [id=" + id + /* ", bank=" + bank.getName() + */ ", code=" + code + ", promotionTitle="
-                + promotionTitle
+        return "Promotion [id=" + id + ", bank=" + bank + ", code=" + code + ", promotionTitle=" + promotionTitle
                 + ", nameStore=" + nameStore + ", cuitStore=" + cuitStore + ", validityStartDate=" + validityStartDate
                 + ", validityEndDate=" + validityEndDate + ", comments=" + comments + "]";
     }

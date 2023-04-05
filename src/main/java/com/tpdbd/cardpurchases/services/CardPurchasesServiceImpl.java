@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.tpdbd.cardpurchases.controllers.util.Params;
 import com.tpdbd.cardpurchases.errors.BankNotFoundException;
 import com.tpdbd.cardpurchases.errors.PaymentNotFoundException;
 import com.tpdbd.cardpurchases.model.Discount;
@@ -23,12 +24,24 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
 
     @Override
     @Transactional
-    public void banksAddDiscountPromotion(String cuit, Discount discount) {
+    public void banksAddDiscountPromotion(String cuit, Params.Discount discount) {
         var bank = this.bankRepository
                 .findByCuit(cuit)
                 .orElseThrow(() -> new BankNotFoundException(cuit));
 
-        bank.addPromotion(discount);
+        bank.addPromotion(new Discount(
+            bank,
+            discount.code(), 
+            discount.promotionTitle(), 
+            discount.nameStore(), 
+            discount.cuitStore(), 
+            discount.validityStartDate(),
+            discount.validityEndDate(), 
+            discount.comments(), 
+            discount.discountPercentage(), 
+            discount.priceCap(), 
+            discount.onlyCash()
+        ));
         
         this.bankRepository.save(bank);
     }

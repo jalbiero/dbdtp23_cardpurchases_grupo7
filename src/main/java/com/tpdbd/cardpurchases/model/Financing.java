@@ -15,6 +15,7 @@ public class Financing extends Promotion {
 
     public Financing(
     // @formatter:off
+        Bank bank,
         String code, 
         String promotionTitle, 
         String nameStore, 
@@ -26,7 +27,7 @@ public class Financing extends Promotion {
         float interest) 
     // @formatter:on
     {
-        super(code, promotionTitle, nameStore, cuitStore, validityStartDate, validityEndDate, comments);
+        super(bank, code, promotionTitle, nameStore, cuitStore, validityStartDate, validityEndDate, comments);
         this.numberOfQuotas = numberOfQuotas;
         this.interest = interest;
     }
@@ -46,4 +47,10 @@ public class Financing extends Promotion {
     public void setInterest(float interest) {
         this.interest = interest;
     }
+
+    @Override
+    public String toString() {
+        return "Financing [numberOfQuotas=" + numberOfQuotas + ", interest=" + interest + "]";
+    }
+   
 }

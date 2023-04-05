@@ -1,5 +1,6 @@
 package com.tpdbd.cardpurchases.model;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.Entity;
 
 @Entity
@@ -7,10 +8,13 @@ public class CashPurchase extends Purchase {
 
     private float storeDiscount;
 
+    public CashPurchase() {
+    }
+
     public CashPurchase(
     // @formatter:off        
         Card card, 
-        String paymentVoucher, 
+        @Nullable String paymentVoucher, 
         String store, 
         String cuitStore, 
         float amount, 
@@ -22,6 +26,15 @@ public class CashPurchase extends Purchase {
         this.storeDiscount = storeDiscount;
     }
 
+    @Override
+    public boolean addQuota(Quota quota) {
+        // Cash purchases only have 1 quota
+        if (getQuotas().size() == 0)
+            return super.addQuota(quota);
+
+        return false;
+    }
+
     public float getStoreDiscount() {
         return storeDiscount;
     }
@@ -29,4 +42,5 @@ public class CashPurchase extends Purchase {
     public void setStoreDiscount(float storeDiscount) {
         this.storeDiscount = storeDiscount;
     }
+
 }

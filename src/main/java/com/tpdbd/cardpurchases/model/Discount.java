@@ -10,13 +10,16 @@ public class Discount extends Promotion {
 
     private float priceCap;
 
-    private boolean onlyCash;
+    // TODO What's the meaning of this attribute? It's supposed that a "Discount"
+    // promotion only applies to cash purchases
+    private boolean onlyCash; 
 
     public Discount() {
     }
 
     public Discount(
     // @formatter:off
+        Bank bank,
         String code, 
         String promotionTitle, 
         String nameStore, 
@@ -29,7 +32,7 @@ public class Discount extends Promotion {
         boolean onlyCash) 
     // @formatter:on
     {
-        super(code, promotionTitle, nameStore, cuitStore, validityStartDate, validityEndDate, comments);
+        super(bank, code, promotionTitle, nameStore, cuitStore, validityStartDate, validityEndDate, comments);
         this.discountPercentage = discountPercentage;
         this.priceCap = priceCap;
         this.onlyCash = onlyCash;
@@ -57,5 +60,11 @@ public class Discount extends Promotion {
 
     public void setOnlyCash(boolean onlyCash) {
         this.onlyCash = onlyCash;
+    }
+
+    @Override
+    public String toString() {
+        return "Discount [discountPercentage=" + discountPercentage + ", priceCap=" + priceCap + ", onlyCash="
+                + onlyCash + "]";
     }
 }
