@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+// This interface is a sort of namespace in order to group a set of DTO types
 public interface ResponseDTO {
 
     ////////////////////////////////////////////////////////
@@ -21,7 +22,13 @@ public interface ResponseDTO {
                 bank.getAddress(),
                 bank.getTelephone(),
                 bank.getPromotions().stream()
-                    .map(Promotion::fromModel)
+                    .map(promotionFromModel -> {
+                        return switch (promotionFromModel) {
+                            case com.tpdbd.cardpurchases.model.Discount d -> Discount.fromModel(d);
+                            case com.tpdbd.cardpurchases.model.Financing f -> Financing.fromModel(f);
+                            default -> throw new IllegalArgumentException("Unknow type of promotion");
+                        };
+                    })
                     .collect(Collectors.toSet()));
         }
     }
@@ -76,25 +83,70 @@ public interface ResponseDTO {
 
 
     ////////////////////////////////////////////////////////
-    record Promotion(
+    interface Promotion {
+        String getType();
+    }
+    
+    record Discount(
         String code,
         String promotionTitle,
         String nameStore,
         String cuitStore,
         LocalDate validityStartDate,
         LocalDate validityEndDate,
-        String comments)
+        String comments,
+        float discountPercentage,
+        float priceCap)
+        implements Promotion
     {
-        public static Promotion fromModel(com.tpdbd.cardpurchases.model.Promotion promotion) {
-            return new Promotion(
-                promotion.getCode(), 
-                promotion.getPromotionTitle(), 
-                promotion.getNameStore(), 
-                promotion.getCuitStore(), 
-                promotion.getValidityStartDate(),
-                promotion.getValidityEndDate(),
-                promotion.getComments());
+        public static Discount fromModel(com.tpdbd.cardpurchases.model.Discount discount) {
+            return new Discount(
+                discount.getCode(), 
+                discount.getPromotionTitle(), 
+                discount.getNameStore(), 
+                discount.getCuitStore(), 
+                discount.getValidityStartDate(),
+                discount.getValidityEndDate(),
+                discount.getComments(),
+                discount.getDiscountPercentage(),
+                discount.getPriceCap());
         } 
+
+        @Override
+        public String getType() {
+            return this.getClass().getSimpleName();
+        }
+    }
+
+    record Financing(
+        String code,
+        String promotionTitle,
+        String nameStore,
+        String cuitStore,
+        LocalDate validityStartDate,
+        LocalDate validityEndDate,
+        String comments,
+        int numberOfQuotas,
+        float interest)
+        implements Promotion
+    {
+        public static Financing fromModel(com.tpdbd.cardpurchases.model.Financing financing) {
+            return new Financing(
+                financing.getCode(), 
+                financing.getPromotionTitle(), 
+                financing.getNameStore(), 
+                financing.getCuitStore(), 
+                financing.getValidityStartDate(),
+                financing.getValidityEndDate(),
+                financing.getComments(),
+                financing.getNumberOfQuotas(),
+                financing.getInterest());
+        }
+
+        @Override
+        public String getType() {
+            return this.getClass().getSimpleName();
+        }
     }
 
     ////////////////////////////////////////////////////////
