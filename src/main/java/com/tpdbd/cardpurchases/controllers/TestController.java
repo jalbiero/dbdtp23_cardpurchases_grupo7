@@ -10,8 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.tpdbd.cardpurchases.model.Bank;
-import com.tpdbd.cardpurchases.model.Payment;
+import com.tpdbd.cardpurchases.dto.ResponseDTO;
 import com.tpdbd.cardpurchases.services.TestService;
 
 /**
@@ -29,15 +28,27 @@ public class TestController {
     }
 
     @GetMapping("/banks/cuits")
-    Map<String, List<String>> getBanksCuits() {
+    Map<String, List<String>> getBankCuits() {
         var result = new LinkedHashMap<String, List<String>>();
         result.put("cuits", this.service.getBankCuits());
         return result;
     }
 
     @GetMapping("/banks/{cuit}")
-    Bank getBank(@PathVariable String cuit) {
-        return this.service.getBank(cuit);
+    ResponseDTO.Bank getBank(@PathVariable String cuit) {
+        return ResponseDTO.Bank.fromModel(this.service.getBank(cuit));
+    }
+
+    @GetMapping("/cards/numbers")
+    Map<String, List<String>> getCardNumbers() {
+        var result = new LinkedHashMap<String, List<String>>();
+        result.put("numbers", this.service.getCardNumbes());
+        return result;
+    }
+
+    @GetMapping("/cards/{number}")
+    ResponseDTO.Card getCard(@PathVariable String number) {
+        return ResponseDTO.Card.fromModel(this.service.getCard(number));
     }
 
     @GetMapping("/payments/codes")
@@ -48,8 +59,7 @@ public class TestController {
     }
 
     @GetMapping("/payments/{code}")
-    Payment getPayment(@PathVariable String code) {
-        return this.service.getPayment(code);
+    ResponseDTO.Payment getPayment(@PathVariable String code) {
+        return ResponseDTO.Payment.fromModel(this.service.getPayment(code));
     }
-
 }
