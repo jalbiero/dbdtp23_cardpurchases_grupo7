@@ -4,6 +4,7 @@ import java.time.LocalDate;
 
 import jakarta.annotation.Nullable;
 
+// This interface is a sort of namespace in order to group a set of DTO types
 public interface RequestDTO {
 
     ////////////////////////////////////////////////////////
@@ -20,7 +21,7 @@ public interface RequestDTO {
         boolean onlyCash)
     {
         public static com.tpdbd.cardpurchases.model.Discount toModel(Discount discount, 
-                                                                    com.tpdbd.cardpurchases.model.Bank bank) 
+                                                                     com.tpdbd.cardpurchases.model.Bank bank) 
         {
             return new com.tpdbd.cardpurchases.model.Discount(
                 bank,
@@ -46,7 +47,7 @@ public interface RequestDTO {
     ////////////////////////////////////////////////////////
     record NextExpiredCards(
         @Nullable LocalDate baseDate,        // Today if it is not specified
-        @Nullable Integer daysFromBaseDate); // 30 days if it is not specified
+        @Nullable Integer daysFromBaseDate)  // 30 days if it is not specified
     {}
 
 }
