@@ -1,14 +1,12 @@
-package com.tpdbd.cardpurchases.controllers.util;
+package com.tpdbd.cardpurchases.dto;
 
 import java.time.LocalDate;
 
 import jakarta.annotation.Nullable;
 
-/**
- * Provides records for modelling controller parameters (when classes from 
- * 'model' are not enough)
- */
-public interface Params {
+public interface RequestDTO {
+
+    ////////////////////////////////////////////////////////
     record Discount(
         String code, 
         String promotionTitle, 
@@ -19,15 +17,36 @@ public interface Params {
         String comments, 
         float discountPercentage, 
         float priceCap, 
-        boolean onlyCash) {}
+        boolean onlyCash)
+    {
+        public static com.tpdbd.cardpurchases.model.Discount toModel(Discount discount, 
+                                                                    com.tpdbd.cardpurchases.model.Bank bank) 
+        {
+            return new com.tpdbd.cardpurchases.model.Discount(
+                bank,
+                discount.code(),
+                discount.promotionTitle(),
+                discount.nameStore(),
+                discount.cuitStore(),
+                discount.validityStartDate(),
+                discount.validityEndDate(),
+                discount.comments(),
+                discount.discountPercentage(),
+                discount.priceCap(),
+                discount.onlyCash());
+        }
+    }
 
+    ////////////////////////////////////////////////////////
     record PaymentDates(
         LocalDate firstExpiration, 
-        LocalDate secondExpiration) {}
+        LocalDate secondExpiration) 
+    {}
 
+    ////////////////////////////////////////////////////////
     record NextExpiredCards(
-        @Nullable LocalDate baseDate,       // Today if it is not specified
-        @Nullable Integer daysFromBaseDate  // 30 days if it is not specified
-    ) {}
+        @Nullable LocalDate baseDate,        // Today if it is not specified
+        @Nullable Integer daysFromBaseDate); // 30 days if it is not specified
+    {}
 
 }
