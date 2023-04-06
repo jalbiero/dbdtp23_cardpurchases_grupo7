@@ -8,7 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import com.tpdbd.cardpurchases.controllers.util.Params;
+import com.tpdbd.cardpurchases.dto.RequestDTO;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -43,33 +43,6 @@ public class CardPurchasesControllerTests {
     }
 
     @Test
-    public void testGetBanksCuits() {
-        given()
-            .when()
-                .get("/test/banks/cuits")
-            .then()
-                .statusCode(200)
-                .contentType(ContentType.JSON)
-                .body("cuits", Matchers.hasSize(Matchers.greaterThan((0))));
-    }
-
-    @Test
-    public void testGetBank() {
-        var cuit = given()
-                .get("/test/banks/cuits")
-                .jsonPath()
-                .getObject("cuits[0]", String.class);
-
-        given()
-            .when()
-                .get(String.format("/test/banks/%s", cuit))
-            .then()
-                .statusCode(200)
-                .contentType(ContentType.JSON)
-                .body("cuit", Matchers.equalTo(cuit));
-    }
-
-    @Test
     public void testBanksAddDiscountPromotion() {
         final var CODE = "1000000";
         final var TITLE = "foo title";
@@ -86,7 +59,7 @@ public class CardPurchasesControllerTests {
                 .getObject("cuits[0]", String.class);
 
         // Add a new promotion
-        var discount = new Params.Discount(
+        var discount = new RequestDTO.Discount(
             CODE, TITLE, NAME, CUIT, LocalDate.now(), LocalDate.now().plusMonths(3), 
             COMMENT, DISCOUNT, PCAP, true);
 
@@ -116,7 +89,7 @@ public class CardPurchasesControllerTests {
 
     @Test
     public void testPaymentsUpdateDate() {
-        final var NEW_DATES = new Params.PaymentDates(
+        final var NEW_DATES = new RequestDTO.PaymentDates(
             LocalDate.of(2030, 12, 31), LocalDate.of(2040, 10, 15));
 
         // Select some payment code
@@ -147,5 +120,19 @@ public class CardPurchasesControllerTests {
                 .body(
                     "secondExpiration", 
                     Matchers.equalTo(NEW_DATES.secondExpiration().toString()));
+    }
+
+    @Test
+    public void testCardsGetNextExpired() {
+        //var body  = new RequestDTO.NextExpiredCards(LocalDate.of(2000, 12, 31), 10000);
+        var body  = new RequestDTO.NextExpiredCards(null, null);
+
+        given()
+            .when()
+                .contentType(ContentType.JSON)    
+                .body(body)
+                .get("/cards/getNextExpire")
+            .then()
+                .statusCode(200);
     }
 }
