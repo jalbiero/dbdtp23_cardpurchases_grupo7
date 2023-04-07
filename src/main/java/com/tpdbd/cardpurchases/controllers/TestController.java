@@ -7,9 +7,12 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.tpdbd.cardpurchases.dto.RequestDTO;
 import com.tpdbd.cardpurchases.dto.ResponseDTO;
 import com.tpdbd.cardpurchases.services.TestService;
 
@@ -50,6 +53,17 @@ public class TestController {
     ResponseDTO.Card getCard(@PathVariable String number) {
         return ResponseDTO.Card.fromModel(this.service.getCard(number));
     }
+
+    /**
+     * Add a new card
+     * @param card
+     * @return The number of the new card
+     */
+    @PostMapping("/cards")
+    String addCard(@RequestBody RequestDTO.Card card) {
+        return this.service.addCard(card);
+    }
+    
 
     @GetMapping("/payments/codes")
     Map<String, List<String>> getPaymentCodes() {
