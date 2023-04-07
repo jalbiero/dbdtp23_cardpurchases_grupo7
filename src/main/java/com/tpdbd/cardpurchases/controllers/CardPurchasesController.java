@@ -1,6 +1,6 @@
 package com.tpdbd.cardpurchases.controllers;
 
-import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -36,10 +36,19 @@ public class CardPurchasesController {
         this.service.paymentsUpdateDates(code, paymentDates.firstExpiration(), paymentDates.secondExpiration());
     }
 
+    /**
+     * List cards that expire in the following 'NextExpiredCards.daysFromBaseDate' days
+     * starting from 'NextExpiredCards.baseDate'.
+     *
+     * @param nextExpiredCards
+     * @return A list of cards
+     */
     @GetMapping("/cards/getNextExpire")
-    Set<ResponseDTO.Card> cardsGetNextExpired(@RequestBody RequestDTO.NextExpiredCards nextExpiredCards) {
-        var cards = this.service.cardsGetNextExpire(
-                nextExpiredCards.baseDate(), nextExpiredCards.daysFromBaseDate());
+    Set<ResponseDTO.Card> cardsGetNextExpired(@RequestBody(required=false) 
+                                              Optional<RequestDTO.NextExpiredCards> nextExpiredCards) 
+    {
+        var params = nextExpiredCards.orElse(new RequestDTO.NextExpiredCards());
+        var cards = this.service.cardsGetNextExpire(params.baseDate(), params.daysFromBaseDate());
 
         return cards.stream()
                 .map(ResponseDTO.Card::fromModel)
