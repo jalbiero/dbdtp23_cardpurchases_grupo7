@@ -2,8 +2,6 @@ package com.tpdbd.cardpurchases.dto;
 
 import java.time.LocalDate;
 
-import jakarta.annotation.Nullable;
-
 // This interface is a sort of namespace in order to group a set of DTO types
 public interface RequestDTO {
 
@@ -46,8 +44,21 @@ public interface RequestDTO {
 
     ////////////////////////////////////////////////////////
     record NextExpiredCards(
-        @Nullable LocalDate baseDate,        // Today if it is not specified
-        @Nullable Integer daysFromBaseDate)  // 30 days if it is not specified
-    {}
+        LocalDate baseDate,        
+        Integer daysFromBaseDate) 
+    {
+        public NextExpiredCards() {
+            this(LocalDate.now(), 30);
+        }
+    }
 
+    ////////////////////////////////////////////////////////
+    record Card(
+        String bankCuit,
+        String cardHolderDni,
+        String number,
+        String ccv,
+        LocalDate since,
+        LocalDate expirationDate)
+    {}
 }
