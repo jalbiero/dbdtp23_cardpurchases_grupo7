@@ -56,8 +56,12 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
 
     @Override
     public Set<Card> cardsGetNextExpire(@Nullable LocalDate baseDate, @Nullable Integer daysFromBaseDate) {
-        // // TODO Add proper filtering, just for now, all cards
-        return StreamSupport.stream(this.cardRepository.findAll().spliterator(), false)
+        var startDate = baseDate != null ? baseDate : LocalDate.now();
+        var finalDate = startDate.plusDays(daysFromBaseDate != null ? daysFromBaseDate : 30);
+
+        var cards = this.cardRepository.findByExpirationDateBetween(startDate, finalDate);
+
+        return StreamSupport.stream(cards.spliterator(), false)
                 .collect(Collectors.toSet());
     }
 }
