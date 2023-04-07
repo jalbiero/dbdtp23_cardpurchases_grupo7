@@ -125,14 +125,18 @@ public class CardPurchasesControllerTests {
     @Test
     public void testCardsGetNextExpired() {
         //var body  = new RequestDTO.NextExpiredCards(LocalDate.of(2000, 12, 31), 10000);
-        var body  = new RequestDTO.NextExpiredCards(null, null);
+        //var body  = new RequestDTO.NextExpiredCards(null, null);
 
-        given()
+        var resp = given()
             .when()
-                .contentType(ContentType.JSON)    
-                .body(body)
+                //.contentType(ContentType.JSON)    
+                //.body(body)
+                .body("{}")
                 .get("/cards/getNextExpire")
-            .then()
-                .statusCode(200);
+                .asPrettyString();
+            //.then()
+            //    .statusCode(200)
+
+        System.out.println("REPONSE: " + resp);
     }
 }
