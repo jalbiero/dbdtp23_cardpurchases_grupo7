@@ -81,6 +81,17 @@ public class TestServiceImpl implements TestService {
     }
 
     @Override
+    @Transactional
+    public void deleteCard(String number) {
+        this.cardRepository.deleteByNumber(number);
+    }
+
+    @Override
+    public List<String> getCardHolderDnis() {
+        return this.cardHolderRepository.findAllDnis();
+    }
+
+    @Override
     public List<String> getPaymentCodes() {
         return this.paymentRepository.findAllCodes();
     }

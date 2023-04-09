@@ -17,6 +17,9 @@ public interface TestService {
     List<String> getCardNumbes();
     Card getCard(String number);
     String addCard(RequestDTO.Card card);
+    void deleteCard(String number);
+
+    List<String> getCardHolderDnis();
 
     List<String> getPaymentCodes();
     Payment getPayment(String code);
