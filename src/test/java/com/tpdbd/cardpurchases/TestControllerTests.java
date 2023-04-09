@@ -46,14 +46,11 @@ public class TestControllerTests {
 
     @Test
     public void testGetBank() {
-        var cuit = given()
-                .get("/test/banks/cuits")
-                .jsonPath()
-                .getObject("cuits[0]", String.class);
+        var cuit = getSomeBankCuit();
 
         given()
             .when()
-                .get(String.format("/test/banks/%s", cuit))
+                .get("/test/banks/{cuit}", cuit)
             .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
@@ -62,14 +59,8 @@ public class TestControllerTests {
 
     @Test
     public void testAddCard() {
-         // Select some bank
-         var cuit = given()
-            .get("/test/banks/cuits")
-            .jsonPath()
-            .getObject("cuits[0]", String.class);
-
-        // TODO Implement the endpoint to list DNIs          
-        var dni = "726-37-4575";
+        var cuit = getSomeBankCuit();
+        var dni = getSomeCardHolderDni();
 
         var card = new RequestDTO.Card(
             cuit, 
@@ -79,14 +70,55 @@ public class TestControllerTests {
             LocalDate.now(), 
             LocalDate.now().plusDays(10));
 
-        given()
-            .when()
-                .contentType(ContentType.JSON)    
-                .body(card)
-                .post("/test/cards")
+        // Create a new card
+        var response = 
+            given()
+                .when()
+                    .contentType(ContentType.JSON)    
+                    .body(card)
+                    .post("/test/cards");
+
+        response
             .then()
                 .statusCode(200);
-                // .contentType(ContentType.JSON)
-                // .body("cuit", Matchers.equalTo(cuit));
+        
+        var number = response.getBody().asString();
+
+        // Validate the creation
+        given()
+            .when()
+                .get("/test/cards/{number}", number)
+            .then()
+                .statusCode(200)
+                .contentType(ContentType.JSON)
+                .body("number", Matchers.equalTo(number));
+                // TODO Validate other attributes
+
+            
+        // Remove the new card
+        given()
+            .when()
+                .delete("/test/cards/{number}", number)
+            .then()
+                .statusCode(200);
     }
+
+
+    ///////////////////
+    // Helpers
+
+    static public String getSomeBankCuit() {
+        return given()
+            .get("/test/banks/cuits")
+            .jsonPath()
+            .getObject("cuits[0]", String.class);
+    }
+
+    static public String getSomeCardHolderDni() {
+        return given()
+            .get("/test/cardHolders/dnis")
+            .jsonPath()
+            .getObject("dnis[0]", String.class);
+    }
+
 }
