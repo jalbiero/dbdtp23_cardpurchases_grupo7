@@ -49,6 +49,9 @@ $ mvn spring-boot:run
     1. El controlador `CardPurchasesController` y su servicio asociado `CardPurchasesService` implementan solamente lo que se pide como tarea.
     2. El controlador `TestController` y su servicio asociado `TestService` implementan funcionalidad necesaria para probar lo pedido en la tarea. En una aplicación completa lo pedido sería sólo una parte del total, el cual se complementaría con lo que está en `TestController/TestService`.
 - En la clase `Quota`, por conveniencia, se cambiaron los tipos de datos de los attributos `month`y `year`, ambos originalmente `String` a `int`
+- Con respecto a los DTO:
+  - El _mapper_ más simple y directo de usar es en mi opinión "modelmapper", pero lamentablemente no soporta objetos DTO basados en _records_ (los cuales son muy sencillos de definir y usar)
+  -  Por lo dicho anteriomente, opté por hacer el mapeo de los objetos basados en entidades a DTO, en los controladores de manera manual.
 
 - TODO 
   

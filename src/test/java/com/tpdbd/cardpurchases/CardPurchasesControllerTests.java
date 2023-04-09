@@ -8,21 +8,29 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import com.tpdbd.cardpurchases.controllers.util.Params;
+import com.tpdbd.cardpurchases.dto.RequestDTO;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import io.restassured.response.ValidatableResponse;
+import net.datafaker.Faker;
 
 import static io.restassured.RestAssured.given;
 
 import java.time.LocalDate;
+import java.util.function.Function;
 
 // @formatter:off
 
+/**
+ * Integration tests for Card Purchase Application
+ */
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class CardPurchasesControllerTests {
     private final static String BASE_URI = "http://localhost";
+    
+    private Faker faker = new Faker();
 
     @LocalServerPort
     private int port;
@@ -43,33 +51,6 @@ public class CardPurchasesControllerTests {
     }
 
     @Test
-    public void testGetBanksCuits() {
-        given()
-            .when()
-                .get("/test/banks/cuits")
-            .then()
-                .statusCode(200)
-                .contentType(ContentType.JSON)
-                .body("cuits", Matchers.hasSize(Matchers.greaterThan((0))));
-    }
-
-    @Test
-    public void testGetBank() {
-        var cuit = given()
-                .get("/test/banks/cuits")
-                .jsonPath()
-                .getObject("cuits[0]", String.class);
-
-        given()
-            .when()
-                .get(String.format("/test/banks/%s", cuit))
-            .then()
-                .statusCode(200)
-                .contentType(ContentType.JSON)
-                .body("cuit", Matchers.equalTo(cuit));
-    }
-
-    @Test
     public void testBanksAddDiscountPromotion() {
         final var CODE = "1000000";
         final var TITLE = "foo title";
@@ -79,14 +60,10 @@ public class CardPurchasesControllerTests {
         final var DISCOUNT = 0.5f;
         final var PCAP = 5000.f;
 
-        // Select some bank
-        var cuit = given()
-                .get("/test/banks/cuits")
-                .jsonPath()
-                .getObject("cuits[0]", String.class);
+        var cuit = getSomeBankCuit();
 
         // Add a new promotion
-        var discount = new Params.Discount(
+        var discount = new RequestDTO.Discount(
             CODE, TITLE, NAME, CUIT, LocalDate.now(), LocalDate.now().plusMonths(3), 
             COMMENT, DISCOUNT, PCAP, true);
 
@@ -94,14 +71,14 @@ public class CardPurchasesControllerTests {
             .when()
                 .contentType(ContentType.JSON)    
                 .body(discount)
-                .post(String.format("/banks/%s/addDiscountPromotion", cuit))
+                .post("/banks/{cuit}/addDiscountPromotion", cuit)
             .then()
                 .statusCode(200);
 
         // Check if the promotion was added to the given bank
         given()
             .when()
-                .get(String.format("/test/banks/%s", cuit))
+                .get("/test/banks/{cuit}", cuit)
             .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
@@ -116,28 +93,24 @@ public class CardPurchasesControllerTests {
 
     @Test
     public void testPaymentsUpdateDate() {
-        final var NEW_DATES = new Params.PaymentDates(
+        final var NEW_DATES = new RequestDTO.PaymentDates(
             LocalDate.of(2030, 12, 31), LocalDate.of(2040, 10, 15));
 
-        // Select some payment code
-         var code = given()
-            .get("/test/payments/codes")
-            .jsonPath()
-            .getObject("codes[0]", String.class);
+        var code = getSomePaymentCode();
 
         // Update dates
         given()
             .when()
                 .contentType(ContentType.JSON)    
                 .body(NEW_DATES)
-                .put(String.format("/payments/%s/updateDates", code))
+                .put("/payments/{code}/updateDates", code)
             .then()
                 .statusCode(200);
 
         // Check payment
         given()
             .when()
-                .get(String.format("/test/payments/%s", code))
+                .get("/test/payments/{code}", code)
             .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
@@ -147,5 +120,84 @@ public class CardPurchasesControllerTests {
                 .body(
                     "secondExpiration", 
                     Matchers.equalTo(NEW_DATES.secondExpiration().toString()));
+    }
+
+    @Test
+    public void testCardsGetSoonToExpire() {
+        // Some unique date (the database already has data from TestDataGeneratorService)
+        // in order to get just the card that it is being created/tested
+        final var BASE_DATE = LocalDate.of(3000, 11, 1); 
+        final var DAYS_TO_EXPIRATION = 31;
+        final var CARD_NUMBER = this.faker.business().creditCardNumber();
+
+        // Create a new card
+        var card = new RequestDTO.Card(
+            getSomeBankCuit(), 
+            getSomeCardHolderDni(), 
+            CARD_NUMBER,
+            this.faker.business().securityCode(),
+            BASE_DATE,
+            BASE_DATE.plusDays(DAYS_TO_EXPIRATION)); 
+
+        given()
+            .contentType(ContentType.JSON)                    
+            .body(card)
+            .post("/test/cards");
+        
+        // Test some expiration paths
+
+        Function<RequestDTO.SoonToExpire, ValidatableResponse> getSoonToExpire = 
+            (body) -> {
+                return given()
+                    .when()
+                        .contentType(ContentType.JSON)    
+                        .body(body)
+                        .get("/cards/getSoonToExpire")
+                    .then()
+                        .statusCode(200)
+                        .contentType(ContentType.JSON);
+            };
+
+
+        var noCardsInTheNext30days = new RequestDTO.SoonToExpire(BASE_DATE, 30);
+        getSoonToExpire.apply(noCardsInTheNext30days)
+            .body("$", Matchers.hasSize(0));
+            
+        var oneCardInTheNext30days = new RequestDTO.SoonToExpire(BASE_DATE.plusDays(5), 30);
+        getSoonToExpire.apply(oneCardInTheNext30days)
+            .body("$", Matchers.hasSize(1))
+            .body("[0].number", Matchers.equalTo(CARD_NUMBER));
+
+        var noCardsAllAlreadyExpired = new RequestDTO.SoonToExpire(BASE_DATE.plusDays(DAYS_TO_EXPIRATION + 1), 30);
+        getSoonToExpire.apply(noCardsAllAlreadyExpired)
+            .body("$", Matchers.hasSize(0));
+
+        // Remove the test card
+        given().delete("/test/cards/{number}", CARD_NUMBER);
+    }
+
+
+    ///////////////////
+    // Helpers
+
+    public String getSomeBankCuit() {
+        return given()
+            .get("/test/banks/cuits")
+            .jsonPath()
+            .getObject("cuits[0]", String.class);
+    }
+
+    public String getSomeCardHolderDni() {
+        return given()
+            .get("/test/cardHolders/dnis")
+            .jsonPath()
+            .getObject("dnis[0]", String.class);
+    }
+
+    public String getSomePaymentCode() {
+        return given()
+            .get("/test/payments/codes")
+            .jsonPath()
+            .getObject("codes[0]", String.class);
     }
 }

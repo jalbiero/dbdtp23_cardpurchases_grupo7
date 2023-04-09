@@ -1,13 +1,15 @@
 package com.tpdbd.cardpurchases.services;
 
 import java.time.LocalDate;
+import java.util.List;
 
-import com.tpdbd.cardpurchases.controllers.util.Params;
+import com.tpdbd.cardpurchases.dto.RequestDTO;
+import com.tpdbd.cardpurchases.model.Card;
 
 
 public interface CardPurchasesService {
     // 1 Agregar una nueva promoción de tipo descuento a un banco dado
-    void banksAddDiscountPromotion(String cuit, Params.Discount discount);
+    void banksAddDiscountPromotion(String cuit, RequestDTO.Discount discount);
 
     // 2 Editar las fecha de vencimiento de un pago con cierto código.
     void paymentsUpdateDates(String code, LocalDate firstExpiration, LocalDate secondExpiration);
@@ -18,12 +20,15 @@ public interface CardPurchasesService {
     // TODO ¿Total de pago por tarjeta o por usuario o por banco o global a todo?
 
     // 4 Obtener el listado de tarjetas que vencen en los siguientes 30 días.
+    List<Card> cardsGetSoonToExpire(LocalDate baseDate, Integer daysFromBaseDate);
 
     // 5 Obtener la información de una compra, incluyendo el listado de cuotas si
     // esta posee.
 
     // 6 Eliminar una promoción a traves de su código (tener en cuenta que esta
     // puede haber sido aplicada alguna compra)
+
+    // TODO ¿Debo eliminar en cascada o no eliminar directamente?
 
     // 7 Obtener el precio total a pagar de una compra en cuotas (tener en cuenta
     // que pueden existir promociones aplicadas)
