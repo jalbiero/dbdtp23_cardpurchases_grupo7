@@ -1,6 +1,5 @@
 package com.tpdbd.cardpurchases;
 
-import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,6 +13,7 @@ import com.tpdbd.cardpurchases.dto.RequestDTO;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
+import net.datafaker.Faker;
 
 import static io.restassured.RestAssured.given;
 
@@ -29,6 +29,8 @@ import java.util.function.Function;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class CardPurchasesControllerTests {
     private final static String BASE_URI = "http://localhost";
+    
+    private Faker faker = new Faker();
 
     @LocalServerPort
     private int port;
@@ -121,55 +123,56 @@ public class CardPurchasesControllerTests {
     }
 
     @Test
-    public void testCardsGetNextExpire() {
-        // Some unique date in order to get just the card that it is being created
+    public void testCardsGetSoonToExpire() {
+        // Some unique date (the database already has data from TestDataGeneratorService)
+        // in order to get just the card that it is being created/tested
         final var BASE_DATE = LocalDate.of(3000, 11, 1); 
         final var DAYS_TO_EXPIRATION = 31;
-
-        final var CARD_NUMBER = "0910912308123";
+        final var CARD_NUMBER = this.faker.business().creditCardNumber();
 
         // Create a new card
         var card = new RequestDTO.Card(
             getSomeBankCuit(), 
             getSomeCardHolderDni(), 
             CARD_NUMBER,
-            "123", 
+            this.faker.business().securityCode(),
             BASE_DATE,
             BASE_DATE.plusDays(DAYS_TO_EXPIRATION)); 
 
         given()
-            .contentType(ContentType.JSON)    
+            .contentType(ContentType.JSON)                    
             .body(card)
-            .post("/test/cards")
-            .andReturn().body().asString();
+            .post("/test/cards");
+        
+        // Test some expiration paths
 
-        // Check some expiration paths
-
-        Function<RequestDTO.NextExpiredCards, ValidatableResponse> getNextExpire = 
+        Function<RequestDTO.SoonToExpire, ValidatableResponse> getSoonToExpire = 
             (body) -> {
                 return given()
                     .when()
                         .contentType(ContentType.JSON)    
                         .body(body)
-                        .get("/cards/getNextExpire")
+                        .get("/cards/getSoonToExpire")
                     .then()
                         .statusCode(200)
                         .contentType(ContentType.JSON);
             };
 
 
-        var noCardInTheNext30days = new RequestDTO.NextExpiredCards(BASE_DATE, 30);
-        getNextExpire.apply(noCardInTheNext30days).body("$", Matchers.hasSize(0));
+        var noCardsInTheNext30days = new RequestDTO.SoonToExpire(BASE_DATE, 30);
+        getSoonToExpire.apply(noCardsInTheNext30days)
+            .body("$", Matchers.hasSize(0));
             
-        var oneCardInTheNext30days = new RequestDTO.NextExpiredCards(BASE_DATE.plusDays(5), 30);
-        getNextExpire.apply(oneCardInTheNext30days)
+        var oneCardInTheNext30days = new RequestDTO.SoonToExpire(BASE_DATE.plusDays(5), 30);
+        getSoonToExpire.apply(oneCardInTheNext30days)
             .body("$", Matchers.hasSize(1))
-            .body("$[0].number", Matchers.equalTo(CARD_NUMBER));
+            .body("[0].number", Matchers.equalTo(CARD_NUMBER));
 
-        var noCardAlreadyExpired = new RequestDTO.NextExpiredCards(BASE_DATE.plusDays(DAYS_TO_EXPIRATION + 1), 30);
-        getNextExpire.apply(noCardAlreadyExpired).body("$", Matchers.hasSize(0));
+        var noCardsAllAlreadyExpired = new RequestDTO.SoonToExpire(BASE_DATE.plusDays(DAYS_TO_EXPIRATION + 1), 30);
+        getSoonToExpire.apply(noCardsAllAlreadyExpired)
+            .body("$", Matchers.hasSize(0));
 
-        // Remove test card
+        // Remove the test card
         given().delete("/test/cards/{number}", CARD_NUMBER);
     }
 

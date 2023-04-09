@@ -12,6 +12,7 @@ import com.tpdbd.cardpurchases.dto.RequestDTO;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import net.datafaker.Faker;
 
 import static io.restassured.RestAssured.given;
 
@@ -19,10 +20,14 @@ import java.time.LocalDate;
 
 // @formatter:off
 
+/**
+ * Integration tests for helper endpoints
+ */
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class TestControllerTests {
     private final static String BASE_URI = "http://localhost";
+    private Faker faker = new Faker();
 
     @LocalServerPort
     private int port;
@@ -58,49 +63,52 @@ public class TestControllerTests {
     }
 
     @Test
-    public void testAddCard() {
+    public void testAddRemoveCard() {
+        final var CARD_NUMBER = this.faker.business().creditCardNumber();
+
         var cuit = getSomeBankCuit();
         var dni = getSomeCardHolderDni();
 
         var card = new RequestDTO.Card(
             cuit, 
             dni, 
-            "213123123123", // TODO Use faker
-            "123", // TODO Use faker
+            CARD_NUMBER, 
+            this.faker.business().securityCode(),
             LocalDate.now(), 
             LocalDate.now().plusDays(10));
 
         // Create a new card
-        var response = 
-            given()
-                .when()
-                    .contentType(ContentType.JSON)    
-                    .body(card)
-                    .post("/test/cards");
-
-        response
+        given()
+            .when()
+                .contentType(ContentType.JSON)    
+                .body(card)
+                .post("/test/cards")
             .then()
                 .statusCode(200);
         
-        var number = response.getBody().asString();
-
         // Validate the creation
         given()
             .when()
-                .get("/test/cards/{number}", number)
+                .get("/test/cards/{number}", CARD_NUMBER)
             .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
-                .body("number", Matchers.equalTo(number));
+                .body("number", Matchers.equalTo(CARD_NUMBER));
                 // TODO Validate other attributes
 
             
         // Remove the new card
         given()
             .when()
-                .delete("/test/cards/{number}", number)
+                .delete("/test/cards/{number}", CARD_NUMBER)
             .then()
                 .statusCode(200);
+
+        given()
+            .when()
+                .get("/cards/{number}", CARD_NUMBER)
+            .then()
+                .statusCode(404);                
     }
 
 
@@ -120,5 +128,4 @@ public class TestControllerTests {
             .jsonPath()
             .getObject("dnis[0]", String.class);
     }
-
 }
