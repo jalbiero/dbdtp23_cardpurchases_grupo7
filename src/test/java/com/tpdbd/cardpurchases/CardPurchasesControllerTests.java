@@ -1,5 +1,6 @@
 package com.tpdbd.cardpurchases;
 
+import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,13 +13,18 @@ import com.tpdbd.cardpurchases.dto.RequestDTO;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import io.restassured.response.ValidatableResponse;
 
 import static io.restassured.RestAssured.given;
 
 import java.time.LocalDate;
+import java.util.function.Function;
 
 // @formatter:off
 
+/**
+ * Integration tests for Card Purchase Application
+ */
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class CardPurchasesControllerTests {
@@ -52,11 +58,7 @@ public class CardPurchasesControllerTests {
         final var DISCOUNT = 0.5f;
         final var PCAP = 5000.f;
 
-        // Select some bank
-        var cuit = given()
-                .get("/test/banks/cuits")
-                .jsonPath()
-                .getObject("cuits[0]", String.class);
+        var cuit = getSomeBankCuit();
 
         // Add a new promotion
         var discount = new RequestDTO.Discount(
@@ -67,14 +69,14 @@ public class CardPurchasesControllerTests {
             .when()
                 .contentType(ContentType.JSON)    
                 .body(discount)
-                .post(String.format("/banks/%s/addDiscountPromotion", cuit))
+                .post("/banks/{cuit}/addDiscountPromotion", cuit)
             .then()
                 .statusCode(200);
 
         // Check if the promotion was added to the given bank
         given()
             .when()
-                .get(String.format("/test/banks/%s", cuit))
+                .get("/test/banks/{cuit}", cuit)
             .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
@@ -92,25 +94,21 @@ public class CardPurchasesControllerTests {
         final var NEW_DATES = new RequestDTO.PaymentDates(
             LocalDate.of(2030, 12, 31), LocalDate.of(2040, 10, 15));
 
-        // Select some payment code
-         var code = given()
-            .get("/test/payments/codes")
-            .jsonPath()
-            .getObject("codes[0]", String.class);
+        var code = getSomePaymentCode();
 
         // Update dates
         given()
             .when()
                 .contentType(ContentType.JSON)    
                 .body(NEW_DATES)
-                .put(String.format("/payments/%s/updateDates", code))
+                .put("/payments/{code}/updateDates", code)
             .then()
                 .statusCode(200);
 
         // Check payment
         given()
             .when()
-                .get(String.format("/test/payments/%s", code))
+                .get("/test/payments/{code}", code)
             .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
@@ -123,20 +121,80 @@ public class CardPurchasesControllerTests {
     }
 
     @Test
-    public void testCardsGetNextExpired() {
-        //var body  = new RequestDTO.NextExpiredCards(LocalDate.of(2000, 12, 31), 10000);
-        //var body  = new RequestDTO.NextExpiredCards(null, null);
+    public void testCardsGetNextExpire() {
+        // Some unique date in order to get just the card that it is being created
+        final var BASE_DATE = LocalDate.of(3000, 11, 1); 
+        final var DAYS_TO_EXPIRATION = 31;
 
-        var resp = given()
-            .when()
-                //.contentType(ContentType.JSON)    
-                //.body(body)
-                .body("{}")
-                .get("/cards/getNextExpire")
-                .asPrettyString();
-            //.then()
-            //    .statusCode(200)
+        final var CARD_NUMBER = "0910912308123";
 
-        System.out.println("REPONSE: " + resp);
+        // Create a new card
+        var card = new RequestDTO.Card(
+            getSomeBankCuit(), 
+            getSomeCardHolderDni(), 
+            CARD_NUMBER,
+            "123", 
+            BASE_DATE,
+            BASE_DATE.plusDays(DAYS_TO_EXPIRATION)); 
+
+        given()
+            .contentType(ContentType.JSON)    
+            .body(card)
+            .post("/test/cards")
+            .andReturn().body().asString();
+
+        // Check some expiration paths
+
+        Function<RequestDTO.NextExpiredCards, ValidatableResponse> getNextExpire = 
+            (body) -> {
+                return given()
+                    .when()
+                        .contentType(ContentType.JSON)    
+                        .body(body)
+                        .get("/cards/getNextExpire")
+                    .then()
+                        .statusCode(200)
+                        .contentType(ContentType.JSON);
+            };
+
+
+        var noCardInTheNext30days = new RequestDTO.NextExpiredCards(BASE_DATE, 30);
+        getNextExpire.apply(noCardInTheNext30days).body("$", Matchers.hasSize(0));
+            
+        var oneCardInTheNext30days = new RequestDTO.NextExpiredCards(BASE_DATE.plusDays(5), 30);
+        getNextExpire.apply(oneCardInTheNext30days)
+            .body("$", Matchers.hasSize(1))
+            .body("$[0].number", Matchers.equalTo(CARD_NUMBER));
+
+        var noCardAlreadyExpired = new RequestDTO.NextExpiredCards(BASE_DATE.plusDays(DAYS_TO_EXPIRATION + 1), 30);
+        getNextExpire.apply(noCardAlreadyExpired).body("$", Matchers.hasSize(0));
+
+        // Remove test card
+        given().delete("/test/cards/{number}", CARD_NUMBER);
+    }
+
+
+    ///////////////////
+    // Helpers
+
+    public String getSomeBankCuit() {
+        return given()
+            .get("/test/banks/cuits")
+            .jsonPath()
+            .getObject("cuits[0]", String.class);
+    }
+
+    public String getSomeCardHolderDni() {
+        return given()
+            .get("/test/cardHolders/dnis")
+            .jsonPath()
+            .getObject("dnis[0]", String.class);
+    }
+
+    public String getSomePaymentCode() {
+        return given()
+            .get("/test/payments/codes")
+            .jsonPath()
+            .getObject("codes[0]", String.class);
     }
 }
