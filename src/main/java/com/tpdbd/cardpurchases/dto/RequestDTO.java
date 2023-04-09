@@ -43,11 +43,11 @@ public interface RequestDTO {
     {}
 
     ////////////////////////////////////////////////////////
-    record NextExpiredCards(
+    record SoonToExpire(
         LocalDate baseDate,        
         Integer daysFromBaseDate) 
     {
-        public NextExpiredCards() {
+        public SoonToExpire() {
             this(LocalDate.now(), 30);
         }
     }
