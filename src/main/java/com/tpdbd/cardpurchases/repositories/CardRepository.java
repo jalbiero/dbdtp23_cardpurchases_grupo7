@@ -16,4 +16,6 @@ public interface CardRepository extends CrudRepository<Card, Long> {
     List<String> findAllNumbers();
 
     List<Card> findByExpirationDateBetween(LocalDate dt1, LocalDate dt2);
+
+    void deleteByNumber(String number);
 }
