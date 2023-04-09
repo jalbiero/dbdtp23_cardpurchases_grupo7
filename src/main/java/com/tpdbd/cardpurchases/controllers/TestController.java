@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,6 +31,9 @@ public class TestController {
         return "Card Purchases application - Test API";
     }
 
+    ///////////////////////
+    // Banks
+
     @GetMapping("/banks/cuits")
     Map<String, List<String>> getBankCuits() {
         var result = new LinkedHashMap<String, List<String>>();
@@ -41,6 +45,9 @@ public class TestController {
     ResponseDTO.Bank getBank(@PathVariable String cuit) {
         return ResponseDTO.Bank.fromModel(this.service.getBank(cuit));
     }
+
+    ///////////////////////
+    // Cards
 
     @GetMapping("/cards/numbers")
     Map<String, List<String>> getCardNumbers() {
@@ -63,7 +70,24 @@ public class TestController {
     String addCard(@RequestBody RequestDTO.Card card) {
         return this.service.addCard(card);
     }
-    
+
+    @DeleteMapping("/cards/{number}")
+    void deleteCard(@PathVariable String number) {
+        this.service.deleteCard(number);
+    }
+
+    ///////////////////////
+    // Card holders
+
+    @GetMapping("/cardHolders/dnis")
+    Map<String, List<String>> getCardHolderDnis() {
+        var result = new LinkedHashMap<String, List<String>>();
+        result.put("dnis", this.service.getCardHolderDnis());
+        return result;
+    }
+
+    ///////////////////////
+    // Payments
 
     @GetMapping("/payments/codes")
     Map<String, List<String>> getPaymentCodes() {
