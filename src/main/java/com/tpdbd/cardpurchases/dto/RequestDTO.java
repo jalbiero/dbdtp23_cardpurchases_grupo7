@@ -61,4 +61,10 @@ public interface RequestDTO {
         LocalDate since,
         LocalDate expirationDate)
     {}
+
+    ////////////////////////////////////////////////////////
+    record PurchaseLocator(
+        String cuitStore,
+        String cardNumber)
+    {}
 }

@@ -1,8 +1,8 @@
 package com.tpdbd.cardpurchases.dto;
 
 import java.time.LocalDate;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Optional;
 
 // This interface is a sort of namespace in order to group a set of DTO types
 public interface ResponseDTO {
@@ -13,7 +13,7 @@ public interface ResponseDTO {
         String cuit,
         String address,
         String telephone,
-        Set<Promotion> promotions)
+        List<Promotion> promotions)
     {
         public static Bank fromModel(com.tpdbd.cardpurchases.model.Bank bank) {
             return new Bank(
@@ -23,13 +23,13 @@ public interface ResponseDTO {
                 bank.getTelephone(),
                 bank.getPromotions().stream()
                     .map(promotionFromModel -> {
-                        return switch (promotionFromModel) {
+                        return (Promotion) switch (promotionFromModel) {
                             case com.tpdbd.cardpurchases.model.Discount d -> Discount.fromModel(d);
                             case com.tpdbd.cardpurchases.model.Financing f -> Financing.fromModel(f);
                             default -> throw new IllegalArgumentException("Unknow type of promotion");
                         };
                     })
-                    .collect(Collectors.toSet()));
+                    .toList());
         }
     }
 
@@ -64,7 +64,7 @@ public interface ResponseDTO {
         LocalDate secondExpiration,
         float surchase,
         float totalPrice,
-        Set<Quota> quotas)
+        List<Quota> quotas)
     {
         public static Payment fromModel(com.tpdbd.cardpurchases.model.Payment payment) {
             return new Payment(
@@ -77,7 +77,7 @@ public interface ResponseDTO {
                 payment.getTotalPrice(),
                 payment.getQuotas().stream()
                     .map(Quota::fromModel)
-                    .collect(Collectors.toSet()));
+                    .toList());
         }
     }
 
@@ -141,6 +141,79 @@ public interface ResponseDTO {
                 financing.getComments(),
                 financing.getNumberOfQuotas(),
                 financing.getInterest());
+        }
+
+        @Override
+        public String getType() {
+            return this.getClass().getSimpleName();
+        }
+    }
+
+    ////////////////////////////////////////////////////////
+    interface Purchase {
+        String getType();
+
+        static Purchase fromModel(com.tpdbd.cardpurchases.model.Purchase purchase) {
+            return switch (purchase) {
+                case com.tpdbd.cardpurchases.model.CashPurchase ca -> CashPurchase.fromModel(ca);
+                case com.tpdbd.cardpurchases.model.CreditPurchase cr -> CreditPurchase.fromModel(cr);
+                default -> throw new IllegalArgumentException("Unknow type of purchase");
+            };
+        }
+    }
+
+    record CashPurchase(
+        String cardNumber,
+        Optional<String> PaymentVoucher,
+        String store,
+        String cuitStore,
+        float ammount,
+        float finalAmount,
+        Quota quota,
+        float storeDiscount)
+        implements Purchase 
+    {
+        public static CashPurchase fromModel(com.tpdbd.cardpurchases.model.CashPurchase cashPurchase) {
+            return new CashPurchase(
+                cashPurchase.getCard().getNumber(), 
+                cashPurchase.getPaymentVoucher(), 
+                cashPurchase.getStore(),
+                cashPurchase.getCuitStore(), 
+                cashPurchase.getAmount(),
+                cashPurchase.getFinalAmount(),
+                Quota.fromModel(cashPurchase.getQuotas().iterator().next()),
+                cashPurchase.getStoreDiscount());
+        }
+
+        @Override
+        public String getType() {
+            return this.getClass().getSimpleName();
+        }
+    }
+
+    record CreditPurchase(
+        String cardNumber,
+        Optional<String> PaymentVoucher,
+        String store,
+        String cuitStore,
+        float ammount,
+        float finalAmount,
+        List<Quota> quotas,
+        float interest, 
+        int numberOfQuotas)
+        implements Purchase  
+    {
+        public static CreditPurchase fromModel(com.tpdbd.cardpurchases.model.CreditPurchase creditPurchase) {
+            return new CreditPurchase(
+                creditPurchase.getCard().getNumber(), 
+                creditPurchase.getPaymentVoucher(), 
+                creditPurchase.getStore(),
+                creditPurchase.getCuitStore(), 
+                creditPurchase.getAmount(),
+                creditPurchase.getFinalAmount(),
+                creditPurchase.getQuotas().stream().map(Quota::fromModel).toList(),
+                creditPurchase.getInterest(),
+                creditPurchase.getNumberOfQuotas());
         }
 
         @Override
