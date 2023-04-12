@@ -37,17 +37,17 @@ public interface RequestDTO {
     }
 
     ////////////////////////////////////////////////////////
-    record PaymentDates(
+    record PaymentsUpdateDatesBody(
         LocalDate firstExpiration, 
         LocalDate secondExpiration) 
     {}
 
     ////////////////////////////////////////////////////////
-    record SoonToExpire(
+    record CardsGetSoonToExpiredBody(
         LocalDate baseDate,        
         Integer daysFromBaseDate) 
     {
-        public SoonToExpire() {
+        public CardsGetSoonToExpiredBody() {
             this(LocalDate.now(), 30);
         }
     }
@@ -63,8 +63,6 @@ public interface RequestDTO {
     {}
 
     ////////////////////////////////////////////////////////
-    record PurchaseLocator(
-        String cuitStore,
-        String cardNumber)
+    record CardsGetPurchasesBody(String cuitStore)
     {}
 }
