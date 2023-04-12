@@ -16,6 +16,7 @@ import com.tpdbd.cardpurchases.repositories.CardRepository;
 import com.tpdbd.cardpurchases.repositories.PaymentRepository;
 import com.tpdbd.cardpurchases.repositories.PurchaseRepository;
 
+import jakarta.annotation.Nullable;
 import jakarta.transaction.Transactional;
 
 @Service
@@ -63,7 +64,9 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
     }
 
     @Override
-    public List<Purchase> getPurchases(String cuitStore, String cardNumber) {
-        return this.purchaseRepository.findByCuitStoreAndCardNumber(cuitStore, cardNumber);
+    public List<Purchase> cardsGetPurchases(String cardNumber, @Nullable String cuitStore) {
+        return cuitStore == null
+            ? this.purchaseRepository.findByCardNumber(cardNumber)
+            : this.purchaseRepository.findByCardNumberAndCuitStore(cardNumber, cuitStore);
     }
 }
