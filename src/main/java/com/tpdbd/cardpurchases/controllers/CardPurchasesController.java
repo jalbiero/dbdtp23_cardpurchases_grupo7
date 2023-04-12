@@ -22,7 +22,7 @@ public class CardPurchasesController {
     private CardPurchasesService service;
 
     /***
-     * Endpoint to check the application is up and running 
+     * Endpoint to check if  the application is up and running 
      * 
      * URL:
      *      GET /
@@ -138,6 +138,22 @@ public class CardPurchasesController {
 
         return cards.stream()
             .map(ResponseDTO.Card::fromModel)
+            .toList();
+    }
+
+
+    /**
+     * Lists purchases from the specfied card in the specified store
+     * 
+     * TODO complete documentation
+     * 
+     */
+    @GetMapping("/cards/getPurchaseInformation")
+    List<ResponseDTO.Purchase> cardsGetPurchaseInformation(@RequestBody RequestDTO.PurchaseLocator purchaseLocator) {
+        var purchases = this.service.getPurchases(purchaseLocator.cuitStore(), purchaseLocator.cardNumber());
+    
+        return purchases.stream()
+            .map(ResponseDTO.Purchase::fromModel)
             .toList();
     }
 }
