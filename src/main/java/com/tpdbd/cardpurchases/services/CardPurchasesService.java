@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.tpdbd.cardpurchases.dto.RequestDTO;
 import com.tpdbd.cardpurchases.model.Card;
+import com.tpdbd.cardpurchases.model.Purchase;
 
 
 public interface CardPurchasesService {
@@ -24,6 +25,13 @@ public interface CardPurchasesService {
 
     // 5 Obtener la información de una compra, incluyendo el listado de cuotas si
     // esta posee.
+    // TODO ¿Cómo identificar una compra exactamente? Lo normal sería usar la
+    //      tarjeta, el comercio y la fecha, pero hay 2 problemas:
+    //         1- Igualmente podria haber más de una compra en el mismo día
+    //         2- El modelo no tiene fecha para una compra
+    //      En base a lo anterior, por el momento se tratará de identificar compras 
+    //      usando solo la tarjeta y el comercio.
+    List<Purchase> getPurchases(String cuitStore, String cardNumber);
 
     // 6 Eliminar una promoción a traves de su código (tener en cuenta que esta
     // puede haber sido aplicada alguna compra)
