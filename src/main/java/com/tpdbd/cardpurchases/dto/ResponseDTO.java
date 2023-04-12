@@ -169,7 +169,7 @@ public interface ResponseDTO {
         String cuitStore,
         float ammount,
         float finalAmount,
-        Quota quota,
+        List<Quota> quotas,
         float storeDiscount)
         implements Purchase 
     {
@@ -181,7 +181,7 @@ public interface ResponseDTO {
                 cashPurchase.getCuitStore(), 
                 cashPurchase.getAmount(),
                 cashPurchase.getFinalAmount(),
-                Quota.fromModel(cashPurchase.getQuotas().iterator().next()),
+                cashPurchase.getQuotas().stream().map(Quota::fromModel).toList(),
                 cashPurchase.getStoreDiscount());
         }
 
