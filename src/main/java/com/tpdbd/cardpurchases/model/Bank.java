@@ -4,8 +4,6 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-
 import jakarta.persistence.*;
 
 @Entity
@@ -23,7 +21,6 @@ public class Bank {
     private String telephone;
 
     @OneToMany(cascade = CascadeType.ALL)
-    @JsonManagedReference
     private Set<Promotion> promotions;
 
     public Bank() {

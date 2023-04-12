@@ -2,8 +2,6 @@ package com.tpdbd.cardpurchases.model;
 
 import java.time.LocalDate;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-
 import jakarta.persistence.*;
 
 @Entity
@@ -14,7 +12,6 @@ public abstract class Promotion {
     private Long id;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JsonBackReference
     private Bank bank;
 
     // TODO Check if this 'code' is the 'paymentVoucher' in Purchase class
