@@ -7,6 +7,8 @@ import com.tpdbd.cardpurchases.dto.RequestDTO;
 import com.tpdbd.cardpurchases.model.Card;
 import com.tpdbd.cardpurchases.model.Purchase;
 
+import jakarta.annotation.Nullable;
+
 
 public interface CardPurchasesService {
     // 1 Agregar una nueva promoción de tipo descuento a un banco dado
@@ -17,7 +19,7 @@ public interface CardPurchasesService {
 
     // 3 Generar el total de pago de un mes dado, informando las compras
     // correspondientes
-
+    //
     // TODO ¿Total de pago por tarjeta o por usuario o por banco o global a todo?
 
     // 4 Obtener el listado de tarjetas que vencen en los siguientes 30 días.
@@ -25,13 +27,14 @@ public interface CardPurchasesService {
 
     // 5 Obtener la información de una compra, incluyendo el listado de cuotas si
     // esta posee.
+    //
     // TODO ¿Cómo identificar una compra exactamente? Lo normal sería usar la
     //      tarjeta, el comercio y la fecha, pero hay 2 problemas:
     //         1- Igualmente podria haber más de una compra en el mismo día
     //         2- El modelo no tiene fecha para una compra
     //      En base a lo anterior, por el momento se tratará de identificar compras 
-    //      usando solo la tarjeta y el comercio.
-    List<Purchase> getPurchases(String cuitStore, String cardNumber);
+    //      usando solo la tarjeta y opcionalmente el comercio.
+    List<Purchase> cardsGetPurchases(String cardNumber, @Nullable String cuitStore);
 
     // 6 Eliminar una promoción a traves de su código (tener en cuenta que esta
     // puede haber sido aplicada alguna compra)
