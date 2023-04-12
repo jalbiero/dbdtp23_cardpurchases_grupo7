@@ -93,7 +93,7 @@ public class CardPurchasesControllerTests {
 
     @Test
     public void testPaymentsUpdateDate() {
-        final var NEW_DATES = new RequestDTO.PaymentDates(
+        final var NEW_DATES = new RequestDTO.PaymentsUpdateDatesBody(
             LocalDate.of(2030, 12, 31), LocalDate.of(2040, 10, 15));
 
         var code = getSomePaymentCode();
@@ -146,29 +146,29 @@ public class CardPurchasesControllerTests {
         
         // Test some expiration paths
 
-        Function<RequestDTO.SoonToExpire, ValidatableResponse> getSoonToExpire = 
+        Function<RequestDTO.CardsGetSoonToExpiredBody, ValidatableResponse> getSoonToExpire = 
             (body) -> {
                 return given()
                     .when()
                         .contentType(ContentType.JSON)    
                         .body(body)
-                        .get("/cards/getSoonToExpire")
+                        .get("/cards/soonToExpire")
                     .then()
                         .statusCode(200)
                         .contentType(ContentType.JSON);
             };
 
 
-        var noCardsInTheNext30days = new RequestDTO.SoonToExpire(BASE_DATE, 30);
+        var noCardsInTheNext30days = new RequestDTO.CardsGetSoonToExpiredBody(BASE_DATE, 30);
         getSoonToExpire.apply(noCardsInTheNext30days)
             .body("$", Matchers.hasSize(0));
             
-        var oneCardInTheNext30days = new RequestDTO.SoonToExpire(BASE_DATE.plusDays(5), 30);
+        var oneCardInTheNext30days = new RequestDTO.CardsGetSoonToExpiredBody(BASE_DATE.plusDays(5), 30);
         getSoonToExpire.apply(oneCardInTheNext30days)
             .body("$", Matchers.hasSize(1))
             .body("[0].number", Matchers.equalTo(CARD_NUMBER));
 
-        var noCardsAllAlreadyExpired = new RequestDTO.SoonToExpire(BASE_DATE.plusDays(DAYS_TO_EXPIRATION + 1), 30);
+        var noCardsAllAlreadyExpired = new RequestDTO.CardsGetSoonToExpiredBody(BASE_DATE.plusDays(DAYS_TO_EXPIRATION + 1), 30);
         getSoonToExpire.apply(noCardsAllAlreadyExpired)
             .body("$", Matchers.hasSize(0));
 
@@ -176,6 +176,40 @@ public class CardPurchasesControllerTests {
         given().delete("/test/cards/{number}", CARD_NUMBER);
     }
 
+    @Test
+    public void testCardsGetPurchases() {
+        var cardNumber = getSomeCardNumber();
+
+        // Get all card purchases
+        var response = 
+            given()
+                .when()
+                    .get("/cards/{number}/purchases", cardNumber);
+        response
+            .then()
+                .statusCode(200)
+                .contentType(ContentType.JSON)
+                .body("$", Matchers.hasSize(Matchers.greaterThan(0)))
+                .body("[0].cardNumber", Matchers.equalTo(cardNumber))
+                .body("[0].quotas", Matchers.hasSize(Matchers.greaterThan(0)));
+
+        // Get purchases in some store                
+        var cuitStore = response.jsonPath().getString("[0].cuitStore");
+        var totalNumOfPurchases = response.jsonPath().getList("$").size();
+
+        var body = new RequestDTO.CardsGetPurchasesBody(cuitStore);
+
+        given()
+            .when()
+                .contentType(ContentType.JSON)
+                .body(body)
+                .get("/cards/{number}/purchases", cardNumber)
+            .then()
+                .statusCode(200)
+                .contentType(ContentType.JSON)
+                .body("$", Matchers.hasSize(Matchers.lessThanOrEqualTo(totalNumOfPurchases)))
+                .body("[0].cuitStore", Matchers.equalTo(cuitStore));
+    }
 
     ///////////////////
     // Helpers
@@ -199,5 +233,12 @@ public class CardPurchasesControllerTests {
             .get("/test/payments/codes")
             .jsonPath()
             .getObject("codes[0]", String.class);
+    }
+
+    public String getSomeCardNumber() {
+        return given()
+            .get("/test/cards/numbers")
+            .jsonPath()
+            .getObject("numbers[0]", String.class);
     }
 }
