@@ -22,7 +22,7 @@ public class CardPurchasesController {
     private CardPurchasesService service;
 
     /***
-     * Endpoint to check the application is up and running 
+     * Endpoint to check if  the application is up and running 
      * 
      * URL:
      *      GET /
@@ -83,15 +83,17 @@ public class CardPurchasesController {
      *      }
      */    
     @PutMapping("/payments/{code}/updateDates")
-    void paymentsUpdateDates(@PathVariable String code, @RequestBody RequestDTO.PaymentDates paymentDates) {
-        if (paymentDates.firstExpiration().isAfter(paymentDates.secondExpiration())) {
+    void paymentsUpdateDates(@PathVariable String code, 
+                             @RequestBody RequestDTO.PaymentsUpdateDatesBody body) 
+    {
+        if (body.firstExpiration().isAfter(body.secondExpiration())) {
             throw new BadRequestException(
                 "Second expiration date (%s) must be grater than the fist one (%s)", 
-                paymentDates.secondExpiration(), 
-                paymentDates.firstExpiration());
+                body.secondExpiration(), 
+                body.firstExpiration());
         }
         
-        this.service.paymentsUpdateDates(code, paymentDates.firstExpiration(), paymentDates.secondExpiration());
+        this.service.paymentsUpdateDates(code, body.firstExpiration(), body.secondExpiration());
     }
 
     /**
@@ -100,7 +102,7 @@ public class CardPurchasesController {
      * specified)
      *
      * URL: 
-     *      GET /cards/getSoonToExpire
+     *      GET /cards/soonToExpire
      * 
      * ContentType: 
      *      application/json
@@ -129,15 +131,75 @@ public class CardPurchasesController {
      *          ...
      *      ]
      */
-    @GetMapping("/cards/getSoonToExpire")
-    List<ResponseDTO.Card> cardsGetSonToExpired(@RequestBody(required=false) 
-                                                Optional<RequestDTO.SoonToExpire> soonToExpire) 
+    @GetMapping("/cards/soonToExpire")
+    List<ResponseDTO.Card> cardsGetSoonToExpired(@RequestBody(required=false) 
+                                                 Optional<RequestDTO.CardsGetSoonToExpiredBody> body) 
     {
-        var params = soonToExpire.orElse(new RequestDTO.SoonToExpire());
+        var params = body.orElse(new RequestDTO.CardsGetSoonToExpiredBody());
         var cards = this.service.cardsGetSoonToExpire(params.baseDate(), params.daysFromBaseDate());
 
         return cards.stream()
             .map(ResponseDTO.Card::fromModel)
+            .toList();
+    }
+
+
+    /**
+     * Lists purchases from the specfied card in the specified store
+     * 
+     * URL: 
+     *      GET /cards/{number}/purchases
+     * 
+     * ContentType: 
+     *      application/json
+     * 
+     * Params:
+     *  - URL: 
+     *  - Body (optional):
+     *      {
+     *          "cuitStore": "23-123123123-1"
+     *      }     
+     * 
+     * Return:
+     *      A list of purchases with their associated quotas
+     * 
+     *      [
+     *          {
+     *              "type": "CashPurchase" | "CreditPurchase"
+     *              "cardNumber": "1123123123123",
+     *              "PaymentVoucher": "voucherCode",
+     *              "store": "the name of the store",
+     *              "cuitStore": "23-123123123-1",
+     *              "ammount": 5012.50,
+     *              "finalAmount": 6000.0,
+     *              "storeDiscount": 10.0         << Only available when type = "CashPurchase"
+     *              "interest": 15.0,             << Only available when type = "CreditPurchase"
+     *              "numberOfQuotas": 5,          << Only available when type = "CreditPurchase"
+     *              "quotas: [                    << Only one quota when type = "CashPurchase"
+     *                  {
+     *                      "number": 1, 
+     *                      "price": 450.50, 
+     *                      "month": 10, 
+     *                      "year": 2023, 
+     *                      "store": "The name of the store",  
+     *                      "cardNumber": "1123123123123"
+     *                  },
+     *                  ...
+     *              ]
+     *          },
+     *          ...
+     *      ]
+     */
+    @GetMapping("/cards/{number}/purchases")
+    List<ResponseDTO.Purchase> cardsGetPurchases(
+        @PathVariable String number, 
+        @RequestBody(required=false) Optional<RequestDTO.CardsGetPurchasesBody> body) 
+    {
+        var purchases = this.service.cardsGetPurchases(
+            number, body.map(RequestDTO.CardsGetPurchasesBody::cuitStore).orElse(null));
+    
+        return purchases.stream()
+            .map(ResponseDTO.Purchase::fromModel)
             .toList();
     }
 }

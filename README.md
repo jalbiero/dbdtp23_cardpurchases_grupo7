@@ -38,6 +38,7 @@ $ mvn spring-boot:run
 
 ## Decisiones de desarrollo
 
+
 - Se actualizaron tipos de datos discontinuados tales como:
   - Anotaciones JPA: En los ejemplos prácticos se usa `javax.persistence.*`, en este trabajo se usa su actualzación `jakarta.persistence.*`
   - Fecha: `java.util.Date` a `java.time.LocalDate`
@@ -48,6 +49,7 @@ $ mvn spring-boot:run
   - Para aislar la funcionalidad pedida de lo que se necesita para probarla se decidió dividir las capas de controladores y servicios en 2 partes:
     1. El controlador `CardPurchasesController` y su servicio asociado `CardPurchasesService` implementan solamente lo que se pide como tarea.
     2. El controlador `TestController` y su servicio asociado `TestService` implementan funcionalidad necesaria para probar lo pedido en la tarea. En una aplicación completa lo pedido sería sólo una parte del total, el cual se complementaría con lo que está en `TestController/TestService`.
+    3. Por cuestiones de tiempo la documentación de los _endpoints_ se hace solamente para el `CardPurchasesController` de una forma sencilla (no se usa swagger por ejemplo). Para más detalles ir directamente al archivo [CardPurchasesController.java](src/main/java/com/tpdbd/cardpurchases/controllers/CardPurchasesController.java)
 - En la clase `Quota`, por conveniencia, se cambiaron los tipos de datos de los attributos `month`y `year`, ambos originalmente `String` a `int`
 - Con respecto a los DTO:
   - El _mapper_ más simple y directo de usar es en mi opinión "modelmapper", pero lamentablemente no soporta objetos DTO basados en _records_ (los cuales son muy sencillos de definir y usar)

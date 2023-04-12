@@ -10,10 +10,13 @@ import com.tpdbd.cardpurchases.dto.RequestDTO;
 import com.tpdbd.cardpurchases.errors.BankNotFoundException;
 import com.tpdbd.cardpurchases.errors.PaymentNotFoundException;
 import com.tpdbd.cardpurchases.model.Card;
+import com.tpdbd.cardpurchases.model.Purchase;
 import com.tpdbd.cardpurchases.repositories.BankRepository;
 import com.tpdbd.cardpurchases.repositories.CardRepository;
 import com.tpdbd.cardpurchases.repositories.PaymentRepository;
+import com.tpdbd.cardpurchases.repositories.PurchaseRepository;
 
+import jakarta.annotation.Nullable;
 import jakarta.transaction.Transactional;
 
 @Service
@@ -26,6 +29,9 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
 
     @Autowired
     private CardRepository cardRepository;
+
+    @Autowired
+    private PurchaseRepository<Purchase> purchaseRepository; 
 
     @Override
     @Transactional
@@ -55,5 +61,12 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
     public List<Card> cardsGetSoonToExpire(LocalDate baseDate, Integer daysFromBaseDate) {
         var finalDate = baseDate.plusDays(daysFromBaseDate);
         return this.cardRepository.findByExpirationDateBetween(baseDate, finalDate);
+    }
+
+    @Override
+    public List<Purchase> cardsGetPurchases(String cardNumber, @Nullable String cuitStore) {
+        return cuitStore == null
+            ? this.purchaseRepository.findByCardNumber(cardNumber)
+            : this.purchaseRepository.findByCardNumberAndCuitStore(cardNumber, cuitStore);
     }
 }
