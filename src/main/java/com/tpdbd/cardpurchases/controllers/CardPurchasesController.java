@@ -143,7 +143,6 @@ public class CardPurchasesController {
             .toList();
     }
 
-
     /**
      * Lists purchases from the specfied card in the specified store
      * 
@@ -200,6 +199,22 @@ public class CardPurchasesController {
     
         return purchases.stream()
             .map(ResponseDTO.Purchase::fromModel)
+            .toList();
+    }
+
+    /**
+     * TODO complete documentation 
+     * 
+     */
+    @GetMapping("/stores/{cuit}/availablePromotions")
+    List<ResponseDTO.Promotion> storesGetAvailablePromotions(
+        @PathVariable String cuit, 
+        @RequestBody RequestDTO.StoresGetAvailablePromotionsBody body) 
+    {
+        var promotions = this.service.storesGetAvailblePromotions(cuit, body.from(), body.to());
+    
+        return promotions.stream()
+            .map(ResponseDTO.Promotion::fromModel)
             .toList();
     }
 }
