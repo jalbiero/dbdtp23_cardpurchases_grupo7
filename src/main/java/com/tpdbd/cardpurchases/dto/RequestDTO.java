@@ -63,6 +63,14 @@ public interface RequestDTO {
     {}
 
     ////////////////////////////////////////////////////////
-    record CardsGetPurchasesBody(String cuitStore)
+    record CardsGetPurchasesBody(
+        String cuitStore)
     {}
+
+    ////////////////////////////////////////////////////////
+    record StoresGetAvailablePromotionsBody(
+        LocalDate from, 
+        LocalDate to)
+    {}
+
 }
