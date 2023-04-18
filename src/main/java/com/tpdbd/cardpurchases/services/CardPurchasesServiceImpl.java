@@ -10,6 +10,7 @@ import com.tpdbd.cardpurchases.dto.RequestDTO;
 import com.tpdbd.cardpurchases.errors.BankNotFoundException;
 import com.tpdbd.cardpurchases.errors.PaymentNotFoundException;
 import com.tpdbd.cardpurchases.model.Card;
+import com.tpdbd.cardpurchases.model.Promotion;
 import com.tpdbd.cardpurchases.model.Purchase;
 import com.tpdbd.cardpurchases.repositories.BankRepository;
 import com.tpdbd.cardpurchases.repositories.CardRepository;
@@ -68,5 +69,10 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
         return cuitStore == null
             ? this.purchaseRepository.findByCardNumber(cardNumber)
             : this.purchaseRepository.findByCardNumberAndCuitStore(cardNumber, cuitStore);
+    }
+
+    @Override
+    public List<Promotion> storesGetAvailblePromotions(String cuitStore, LocalDate from, LocalDate to) {
+        return null;
     }
 }

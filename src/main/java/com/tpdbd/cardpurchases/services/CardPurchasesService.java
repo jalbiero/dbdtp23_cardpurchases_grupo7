@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.tpdbd.cardpurchases.dto.RequestDTO;
 import com.tpdbd.cardpurchases.model.Card;
+import com.tpdbd.cardpurchases.model.Promotion;
 import com.tpdbd.cardpurchases.model.Purchase;
 
 import jakarta.annotation.Nullable;
@@ -38,7 +39,7 @@ public interface CardPurchasesService {
 
     // 6 Eliminar una promoción a traves de su código (tener en cuenta que esta
     // puede haber sido aplicada alguna compra)
-
+    //
     // TODO ¿Debo eliminar en cascada o no eliminar directamente?
 
     // 7 Obtener el precio total a pagar de una compra en cuotas (tener en cuenta
@@ -46,6 +47,7 @@ public interface CardPurchasesService {
 
     // 8 Obtener el listado de las promociones disponibles de un local entre dos
     // fechas
+    List<Promotion> storesGetAvailblePromotions(String cuitStore, LocalDate from, LocalDate to);
 
     // 9 Obtener los titulares de las 10 tarjetas con más compras.
 
