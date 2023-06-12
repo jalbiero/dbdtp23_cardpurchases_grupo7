@@ -22,7 +22,7 @@ public class CardPurchasesController {
     private CardPurchasesService service;
 
     /***
-     * Endpoint to check if  the application is up and running 
+     * Endpoint to check if the application is up and running 
      * 
      * URL:
      *      GET /
@@ -88,7 +88,7 @@ public class CardPurchasesController {
     {
         if (body.firstExpiration().isAfter(body.secondExpiration())) {
             throw new BadRequestException(
-                "Second expiration date (%s) must be grater than the fist one (%s)", 
+                "Second expiration date (%s) must be grater than the first one (%s)", 
                 body.secondExpiration(), 
                 body.firstExpiration());
         }
