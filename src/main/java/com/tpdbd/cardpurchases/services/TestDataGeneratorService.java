@@ -73,6 +73,7 @@ public class TestDataGeneratorService {
     private SequenceGenerator cuitGenerator = new SequenceGenerator();
     private SequenceGenerator promotionCode = new SequenceGenerator("promo");
     private SequenceGenerator paymentCode = new SequenceGenerator("payment");
+    private Iterable<Store> stores;
 
     public TestDataGeneratorService() {
         var locale = new Locale.Builder()
@@ -85,13 +86,14 @@ public class TestDataGeneratorService {
 
     @Transactional
     public void generateData() {
-        var stores = generateStores();
-        var banks = this.bankRepository.saveAll(generateBanks(stores));
+        this.stores = generateStores();
+
+        var banks = this.bankRepository.saveAll(generateBanks(this.stores));
         var cardHolders = this.cardHolderRepository.saveAll(generateCardHolders());
         var cards = this.cardRepository.saveAll(generateCards(banks, cardHolders));
 
-        var cashPurchases = generateCashPurchases(stores, cards);
-        var creditPurchases = generateCreditPurchases(stores, cards);
+        var cashPurchases = generateCashPurchases(this.stores, cards);
+        var creditPurchases = generateCreditPurchases(this.stores, cards);
 
         generatePaymentsFor(Stream.concat(
             StreamSupport.stream(cashPurchases.spliterator(), false),
@@ -99,6 +101,12 @@ public class TestDataGeneratorService {
 
         this.cashRepository.saveAll(cashPurchases);
         this.creditRepository.saveAll(creditPurchases);
+    }
+
+    public List<String> getStoreCuits() {
+        return StreamSupport.stream(this.stores.spliterator() , false)
+            .map(store -> store.cuit())
+            .collect(Collectors.toList());
     }
 
     //
@@ -201,7 +209,7 @@ public class TestDataGeneratorService {
      * @return
      */
     private Iterable<Store> generateStores() {        
-        return faker.collection(() -> new Store(
+        return this.faker.collection(() -> new Store(
                 this.faker.company().name(), 
                 this.cuitGenerator.getNextValue())
             )
