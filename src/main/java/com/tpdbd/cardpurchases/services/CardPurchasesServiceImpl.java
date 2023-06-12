@@ -10,10 +10,12 @@ import com.tpdbd.cardpurchases.dto.RequestDTO;
 import com.tpdbd.cardpurchases.errors.BankNotFoundException;
 import com.tpdbd.cardpurchases.errors.PaymentNotFoundException;
 import com.tpdbd.cardpurchases.model.Card;
+import com.tpdbd.cardpurchases.model.Promotion;
 import com.tpdbd.cardpurchases.model.Purchase;
 import com.tpdbd.cardpurchases.repositories.BankRepository;
 import com.tpdbd.cardpurchases.repositories.CardRepository;
 import com.tpdbd.cardpurchases.repositories.PaymentRepository;
+import com.tpdbd.cardpurchases.repositories.PromotionRepository;
 import com.tpdbd.cardpurchases.repositories.PurchaseRepository;
 
 import jakarta.annotation.Nullable;
@@ -32,6 +34,9 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
 
     @Autowired
     private PurchaseRepository<Purchase> purchaseRepository; 
+
+    @Autowired
+    private PromotionRepository promotionRepository;
 
     @Override
     @Transactional
@@ -68,5 +73,11 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
         return cuitStore == null
             ? this.purchaseRepository.findByCardNumber(cardNumber)
             : this.purchaseRepository.findByCardNumberAndCuitStore(cardNumber, cuitStore);
+    }
+
+    @Override
+    public List<Promotion> storesGetAvailblePromotions(String cuitStore, LocalDate from, LocalDate to) {
+        return this.promotionRepository
+          .findByCuitStoreAndValidityStartDateGreaterThanEqualAndValidityEndDateLessThanEqual(cuitStore, from, to);
     }
 }

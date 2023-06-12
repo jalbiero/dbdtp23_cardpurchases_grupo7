@@ -22,13 +22,7 @@ public interface ResponseDTO {
                 bank.getAddress(),
                 bank.getTelephone(),
                 bank.getPromotions().stream()
-                    .map(promotionFromModel -> {
-                        return (Promotion) switch (promotionFromModel) {
-                            case com.tpdbd.cardpurchases.model.Discount d -> Discount.fromModel(d);
-                            case com.tpdbd.cardpurchases.model.Financing f -> Financing.fromModel(f);
-                            default -> throw new IllegalArgumentException("Unknow type of promotion");
-                        };
-                    })
+                    .map(Promotion::fromModel)
                     .toList());
         }
     }
@@ -85,6 +79,14 @@ public interface ResponseDTO {
     ////////////////////////////////////////////////////////
     interface Promotion {
         String getType();
+
+        static Promotion fromModel(com.tpdbd.cardpurchases.model.Promotion promotion) {
+            return switch (promotion) {
+                case com.tpdbd.cardpurchases.model.Discount d -> Discount.fromModel(d);
+                case com.tpdbd.cardpurchases.model.Financing f -> Financing.fromModel(f);
+                default -> throw new IllegalArgumentException("Unknow type of promotion");
+            };
+        }
     }
     
     record Discount(

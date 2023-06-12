@@ -1,4 +1,5 @@
 # dbd_tp2022-23
+
 Trabajo final de Diseño de Bases de Datos 2022/23 - **GRUPO 7**
 
 ## Introducción
@@ -38,7 +39,7 @@ $ mvn spring-boot:run
 
 ## Decisiones de desarrollo
 
-
+- Se usa Java 19 con habilitación de "preview features" para usar funcionalidad nueva de _pattern matching_, específicamente _switch_ para _instanceof_ (ver [ResponseDTO.java](src/main/java/com/tpdbd/cardpurchases/dto/ResponseDTO.java))
 - Se actualizaron tipos de datos discontinuados tales como:
   - Anotaciones JPA: En los ejemplos prácticos se usa `javax.persistence.*`, en este trabajo se usa su actualzación `jakarta.persistence.*`
   - Fecha: `java.util.Date` a `java.time.LocalDate`

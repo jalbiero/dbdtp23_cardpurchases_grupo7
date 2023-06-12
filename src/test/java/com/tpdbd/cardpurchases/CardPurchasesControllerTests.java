@@ -18,6 +18,7 @@ import net.datafaker.Faker;
 import static io.restassured.RestAssured.given;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.function.Function;
 
 // @formatter:off
@@ -211,6 +212,50 @@ public class CardPurchasesControllerTests {
                 .body("[0].cuitStore", Matchers.equalTo(cuitStore));
     }
 
+    @Test
+    public void testStoresGetPromotions() {
+        var storeCuit = getSomeStoreCuit();
+
+        // Get all available promotions for the specified CUIT
+        var body = new RequestDTO.StoresGetAvailablePromotionsBody(
+            LocalDate.of(1900, 1, 1), LocalDate.of(3000, 12, 31));
+
+        var response = 
+            given()
+                .when()
+                    .contentType(ContentType.JSON)
+                    .body(body)
+                    .get("/stores/{cuit}/availablePromotions", storeCuit);
+        response
+            .then()
+                .statusCode(200)
+                .contentType(ContentType.JSON)
+                .body("$", Matchers.hasSize(Matchers.greaterThan(0)));
+
+        // Pick the 1st promotion in order to filter by its dates
+        var from = response.jsonPath().getString("[0].validityStartDate");
+        var to = response.jsonPath().getString("[0].validityEndDate");
+
+        var formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        body = new RequestDTO.StoresGetAvailablePromotionsBody(
+            LocalDate.parse(from, formatter),
+            LocalDate.parse(to, formatter)); 
+
+        response = 
+            given()
+                .when()
+                    .contentType(ContentType.JSON)
+                    .body(body)
+                    .get("/stores/{cuit}/availablePromotions", storeCuit);
+        response
+            .then()
+                .statusCode(200)
+                .contentType(ContentType.JSON)
+                .body("$", Matchers.hasSize(Matchers.equalTo(1)));
+    }
+
+
     ///////////////////
     // Helpers
 
@@ -240,5 +285,12 @@ public class CardPurchasesControllerTests {
             .get("/test/cards/numbers")
             .jsonPath()
             .getObject("numbers[0]", String.class);
+    }
+
+    static public String getSomeStoreCuit() {
+        return given()
+            .get("/test/stores/cuits")
+            .jsonPath()
+            .getObject("cuits[0]", String.class);
     }
 }
