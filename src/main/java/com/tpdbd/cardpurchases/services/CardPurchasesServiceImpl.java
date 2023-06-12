@@ -78,6 +78,6 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
     @Override
     public List<Promotion> storesGetAvailblePromotions(String cuitStore, LocalDate from, LocalDate to) {
         return this.promotionRepository
-            .findByCuitStoreAndValidityStartDateAfterAndValidityEndDateBefore(cuitStore, from, to);
+          .findByCuitStoreAndValidityStartDateGreaterThanEqualAndValidityEndDateLessThanEqual(cuitStore, from, to);
     }
 }
