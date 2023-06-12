@@ -108,7 +108,6 @@ public class CardPurchasesController {
      *      application/json
      * 
      * Params:
-     *  - URL: 
      *  - Body (optional):
      *      {
      *          "baseDate": "2023/10/15",       
@@ -153,7 +152,7 @@ public class CardPurchasesController {
      *      application/json
      * 
      * Params:
-     *  - URL: 
+     *  - URL: {number} the card number
      *  - Body (optional):
      *      {
      *          "cuitStore": "23-123123123-1"
@@ -203,8 +202,41 @@ public class CardPurchasesController {
     }
 
     /**
-     * TODO complete documentation 
+     * List promotions for the specified store in the specified date range
      * 
+     * URL: 
+     *      GET /stores/{cuit}/availablePromotions
+     * 
+     * ContentType: 
+     *      application/json
+     * 
+     * Params:
+     *  - URL: {cuit} the CUIT store
+     *  - Body:
+     *      {
+     *          "from": "2021-12-31",
+     *          "to": "2022-09-20"
+     *      }     
+     * 
+     * Return:
+     *      A list of store promotions
+     * 
+     *      [
+     *          {
+     *              "code": "promo114",
+     *              "promotionTitle": "definición transicional Pre-emptivo",
+     *              "nameStore": "Pardo S.R.L.",
+     *              "cuitStore": "0",
+     *              "validityStartDate": "2018-10-27",
+     *              "validityEndDate": "2019-06-12",
+     *              "comments": "Douglas Reynholm",
+     *              "discountPercentage": 0.15,
+     *              "priceCap": 6546.0,
+     *              "type": "Discount"
+     *          },
+     *          ...
+     *      ]
+     *
      */
     @GetMapping("/stores/{cuit}/availablePromotions")
     List<ResponseDTO.Promotion> storesGetAvailablePromotions(
