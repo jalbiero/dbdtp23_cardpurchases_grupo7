@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.tpdbd.cardpurchases.dto.RequestDTO;
 import com.tpdbd.cardpurchases.dto.ResponseDTO;
+import com.tpdbd.cardpurchases.services.TestDataGeneratorService;
 import com.tpdbd.cardpurchases.services.TestService;
 
 /**
@@ -25,6 +26,9 @@ import com.tpdbd.cardpurchases.services.TestService;
 public class TestController {
     @Autowired
     private TestService service;
+
+    @Autowired
+    private TestDataGeneratorService tdgService;
 
     @GetMapping("/")
     String index() {
@@ -100,4 +104,16 @@ public class TestController {
     ResponseDTO.Payment getPayment(@PathVariable String code) {
         return ResponseDTO.Payment.fromModel(this.service.getPayment(code));
     }
+
+    ///////////////////////
+    // Stores
+
+    @GetMapping("/stores/cuits")
+    Map<String, List<String>> getStoreCuits() {
+        var result = new LinkedHashMap<String, List<String>>();
+        result.put("cuits", this.tdgService.getStoreCuits());
+        return result;
+    }
+
+
 }
