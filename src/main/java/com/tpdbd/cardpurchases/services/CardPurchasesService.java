@@ -22,6 +22,7 @@ public interface CardPurchasesService {
     // correspondientes
     //
     // TODO ¿Total de pago por tarjeta o por usuario o por banco o global a todo?
+    // > total de un mes de una tarjeta
 
     // 4 Obtener el listado de tarjetas que vencen en los siguientes 30 días.
     List<Card> cardsGetSoonToExpire(LocalDate baseDate, Integer daysFromBaseDate);
@@ -35,12 +36,15 @@ public interface CardPurchasesService {
     //         2- El modelo no tiene fecha para una compra
     //      En base a lo anterior, por el momento se tratará de identificar compras 
     //      usando solo la tarjeta y opcionalmente el comercio.
+    // > Usar Id de la compra
     List<Purchase> cardsGetPurchases(String cardNumber, @Nullable String cuitStore);
 
     // 6 Eliminar una promoción a traves de su código (tener en cuenta que esta
     // puede haber sido aplicada alguna compra)
     //
     // TODO ¿Debo eliminar en cascada o no eliminar directamente?
+    // > Posible borrado lógico, 
+    // > Verificar si spring tiene algo para borrador lógico
 
     // 7 Obtener el precio total a pagar de una compra en cuotas (tener en cuenta
     // que pueden existir promociones aplicadas)
