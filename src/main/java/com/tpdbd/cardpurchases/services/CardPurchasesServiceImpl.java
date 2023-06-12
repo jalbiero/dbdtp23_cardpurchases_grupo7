@@ -15,6 +15,7 @@ import com.tpdbd.cardpurchases.model.Purchase;
 import com.tpdbd.cardpurchases.repositories.BankRepository;
 import com.tpdbd.cardpurchases.repositories.CardRepository;
 import com.tpdbd.cardpurchases.repositories.PaymentRepository;
+import com.tpdbd.cardpurchases.repositories.PromotionRepository;
 import com.tpdbd.cardpurchases.repositories.PurchaseRepository;
 
 import jakarta.annotation.Nullable;
@@ -33,6 +34,9 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
 
     @Autowired
     private PurchaseRepository<Purchase> purchaseRepository; 
+
+    @Autowired
+    private PromotionRepository promotionRepository;
 
     @Override
     @Transactional
@@ -73,6 +77,7 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
 
     @Override
     public List<Promotion> storesGetAvailblePromotions(String cuitStore, LocalDate from, LocalDate to) {
-        return null;
+        return this.promotionRepository
+            .findByCuitStoreAndValidityStartDateAfterAndValidityEndDateBefore(cuitStore, from, to);
     }
 }
