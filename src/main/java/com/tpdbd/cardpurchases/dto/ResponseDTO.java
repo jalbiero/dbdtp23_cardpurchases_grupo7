@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+
 // This interface is a sort of namespace in order to group a set of DTO types
 public interface ResponseDTO {
 
@@ -165,6 +166,7 @@ public interface ResponseDTO {
     }
 
     record CashPurchase(
+        long id,
         String cardNumber,
         Optional<String> PaymentVoucher,
         String store,
@@ -177,6 +179,7 @@ public interface ResponseDTO {
     {
         public static CashPurchase fromModel(com.tpdbd.cardpurchases.model.CashPurchase cashPurchase) {
             return new CashPurchase(
+                cashPurchase.getId(),
                 cashPurchase.getCard().getNumber(), 
                 cashPurchase.getPaymentVoucher(), 
                 cashPurchase.getStore(),
@@ -194,6 +197,7 @@ public interface ResponseDTO {
     }
 
     record CreditPurchase(
+        long id,
         String cardNumber,
         Optional<String> PaymentVoucher,
         String store,
@@ -207,6 +211,7 @@ public interface ResponseDTO {
     {
         public static CreditPurchase fromModel(com.tpdbd.cardpurchases.model.CreditPurchase creditPurchase) {
             return new CreditPurchase(
+                creditPurchase.getId(),
                 creditPurchase.getCard().getNumber(), 
                 creditPurchase.getPaymentVoucher(), 
                 creditPurchase.getStore(),
