@@ -143,63 +143,50 @@ public class CardPurchasesController {
     }
 
     /**
-     * Lists purchases from the specfied card in the specified store
+     * Gets information about the specified purchase
      * 
      * URL: 
-     *      GET /cards/{number}/purchases
+     *      GET /purchases/{id}
      * 
      * ContentType: 
      *      application/json
      * 
      * Params:
-     *  - URL: {number} the card number
-     *  - Body (optional):
-     *      {
-     *          "cuitStore": "23-123123123-1"
-     *      }     
+     *  - URL: {id} the purchase id
      * 
      * Return:
-     *      A list of purchases with their associated quotas
+     *      The purchase information
      * 
-     *      [
-     *          {
-     *              "type": "CashPurchase" | "CreditPurchase"
-     *              "cardNumber": "1123123123123",
-     *              "PaymentVoucher": "voucherCode",
-     *              "store": "the name of the store",
-     *              "cuitStore": "23-123123123-1",
-     *              "ammount": 5012.50,
-     *              "finalAmount": 6000.0,
-     *              "storeDiscount": 10.0         << Only available when type = "CashPurchase"
-     *              "interest": 15.0,             << Only available when type = "CreditPurchase"
-     *              "numberOfQuotas": 5,          << Only available when type = "CreditPurchase"
-     *              "quotas: [                    << Only one quota when type = "CashPurchase"
-     *                  {
-     *                      "number": 1, 
-     *                      "price": 450.50, 
-     *                      "month": 10, 
-     *                      "year": 2023, 
-     *                      "store": "The name of the store",  
-     *                      "cardNumber": "1123123123123"
-     *                  },
-     *                  ...
-     *              ]
-     *          },
-     *          ...
-     *      ]
+     *      {
+     *          "id": 12
+     *          "type": "CashPurchase" | "CreditPurchase"
+     *          "cardNumber": "1123123123123",
+     *          "PaymentVoucher": "voucherCode",
+     *          "store": "the name of the store",
+     *          "cuitStore": "23-123123123-1",
+     *          "ammount": 5012.50,
+     *          "finalAmount": 6000.0,
+     *          "storeDiscount": 10.0         << Only available when type = "CashPurchase"
+     *          "interest": 15.0,             << Only available when type = "CreditPurchase"
+     *          "numberOfQuotas": 5,          << Only available when type = "CreditPurchase"
+     *          "quotas: [                    << Only one quota when type = "CashPurchase"
+     *              {
+     *                  "number": 1, 
+     *                  "price": 450.50, 
+     *                  "month": 10, 
+     *                  "year": 2023, 
+     *                  "store": "The name of the store",  
+     *                  "cardNumber": "1123123123123"
+     *              },
+     *              ...
+     *          ]
+     *      }
      */
-    @GetMapping("/cards/{number}/purchases")
-    List<ResponseDTO.Purchase> cardsGetPurchases(
-        @PathVariable String number, 
-        @RequestBody(required=false) Optional<RequestDTO.CardsGetPurchasesBody> body) 
-    {
-        var purchases = this.service.cardsGetPurchases(
-            number, body.map(RequestDTO.CardsGetPurchasesBody::cuitStore).orElse(null));
-    
-        return purchases.stream()
-            .map(ResponseDTO.Purchase::fromModel)
-            .toList();
+    @GetMapping("/purchases/{id}")
+    ResponseDTO.Purchase purchasesGetInfo(@PathVariable Long id) {
+        return ResponseDTO.Purchase.fromModel(this.service.purchasesGetInfo(id));
     }
+
 
     /**
      * List promotions for the specified store in the specified date range
