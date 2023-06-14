@@ -29,15 +29,7 @@ public interface CardPurchasesService {
 
     // 5 Obtener la información de una compra, incluyendo el listado de cuotas si
     // esta posee.
-    //
-    // TODO ¿Cómo identificar una compra exactamente? Lo normal sería usar la
-    //      tarjeta, el comercio y la fecha, pero hay 2 problemas:
-    //         1- Igualmente podria haber más de una compra en el mismo día
-    //         2- El modelo no tiene fecha para una compra
-    //      En base a lo anterior, por el momento se tratará de identificar compras 
-    //      usando solo la tarjeta y opcionalmente el comercio.
-    // > Usar Id de la compra
-    List<Purchase> cardsGetPurchases(String cardNumber, @Nullable String cuitStore);
+    Purchase purchasesGetInfo(long purchaseId);
 
     // 6 Eliminar una promoción a traves de su código (tener en cuenta que esta
     // puede haber sido aplicada alguna compra)
