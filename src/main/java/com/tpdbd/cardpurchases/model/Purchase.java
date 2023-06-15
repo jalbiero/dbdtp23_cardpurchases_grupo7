@@ -36,14 +36,12 @@ public abstract class Purchase {
     }
 
     public Purchase(
-    // @formatter:off        
         Card card, 
         @Nullable String paymentVoucher, 
         String store, 
         String cuitStore, 
         float amount, 
         float finalAmount) 
-    // @formatter:on
     {
         this.card = card;
         this.paymentVoucher = paymentVoucher;
@@ -52,6 +50,10 @@ public abstract class Purchase {
         this.amount = amount;
         this.finalAmount = finalAmount;
         this.quotas = new LinkedHashSet<Quota>();
+    }
+
+    public long getId() {
+        return this.id;
     }
 
     public Card getCard() {

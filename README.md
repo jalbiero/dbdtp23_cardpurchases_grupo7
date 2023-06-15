@@ -39,6 +39,8 @@ $ mvn spring-boot:run
 
 ## Decisiones de desarrollo
 
+### Iniciales
+
 - Se usa Java 19 con habilitación de "preview features" para usar funcionalidad nueva de _pattern matching_, específicamente _switch_ para _instanceof_ (ver [ResponseDTO.java](src/main/java/com/tpdbd/cardpurchases/dto/ResponseDTO.java))
 - Se actualizaron tipos de datos discontinuados tales como:
   - Anotaciones JPA: En los ejemplos prácticos se usa `javax.persistence.*`, en este trabajo se usa su actualzación `jakarta.persistence.*`
@@ -46,11 +48,21 @@ $ mvn spring-boot:run
 - Por cuestiones de claridad las siguientes clases fueron renombradas (ya que al representar compras se confundían con los pagos de las mismas)
   - `CashPayment` a `CashPurchase`
   - `MonthlyPayment` a `CreditPurchase`
-- Con respecto a los controladores y a los servicios:
-  - Para aislar la funcionalidad pedida de lo que se necesita para probarla se decidió dividir las capas de controladores y servicios en 2 partes:
-    1. El controlador `CardPurchasesController` y su servicio asociado `CardPurchasesService` implementan solamente lo que se pide como tarea.
-    2. El controlador `TestController` y su servicio asociado `TestService` implementan funcionalidad necesaria para probar lo pedido en la tarea. En una aplicación completa lo pedido sería sólo una parte del total, el cual se complementaría con lo que está en `TestController/TestService`.
-    3. Por cuestiones de tiempo la documentación de los _endpoints_ se hace solamente para el `CardPurchasesController` de una forma sencilla (no se usa swagger por ejemplo). Para más detalles ir directamente al archivo [CardPurchasesController.java](src/main/java/com/tpdbd/cardpurchases/controllers/CardPurchasesController.java)
+
+### Controladores y servicos
+
+Para aislar la funcionalidad pedida de lo que se necesita para probarla se decidió dividir las capas de controladores y servicios en 2 partes:
+
+1. El controlador `CardPurchasesController` y su servicio asociado `CardPurchasesService` implementan solamente lo que se pide como tarea.
+2. El controlador `TestController` y su servicio asociado `TestService` implementan funcionalidad necesaria para probar lo pedido en la tarea. En una aplicación completa lo pedido sería sólo una parte del total, el cual se complementaría con lo que está en `TestController/TestService`.
+3. Por cuestiones de tiempo la documentación de los _endpoints_ se hace solamente para el `CardPurchasesController` de una forma sencilla (no se usa swagger por ejemplo). Para más detalles ir directamente al archivo [CardPurchasesController.java](src/main/java/com/tpdbd/cardpurchases/controllers/CardPurchasesController.java)
+
+### Entidades
+
+¿Cómo identificar unívocamente las entidades? En aquellas en los que hubiera un campo que permita hacerlo (CUIT, DNI, Number, etc) se optó por usar los mismos (ej: `Bank`, `CardHolder`, `Card`). En los que no, se usa directamente el ID autogenerado (ej: `Purchases`)
+
+### Otros
+
 - En la clase `Quota`, por conveniencia, se cambiaron los tipos de datos de los attributos `month`y `year`, ambos originalmente `String` a `int`
 - Con respecto a los DTO:
   - El _mapper_ más simple y directo de usar es en mi opinión "modelmapper", pero lamentablemente no soporta objetos DTO basados en _records_ (los cuales son muy sencillos de definir y usar)

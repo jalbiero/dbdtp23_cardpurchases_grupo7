@@ -8,9 +8,6 @@ import com.tpdbd.cardpurchases.model.Card;
 import com.tpdbd.cardpurchases.model.Promotion;
 import com.tpdbd.cardpurchases.model.Purchase;
 
-import jakarta.annotation.Nullable;
-
-
 public interface CardPurchasesService {
     // 1 Agregar una nueva promoción de tipo descuento a un banco dado
     void banksAddDiscountPromotion(String cuit, RequestDTO.Discount discount);
@@ -29,21 +26,13 @@ public interface CardPurchasesService {
 
     // 5 Obtener la información de una compra, incluyendo el listado de cuotas si
     // esta posee.
-    //
-    // TODO ¿Cómo identificar una compra exactamente? Lo normal sería usar la
-    //      tarjeta, el comercio y la fecha, pero hay 2 problemas:
-    //         1- Igualmente podria haber más de una compra en el mismo día
-    //         2- El modelo no tiene fecha para una compra
-    //      En base a lo anterior, por el momento se tratará de identificar compras 
-    //      usando solo la tarjeta y opcionalmente el comercio.
-    // > Usar Id de la compra
-    List<Purchase> cardsGetPurchases(String cardNumber, @Nullable String cuitStore);
+    Purchase purchasesGetInfo(long purchaseId);
 
     // 6 Eliminar una promoción a traves de su código (tener en cuenta que esta
     // puede haber sido aplicada alguna compra)
     //
     // TODO ¿Debo eliminar en cascada o no eliminar directamente?
-    // > Posible borrado lógico, 
+    // > Posible borrado lógico,
     // > Verificar si spring tiene algo para borrador lógico
 
     // 7 Obtener el precio total a pagar de una compra en cuotas (tener en cuenta

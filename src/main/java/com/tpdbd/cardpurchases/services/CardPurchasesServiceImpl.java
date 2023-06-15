@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.tpdbd.cardpurchases.dto.RequestDTO;
 import com.tpdbd.cardpurchases.errors.BankNotFoundException;
 import com.tpdbd.cardpurchases.errors.PaymentNotFoundException;
+import com.tpdbd.cardpurchases.errors.PurchaseNotFoundException;
 import com.tpdbd.cardpurchases.model.Card;
 import com.tpdbd.cardpurchases.model.Promotion;
 import com.tpdbd.cardpurchases.model.Purchase;
@@ -18,7 +19,6 @@ import com.tpdbd.cardpurchases.repositories.PaymentRepository;
 import com.tpdbd.cardpurchases.repositories.PromotionRepository;
 import com.tpdbd.cardpurchases.repositories.PurchaseRepository;
 
-import jakarta.annotation.Nullable;
 import jakarta.transaction.Transactional;
 
 @Service
@@ -69,10 +69,10 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
     }
 
     @Override
-    public List<Purchase> cardsGetPurchases(String cardNumber, @Nullable String cuitStore) {
-        return cuitStore == null
-            ? this.purchaseRepository.findByCardNumber(cardNumber)
-            : this.purchaseRepository.findByCardNumberAndCuitStore(cardNumber, cuitStore);
+    public Purchase purchasesGetInfo(long id) {
+        return this.purchaseRepository
+            .findById(id)
+            .orElseThrow(() -> new PurchaseNotFoundException(id));
     }
 
     @Override

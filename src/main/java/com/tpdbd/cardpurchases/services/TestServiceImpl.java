@@ -13,10 +13,12 @@ import com.tpdbd.cardpurchases.errors.PaymentNotFoundException;
 import com.tpdbd.cardpurchases.model.Bank;
 import com.tpdbd.cardpurchases.model.Card;
 import com.tpdbd.cardpurchases.model.Payment;
+import com.tpdbd.cardpurchases.model.Purchase;
 import com.tpdbd.cardpurchases.repositories.BankRepository;
 import com.tpdbd.cardpurchases.repositories.CardHolderRepository;
 import com.tpdbd.cardpurchases.repositories.CardRepository;
 import com.tpdbd.cardpurchases.repositories.PaymentRepository;
+import com.tpdbd.cardpurchases.repositories.PurchaseRepository;
 
 import jakarta.transaction.Transactional;
 
@@ -26,13 +28,16 @@ public class TestServiceImpl implements TestService {
     BankRepository bankRepository;
 
     @Autowired
-    PaymentRepository paymentRepository;
+    CardHolderRepository cardHolderRepository;
 
     @Autowired
     CardRepository cardRepository;
 
     @Autowired
-    CardHolderRepository cardHolderRepository;
+    PaymentRepository paymentRepository;
+
+    @Autowired
+    PurchaseRepository<Purchase> purchaseRepository;
 
     @Override
     public List<String> getBankCuits() {
@@ -101,5 +106,10 @@ public class TestServiceImpl implements TestService {
         return this.paymentRepository
             .findByCode(code)
             .orElseThrow(() -> new PaymentNotFoundException(code));
+    }
+
+    @Override
+    public List<Long> getPurchaseIds() {
+        return this.purchaseRepository.findAllIds();
     }
 }

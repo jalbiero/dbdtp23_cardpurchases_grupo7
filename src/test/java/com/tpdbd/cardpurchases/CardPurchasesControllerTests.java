@@ -177,39 +177,18 @@ public class CardPurchasesControllerTests {
         given().delete("/test/cards/{number}", CARD_NUMBER);
     }
 
-    @Test
-    public void testCardsGetPurchases() {
-        var cardNumber = getSomeCardNumber();
-
-        // Get all card purchases
-        var response = 
-            given()
-                .when()
-                    .get("/cards/{number}/purchases", cardNumber);
-        response
-            .then()
-                .statusCode(200)
-                .contentType(ContentType.JSON)
-                .body("$", Matchers.hasSize(Matchers.greaterThan(0)))
-                .body("[0].cardNumber", Matchers.equalTo(cardNumber))
-                .body("[0].quotas", Matchers.hasSize(Matchers.greaterThan(0)));
-
-        // Get purchases in some store                
-        var cuitStore = response.jsonPath().getString("[0].cuitStore");
-        var totalNumOfPurchases = response.jsonPath().getList("$").size();
-
-        var body = new RequestDTO.CardsGetPurchasesBody(cuitStore);
-
+    @Test 
+    public void testPurchasesGetInfo() {
+        var id = getSomePurchaseId();
+     
         given()
             .when()
-                .contentType(ContentType.JSON)
-                .body(body)
-                .get("/cards/{number}/purchases", cardNumber)
+                .get("/purchases/{id}", id)
             .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
-                .body("$", Matchers.hasSize(Matchers.lessThanOrEqualTo(totalNumOfPurchases)))
-                .body("[0].cuitStore", Matchers.equalTo(cuitStore));
+                .body("id", Matchers.equalTo((int)id))
+                .body("quotas", Matchers.hasSize(Matchers.greaterThanOrEqualTo(0)));
     }
 
     @Test
@@ -293,4 +272,12 @@ public class CardPurchasesControllerTests {
             .jsonPath()
             .getObject("cuits[0]", String.class);
     }
+
+    static public long getSomePurchaseId() {
+        return given()
+            .get("/test/purchases/ids")
+            .jsonPath()
+            .getObject("ids[0]", Long.class);
+    }
+
 }
