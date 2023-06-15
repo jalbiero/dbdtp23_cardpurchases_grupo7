@@ -8,9 +8,6 @@ import com.tpdbd.cardpurchases.model.Card;
 import com.tpdbd.cardpurchases.model.Promotion;
 import com.tpdbd.cardpurchases.model.Purchase;
 
-import jakarta.annotation.Nullable;
-
-
 public interface CardPurchasesService {
     // 1 Agregar una nueva promoción de tipo descuento a un banco dado
     void banksAddDiscountPromotion(String cuit, RequestDTO.Discount discount);
@@ -35,7 +32,7 @@ public interface CardPurchasesService {
     // puede haber sido aplicada alguna compra)
     //
     // TODO ¿Debo eliminar en cascada o no eliminar directamente?
-    // > Posible borrado lógico, 
+    // > Posible borrado lógico,
     // > Verificar si spring tiene algo para borrador lógico
 
     // 7 Obtener el precio total a pagar de una compra en cuotas (tener en cuenta
