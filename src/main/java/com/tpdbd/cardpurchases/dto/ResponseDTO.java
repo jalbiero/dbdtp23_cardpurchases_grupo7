@@ -248,4 +248,9 @@ public interface ResponseDTO {
                 quota.getPurchase().getCard().getNumber());
         }
     }
+
+    ////////////////////////////////////////////////////////
+    record Store(String name, String cuit, Float profit) {
+        
+    }
 }

@@ -4,10 +4,13 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import com.tpdbd.cardpurchases.dto.RequestDTO;
+import com.tpdbd.cardpurchases.dto.ResponseDTO;
 import com.tpdbd.cardpurchases.errors.BankNotFoundException;
+import com.tpdbd.cardpurchases.errors.BestSellerStoreNotFoundException;
 import com.tpdbd.cardpurchases.errors.PaymentNotFoundException;
 import com.tpdbd.cardpurchases.errors.PurchaseNotFoundException;
 import com.tpdbd.cardpurchases.model.Card;
@@ -18,6 +21,7 @@ import com.tpdbd.cardpurchases.repositories.CardRepository;
 import com.tpdbd.cardpurchases.repositories.PaymentRepository;
 import com.tpdbd.cardpurchases.repositories.PromotionRepository;
 import com.tpdbd.cardpurchases.repositories.PurchaseRepository;
+import com.tpdbd.cardpurchases.repositories.QuotaRepository;
 
 import jakarta.transaction.Transactional;
 
@@ -37,6 +41,9 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
 
     @Autowired
     private PromotionRepository promotionRepository;
+
+    @Autowired
+    private QuotaRepository quotaRepository;
 
     @Override
     @Transactional
@@ -79,5 +86,18 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
     public List<Promotion> storesGetAvailblePromotions(String cuitStore, LocalDate from, LocalDate to) {
         return this.promotionRepository
           .findByCuitStoreAndValidityStartDateGreaterThanEqualAndValidityEndDateLessThanEqual(cuitStore, from, to);
+    }
+
+    @Override
+    public ResponseDTO.Store storesGetBestSeller(int year, int month) {
+        var bestSellers = this.quotaRepository.findBestSellerStores(year, month, PageRequest.of(0, 1));
+
+        if (bestSellers.isEmpty())
+            throw new BestSellerStoreNotFoundException(year, month);
+
+        var bestSeller = bestSellers.getContent().get(0);
+
+        return new ResponseDTO.Store(
+            bestSeller.getStore(), bestSeller.getCuitStore(), bestSeller.getMonthlyProfit());
     }
 }

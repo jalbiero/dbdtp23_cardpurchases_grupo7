@@ -234,6 +234,33 @@ public class CardPurchasesControllerTests {
                 .body("$", Matchers.hasSize(Matchers.equalTo(1)));
     }
 
+    @Test
+    public void testStoresGetBestSellerHappyPath() {
+        // TODO This test is not well designed because the year and month are 
+        // hardcoded (test data is repeatable, but if not the test will fail.
+        // See TestDataGeneratorService.random for more information about repeatable data)
+
+        given()
+            .when()
+                .get("/stores/bestSeller?year={year}&month={month}", 2023, 3)
+            .then()
+                .statusCode(200)
+                .contentType(ContentType.JSON)
+                .body("name", Matchers.not(Matchers.emptyString()))
+                .body("cuit", Matchers.not(Matchers.emptyString()))
+                .body("profit", Matchers.greaterThan(0.f));
+    }
+
+    @Test
+    public void testStoresGetBestSellerNotFound() {
+        // No sells in January, 1610 ;-)
+        given()
+            .when()
+                .get("/stores/bestSeller?year={year}&month={month}", 1610, 1)
+            .then()
+                .statusCode(404);
+    }
+
 
     ///////////////////
     // Helpers
