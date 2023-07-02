@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import com.tpdbd.cardpurchases.dto.RequestDTO;
+import com.tpdbd.cardpurchases.dto.ResponseDTO;
 import com.tpdbd.cardpurchases.model.Card;
 import com.tpdbd.cardpurchases.model.Promotion;
 import com.tpdbd.cardpurchases.model.Purchase;
@@ -47,6 +48,7 @@ public interface CardPurchasesService {
     // 10 Obtener la promoción mas utilizada en las compras registradas
 
     // 11 Obtener el nombre y cuit del local, que mas facturo en cierto mes
+    ResponseDTO.Store storesGetBestSeller(int year, int month);
 
     // 12 Obtener el banco que registre la mayor sumatoria de los importes en pagos
     // con su tarjeta.
