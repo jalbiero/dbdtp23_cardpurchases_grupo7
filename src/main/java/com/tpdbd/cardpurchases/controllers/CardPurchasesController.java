@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.tpdbd.cardpurchases.dto.RequestDTO;
@@ -235,5 +236,30 @@ public class CardPurchasesController {
         return promotions.stream()
             .map(ResponseDTO.Promotion::fromModel)
             .toList();
+    }
+
+    /**
+     * Returns the best seller store for the speficied year and month
+     * 
+     * URL: 
+     *      GET /stores/bestSeller?year={someYear}&month={someMonth}
+     * 
+     * URL params:
+     *  - URL: {someYear} the specified year
+     *         {someMonth} the speficified month
+     * 
+     * Return:
+     *      The store found (name, cuit and profit for the specified year and month) or 404 otherwise
+     * 
+     *      {
+     *          "name":"Roman Caro e Hijos",
+     *          "cuit":"30",
+     *          "profit":59118.285
+     *      }
+     *
+     */
+    @GetMapping("/stores/bestSeller")
+    ResponseDTO.Store storesGetBestSeller(@RequestParam int year, @RequestParam int month) {
+        return this.service.storesGetBestSeller(year, month);
     }
 }
