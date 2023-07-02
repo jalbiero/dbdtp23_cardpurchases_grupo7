@@ -244,7 +244,6 @@ public class TestDataGeneratorService {
                     var validityStart = getFakeDate();
                     var validityEnd = getFakeDate(validityStart);
 
-                    // TODO If 
                     bank.addPromotion(new Discount(
                         bank,
                         this.promotionCode.getNextValue(), 
