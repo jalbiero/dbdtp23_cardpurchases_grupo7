@@ -125,5 +125,16 @@ public class TestController {
         return result;
     }
 
+    ///////////////////////
+    // Promotions
+
+    @GetMapping("/promotions/codes")
+    Map<String, List<String>> getPromotionCodes() {
+        var result = new LinkedHashMap<String, List<String>>();
+        result.put("codes", this.service.getPromotionCodes());
+        return result;
+    }
+
+
 
 }
