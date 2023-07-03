@@ -14,7 +14,6 @@ public class Financing extends Promotion {
     }
 
     public Financing(
-    // @formatter:off
         Bank bank,
         String code, 
         String promotionTitle, 
@@ -25,7 +24,6 @@ public class Financing extends Promotion {
         String comments, 
         int numberOfQuotas, 
         float interest) 
-    // @formatter:on
     {
         super(bank, code, promotionTitle, nameStore, cuitStore, validityStartDate, validityEndDate, comments);
         this.numberOfQuotas = numberOfQuotas;
