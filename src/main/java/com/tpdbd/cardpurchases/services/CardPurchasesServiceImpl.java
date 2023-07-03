@@ -12,6 +12,7 @@ import com.tpdbd.cardpurchases.dto.ResponseDTO;
 import com.tpdbd.cardpurchases.errors.BankNotFoundException;
 import com.tpdbd.cardpurchases.errors.BestSellerStoreNotFoundException;
 import com.tpdbd.cardpurchases.errors.PaymentNotFoundException;
+import com.tpdbd.cardpurchases.errors.PromotionNotFoundException;
 import com.tpdbd.cardpurchases.errors.PurchaseNotFoundException;
 import com.tpdbd.cardpurchases.model.Card;
 import com.tpdbd.cardpurchases.model.Promotion;
@@ -99,5 +100,11 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
 
         return new ResponseDTO.Store(
             bestSeller.getStore(), bestSeller.getCuitStore(), bestSeller.getMonthlyProfit());
+    }
+
+    @Override
+    public void promotionsDelete(String code) {
+        if (this.promotionRepository.deleteByCode(code) == 0) 
+            throw new PromotionNotFoundException(code);
     }
 }
