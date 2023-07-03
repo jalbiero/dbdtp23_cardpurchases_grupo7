@@ -111,6 +111,17 @@ public class TestControllerTests {
                 .statusCode(404);                
     }
 
+    @Test
+    public void testGetPromotionCodes() {
+        given()
+            .when()
+                .get("/test/promotions/codes")
+            .then()
+                .statusCode(200)
+                .contentType(ContentType.JSON)
+                .body("codes", Matchers.hasSize(Matchers.greaterThan((0))));
+    }
+    
 
     ///////////////////
     // Helpers
