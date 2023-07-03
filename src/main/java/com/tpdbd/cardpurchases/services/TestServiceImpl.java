@@ -18,6 +18,7 @@ import com.tpdbd.cardpurchases.repositories.BankRepository;
 import com.tpdbd.cardpurchases.repositories.CardHolderRepository;
 import com.tpdbd.cardpurchases.repositories.CardRepository;
 import com.tpdbd.cardpurchases.repositories.PaymentRepository;
+import com.tpdbd.cardpurchases.repositories.PromotionRepository;
 import com.tpdbd.cardpurchases.repositories.PurchaseRepository;
 
 import jakarta.transaction.Transactional;
@@ -38,6 +39,9 @@ public class TestServiceImpl implements TestService {
 
     @Autowired
     PurchaseRepository<Purchase> purchaseRepository;
+
+    @Autowired
+    PromotionRepository promotionRepository;
 
     @Override
     public List<String> getBankCuits() {
@@ -111,5 +115,10 @@ public class TestServiceImpl implements TestService {
     @Override
     public List<Long> getPurchaseIds() {
         return this.purchaseRepository.findAllIds();
+    }
+
+    @Override
+    public List<String> getPromotionCodes() {
+        return this.promotionRepository.findAllCodes();
     }
 }
