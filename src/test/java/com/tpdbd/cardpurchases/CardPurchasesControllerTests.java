@@ -1,5 +1,6 @@
 package com.tpdbd.cardpurchases;
 
+import static org.hamcrest.MatcherAssert.assertThat; 
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,6 +12,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import com.tpdbd.cardpurchases.dto.RequestDTO;
 
 import io.restassured.RestAssured;
+import io.restassured.common.mapper.TypeRef;
 import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
 import net.datafaker.Faker;
@@ -19,6 +21,8 @@ import static io.restassured.RestAssured.given;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.function.Function;
 
 // @formatter:off
@@ -237,7 +241,7 @@ public class CardPurchasesControllerTests {
     @Test
     public void testStoresGetBestSellerHappyPath() {
         // TODO This test is not well designed because the year and month are 
-        // hardcoded (test data is repeatable, but if not the test will fail.
+        // hardcoded (test data is repeatable, but if not, the test will fail.
         // See TestDataGeneratorService.random for more information about repeatable data)
 
         given()
@@ -259,6 +263,21 @@ public class CardPurchasesControllerTests {
                 .get("/stores/bestSeller?year={year}&month={month}", 1610, 1)
             .then()
                 .statusCode(404);
+    }
+
+    @Test 
+    public void testPromotionsDelete() {
+        var promoCodes = getPromotionCodes();
+        var codeToBeDeleted = promoCodes.get(0);
+
+        given()
+            .when()
+                .delete("/promotions/{code}", codeToBeDeleted)
+            .then()
+                .statusCode(200);
+
+        promoCodes = getPromotionCodes();
+        assertThat("Promotion not deleted", !promoCodes.contains(codeToBeDeleted));
     }
 
 
@@ -305,6 +324,13 @@ public class CardPurchasesControllerTests {
             .get("/test/purchases/ids")
             .jsonPath()
             .getObject("ids[0]", Long.class);
+    }
+
+    static public List<String> getPromotionCodes() {
+        return given()
+            .get("/test/promotions/codes")
+            .jsonPath()
+            .getObject("codes", new TypeRef<LinkedList<String>>(){});
     }
 
 }

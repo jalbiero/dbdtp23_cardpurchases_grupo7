@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,6 +18,8 @@ import com.tpdbd.cardpurchases.dto.ResponseDTO;
 import com.tpdbd.cardpurchases.errors.BadRequestException;
 import com.tpdbd.cardpurchases.services.CardPurchasesService;
 
+// Note: Number in the documentation of each endpoint is correlated with
+//       the one in the service class (CardPurchaseService)
 @RestController
 public class CardPurchasesController {
     @Autowired
@@ -30,14 +33,15 @@ public class CardPurchasesController {
      * 
      * Return:
      *      The name of the application
+     * 
      */
     @GetMapping("/")
     String index() {
         return "Card Purchases application";
     }
 
-    /**
-     * Adds a new Discount promotion to the speficied bank (identified by its CUIT)
+    /** 
+     * 01 - Adds a new Discount promotion to the speficied bank (identified by its CUIT)
      * 
      * URL: 
      *      POST /banks/{cuit}/addDiscountPromotion
@@ -46,20 +50,20 @@ public class CardPurchasesController {
      *      application/json
      * 
      * Params:
-     *  - URL: {cuit} string that indentifies the bank
-     *  - Body:
-     *      {
-     *          "code":               "Promotion code",
-     *          "promotionTitle":     "Promotion title", 
-     *          "nameStore":          "Store name", 
-     *          "cuitStore":          "Store CUIT",
-     *          "validityStartDate":  "2020/10/10",
-     *          "validityEndDate":    "2023/12/31", 
-     *          "comments":           "Some extra comments", 
-     *          "discountPercentage": 10.5, 
-     *          "priceCap":           10000.0, 
-     *          "onlyCash":           true
-     *      }
+     *      - URL: {cuit} string that indentifies the bank
+     *      - Body:
+     *          {
+     *              "code":               "Promotion code",
+     *              "promotionTitle":     "Promotion title", 
+     *              "nameStore":          "Store name", 
+     *              "cuitStore":          "Store CUIT",
+     *              "validityStartDate":  "2020/10/10",
+     *              "validityEndDate":    "2023/12/31", 
+     *              "comments":           "Some extra comments", 
+     *              "discountPercentage": 10.5, 
+     *              "priceCap":           10000.0, 
+     *              "onlyCash":           true
+     *          }
      */
     @PostMapping("/banks/{cuit}/addDiscountPromotion")
     void banksAddDiscountPromotion(@PathVariable String cuit, @RequestBody RequestDTO.Discount discount) {
@@ -67,7 +71,7 @@ public class CardPurchasesController {
     }
 
     /**
-     * Update the dates of the specified payment indentified by its code
+     * 02 - Update the dates of the specified payment indentified by its code
      * 
      * URL: 
      *      PUT /payments/{code}/updateDates
@@ -76,12 +80,12 @@ public class CardPurchasesController {
      *      application/json
      * 
      * Params:
-     *  - URL: {code} string that indentifies the payment
-     *  - Body:
-     *      {
-     *          "firstExpiration": "2023/10/31", 
-     *          "secondExpiration": "2023/11/15"
-     *      }
+     *      - URL: {code} string that indentifies the payment
+     *      - Body:
+     *          {
+     *              "firstExpiration": "2023/10/31", 
+     *              "secondExpiration": "2023/11/15"
+     *          }
      */    
     @PutMapping("/payments/{code}/updateDates")
     void paymentsUpdateDates(@PathVariable String code, 
@@ -98,7 +102,7 @@ public class CardPurchasesController {
     }
 
     /**
-     * Lists cards that expire in the following days (by default 30 days starting
+     * 04 - Lists cards that expire in the following days (by default 30 days starting
      * from the moment of calling this endpoint if the days and the date are not 
      * specified)
      *
@@ -109,11 +113,11 @@ public class CardPurchasesController {
      *      application/json
      * 
      * Params:
-     *  - Body (optional):
-     *      {
-     *          "baseDate": "2023/10/15",       
-     *          "daysFromBaseDate": 25 
-     *      }     
+     *      - Body (optional):
+     *          {
+     *              "baseDate": "2023/10/15",       
+     *              "daysFromBaseDate": 25 
+     *          }     
      * 
      * Return:
      *      A list of Cards:
@@ -144,7 +148,7 @@ public class CardPurchasesController {
     }
 
     /**
-     * Gets information about the specified purchase
+     * 05 - Gets information about the specified purchase
      * 
      * URL: 
      *      GET /purchases/{id}
@@ -153,10 +157,10 @@ public class CardPurchasesController {
      *      application/json
      * 
      * Params:
-     *  - URL: {id} the purchase id
+     *      - URL: {id} the purchase id
      * 
      * Return:
-     *      The purchase information
+     *      The purchase information:
      * 
      *      {
      *          "id": 12
@@ -188,9 +192,27 @@ public class CardPurchasesController {
         return ResponseDTO.Purchase.fromModel(this.service.purchasesGetInfo(id));
     }
 
+    /**
+     * 06 - Delete a specified promotion
+     * 
+     * URL: 
+     *      DELETE /promotions/{code}
+     *
+     * Params:
+     *      - URL: {code} Promotion code
+     * 
+     * Return:
+     *      404 if promotion code could not be found  
+     * 
+     */
+    @DeleteMapping("/promotions/{code}")
+    void promotionsDelete(@PathVariable String code) {
+        this.service.promotionsDelete(code);
+    }
+
 
     /**
-     * List promotions for the specified store in the specified date range
+     * 08 - List promotions for the specified store in the specified date range
      * 
      * URL: 
      *      GET /stores/{cuit}/availablePromotions
@@ -199,15 +221,15 @@ public class CardPurchasesController {
      *      application/json
      * 
      * Params:
-     *  - URL: {cuit} the CUIT store
-     *  - Body:
-     *      {
-     *          "from": "2021-12-31",
-     *          "to": "2022-09-20"
-     *      }     
+     *      - URL: {cuit} the CUIT store
+     *      - Body:
+     *          {
+     *              "from": "2021-12-31",
+     *              "to": "2022-09-20"
+     *          }     
      * 
      * Return:
-     *      A list of store promotions
+     *      A list of store promotions:
      * 
      *      [
      *          {
@@ -239,17 +261,18 @@ public class CardPurchasesController {
     }
 
     /**
-     * Returns the best seller store for the speficied year and month
+     * 11 - Returns the best seller store for the speficied year and month
      * 
      * URL: 
      *      GET /stores/bestSeller?year={someYear}&month={someMonth}
      * 
      * URL params:
-     *  - URL: {someYear} the specified year
-     *         {someMonth} the speficified month
+     *      - URL: {someYear} the specified year
+     *             {someMonth} the speficified month
      * 
      * Return:
-     *      The store found (name, cuit and profit for the specified year and month) or 404 otherwise
+     *      The store found (name, cuit and profit for the specified year and month)
+     *      or 404 otherwise
      * 
      *      {
      *          "name":"Roman Caro e Hijos",

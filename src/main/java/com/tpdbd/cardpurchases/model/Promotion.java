@@ -3,9 +3,11 @@ package com.tpdbd.cardpurchases.model;
 import java.time.LocalDate;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.Where;
 
 @Entity
 @Inheritance
+@Where(clause = "deleted = false") // Note: SQL specific, Mongo vesion could need another solution 
 public abstract class Promotion {
     @Id
     @GeneratedValue
@@ -29,11 +31,13 @@ public abstract class Promotion {
 
     private String comments;
 
+    // See PromotionRepository.deleteByCode for more information about its usage
+    private Boolean deleted; 
+
     public Promotion() {
     }
 
     public Promotion(
-    // @formatter:off            
         Bank bank, 
         String code, 
         String promotionTitle, 
@@ -42,7 +46,6 @@ public abstract class Promotion {
         LocalDate validityStartDate, 
         LocalDate validityEndDate, 
         String comments) 
-    // @formatter:on
     {
         this.bank = bank;
         this.code = code;
@@ -52,6 +55,7 @@ public abstract class Promotion {
         this.validityStartDate = validityStartDate;
         this.validityEndDate = validityEndDate;
         this.comments = comments;
+        this.deleted = false;
     }
 
     public Bank getBank() {

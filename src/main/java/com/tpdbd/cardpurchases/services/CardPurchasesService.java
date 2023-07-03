@@ -31,10 +31,7 @@ public interface CardPurchasesService {
 
     // 6 Eliminar una promoción a traves de su código (tener en cuenta que esta
     // puede haber sido aplicada alguna compra)
-    //
-    // TODO ¿Debo eliminar en cascada o no eliminar directamente?
-    // > Posible borrado lógico,
-    // > Verificar si spring tiene algo para borrador lógico
+    void promotionsDelete(String code);
 
     // 7 Obtener el precio total a pagar de una compra en cuotas (tener en cuenta
     // que pueden existir promociones aplicadas)

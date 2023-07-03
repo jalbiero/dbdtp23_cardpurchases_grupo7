@@ -18,7 +18,6 @@ public class Discount extends Promotion {
     }
 
     public Discount(
-    // @formatter:off
         Bank bank,
         String code, 
         String promotionTitle, 
@@ -30,7 +29,6 @@ public class Discount extends Promotion {
         float discountPercentage, 
         float priceCap, 
         boolean onlyCash) 
-    // @formatter:on
     {
         super(bank, code, promotionTitle, nameStore, cuitStore, validityStartDate, validityEndDate, comments);
         this.discountPercentage = discountPercentage;
