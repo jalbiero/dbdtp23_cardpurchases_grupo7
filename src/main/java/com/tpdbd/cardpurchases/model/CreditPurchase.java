@@ -14,7 +14,6 @@ public class CreditPurchase extends Purchase {
     }
 
     public CreditPurchase(
-    // @formatter:off
         Card card, 
         @Nullable String paymentVoucher, 
         String store, 
@@ -23,7 +22,6 @@ public class CreditPurchase extends Purchase {
         float finalAmount, 
         float interest,
         int numberOfQuotas)
-    // @formatter:on
     {
         super(card, paymentVoucher, store, cuitStore, amount, finalAmount);
         this.interest = interest;

@@ -34,7 +34,6 @@ public class Payment {
     }
 
     public Payment(
-    // @formatter:off        
         String code, 
         int month, 
         int year, 
@@ -42,7 +41,6 @@ public class Payment {
         LocalDate secondExpiration,
         float surchase, 
         float totalPrice) 
-    // @formatter:on
     {
         this.code = code;
         this.month = month;

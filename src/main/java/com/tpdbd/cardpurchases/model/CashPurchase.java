@@ -12,7 +12,6 @@ public class CashPurchase extends Purchase {
     }
 
     public CashPurchase(
-    // @formatter:off        
         Card card, 
         @Nullable String paymentVoucher, 
         String store, 
@@ -20,7 +19,6 @@ public class CashPurchase extends Purchase {
         float amount, 
         float finalAmount,
         float storeDiscount) 
-    // @formatter:on
     {
         super(card, paymentVoucher, store, cuitStore, amount, finalAmount);
         this.storeDiscount = storeDiscount;
