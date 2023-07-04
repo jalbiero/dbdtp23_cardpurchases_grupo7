@@ -32,6 +32,7 @@ public abstract class Promotion {
     private String comments;
 
     // See PromotionRepository.deleteByCode for more information about its usage
+    @SuppressWarnings("unused")
     private Boolean deleted; 
 
     public Promotion() {
