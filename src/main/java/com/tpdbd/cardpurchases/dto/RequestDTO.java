@@ -73,4 +73,10 @@ public interface RequestDTO {
         LocalDate to)
     {}
 
+    ////////////////////////////////////////////////////////
+    record CardsMonthtlyPayment(
+        int year,
+        int month)
+    {}   
+
 }
