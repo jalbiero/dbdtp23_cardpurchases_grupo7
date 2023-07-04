@@ -102,6 +102,33 @@ public class CardPurchasesController {
     }
 
     /**
+     * 03 - Get card montly payment with its purchases
+     * 
+     * URL: 
+     *      PUT /cards/{number}/montlyPayment
+     * 
+     * ContentType: 
+     *      application/json
+     * 
+     * Params:
+     *      - URL: {number} Card number
+     *      - Body:
+     *          {
+     *              "year": 2023, 
+     *              "month": 10
+     *          }
+     * 
+     * Return:
+     *      TODO Complete return type
+     */
+    @GetMapping("/cards/{number}/montlyPayment")
+    ResponseDTO.MonthlyPayment cardsGetMonthtlyPayment(@PathVariable String number, 
+                                                       @RequestBody RequestDTO.CardsMonthtlyPayment body) 
+    {
+        return this.service.cardsGetMonthtlyPayment(number, body.year(), body.month());
+    }
+
+    /**
      * 04 - Lists cards that expire in the following days (by default 30 days starting
      * from the moment of calling this endpoint if the days and the date are not 
      * specified)
