@@ -21,7 +21,8 @@ public interface CardPurchasesService {
     //
     // TODO ¿Total de pago por tarjeta o por usuario o por banco o global a todo?
     // > total de un mes de una tarjeta
-
+    ResponseDTO.MonthlyPayment cardsGetMonthtlyPayment(String cardNumber, int year, int month);
+  
     // 4 Obtener el listado de tarjetas que vencen en los siguientes 30 días.
     List<Card> cardsGetSoonToExpire(LocalDate baseDate, Integer daysFromBaseDate);
 
