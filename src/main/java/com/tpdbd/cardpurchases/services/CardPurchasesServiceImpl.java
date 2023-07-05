@@ -11,10 +11,12 @@ import com.tpdbd.cardpurchases.dto.RequestDTO;
 import com.tpdbd.cardpurchases.dto.ResponseDTO;
 import com.tpdbd.cardpurchases.errors.BankNotFoundException;
 import com.tpdbd.cardpurchases.errors.BestSellerStoreNotFoundException;
+import com.tpdbd.cardpurchases.errors.MonthlyPaymentNotFoundException;
 import com.tpdbd.cardpurchases.errors.PaymentNotFoundException;
 import com.tpdbd.cardpurchases.errors.PromotionNotFoundException;
 import com.tpdbd.cardpurchases.errors.PurchaseNotFoundException;
 import com.tpdbd.cardpurchases.model.Card;
+import com.tpdbd.cardpurchases.model.Payment;
 import com.tpdbd.cardpurchases.model.Promotion;
 import com.tpdbd.cardpurchases.model.Purchase;
 import com.tpdbd.cardpurchases.repositories.BankRepository;
@@ -50,8 +52,8 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
     @Transactional
     public void banksAddDiscountPromotion(String cuit, RequestDTO.Discount discount) {
         var bank = this.bankRepository
-                .findByCuit(cuit)
-                .orElseThrow(() -> new BankNotFoundException(cuit));
+            .findByCuit(cuit)
+            .orElseThrow(() -> new BankNotFoundException(cuit));
 
         bank.addPromotion(RequestDTO.Discount.toModel(discount, bank));
         this.bankRepository.save(bank);
@@ -61,8 +63,8 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
     @Transactional
     public void paymentsUpdateDates(String code, LocalDate firstExpiration, LocalDate secondExpiration) {
         var payment = this.paymentRepository
-                .findByCode(code)
-                .orElseThrow(() -> new PaymentNotFoundException(code));
+            .findByCode(code)
+            .orElseThrow(() -> new PaymentNotFoundException(code));
 
         payment.setFirstExpiration(firstExpiration);
         payment.setSecondExpiration(secondExpiration);
@@ -70,6 +72,13 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
         this.paymentRepository.save(payment);
     }
 
+    @Override
+    public Payment cardsGetMonthtlyPayment(String cardNumber, int year, int month) {
+        return this.paymentRepository
+            .findMonthlyPayment(cardNumber, year, month)
+            .orElseThrow(() -> new MonthlyPaymentNotFoundException(cardNumber, year, month));
+    }
+  
     @Override
     public List<Card> cardsGetSoonToExpire(LocalDate baseDate, Integer daysFromBaseDate) {
         var finalDate = baseDate.plusDays(daysFromBaseDate);
@@ -86,7 +95,7 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
     @Override
     public List<Promotion> storesGetAvailblePromotions(String cuitStore, LocalDate from, LocalDate to) {
         return this.promotionRepository
-          .findByCuitStoreAndValidityStartDateGreaterThanEqualAndValidityEndDateLessThanEqual(cuitStore, from, to);
+            .findByCuitStoreAndValidityStartDateGreaterThanEqualAndValidityEndDateLessThanEqual(cuitStore, from, to);
     }
 
     @Override
@@ -107,4 +116,5 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
         if (this.promotionRepository.deleteByCode(code) == 0) 
             throw new PromotionNotFoundException(code);
     }
+
 }
