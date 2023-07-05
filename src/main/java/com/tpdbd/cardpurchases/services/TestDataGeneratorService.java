@@ -483,7 +483,7 @@ public class TestDataGeneratorService {
 
     /**
      * Generates monthly payments for all purchases, grouping quotas of the same card for the 
-     * same period of time
+     * same period of time (one payment for them)
      * @param purchases
      */
     private void generatePaymentsFor(Stream<Purchase> purchases) {
@@ -507,14 +507,19 @@ public class TestDataGeneratorService {
                             .map(Quota::getPrice)
                             .reduce(0.f, (accum, price) -> accum + price);
 
+                        // All quotas belong to purchases made with the same card,
+                        // so just use one of the to get the card
+                        var card = quotas.get(0).getPurchase().getCard();
+
                         var payment = new Payment(
                             this.paymentCode.getNextValue(),
                             period.month(),
                             period.year(),
                             LocalDate.of(period.year(), period.month(), 15),
                             LocalDate.of(period.year(), period.month(), 25),
-                            5.f, // TODO 5%
-                            totalPrice);
+                            totalPrice * 0.5f, // TODO 5% is harcoded 
+                            totalPrice,
+                            card);
 
                         // Set the bi-directional relationship
                         // TODO Check if this is entirely necessary
