@@ -120,10 +120,11 @@ public class CardPurchasesController {
      * 
      * Return:
      *      {
+     *          "cardNumber", "5876-1948-6884-1575",
      *          "year": 2021,
      *          "month": 8,
      *          "totalPrice": 72423.0,
-     *          "purchase": [
+     *          "purchases": [
      *             {
      *                 "id": 2,
      *                 "cardNumber": "5876-1948-6884-1575",
