@@ -257,10 +257,11 @@ public interface ResponseDTO {
 
     ////////////////////////////////////////////////////////
     record MonthlyPayment(
+        String cardNumber,
         int year, 
         int month, 
         float totalPrice,
-        List<Purchase> purchase) 
+        List<Purchase> purchases) 
     {
         public static MonthlyPayment fromModel(com.tpdbd.cardpurchases.model.Payment payment) {
             List<Purchase> purchases = payment.getQuotas().stream()
@@ -277,6 +278,7 @@ public interface ResponseDTO {
             //       a Card holder has payed in the given period (year and month)            
 
             return new MonthlyPayment(
+                payment.getCard().getNumber(),
                 payment.getYear(),
                 payment.getMonth(),
                 payment.getTotalPrice(),
