@@ -30,14 +30,12 @@ public class Card {
     }
 
     public Card(
-    // @formatter:off        
         Bank bank,
         CardHolder cardHolder, 
         String number, 
         String ccv, 
         LocalDate since,
         LocalDate expirationDate) 
-    // @formatter:on
     {
         this.bank = bank;
         this.cardHolder = cardHolder;

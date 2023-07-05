@@ -3,6 +3,7 @@ package com.tpdbd.cardpurchases.dto;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 // This interface is a sort of namespace in order to group a set of DTO types
@@ -68,7 +69,7 @@ public interface ResponseDTO {
                 payment.getYear(),
                 payment.getFirstExpiration(), 
                 payment.getSecondExpiration(), 
-                payment.getSurchase(), 
+                payment.getSurcharge(), 
                 payment.getTotalPrice(),
                 payment.getQuotas().stream()
                     .map(Quota::fromModel)
@@ -250,7 +251,39 @@ public interface ResponseDTO {
     }
 
     ////////////////////////////////////////////////////////
-    record Store(String name, String cuit, Float profit) {
+    record Store(String name, String cuit, float profit) {
         
+    }
+
+    ////////////////////////////////////////////////////////
+    record MonthlyPayment(
+        String cardNumber,
+        int year, 
+        int month, 
+        float totalPrice,
+        List<Purchase> purchases) 
+    {
+        public static MonthlyPayment fromModel(com.tpdbd.cardpurchases.model.Payment payment) {
+            List<Purchase> purchases = payment.getQuotas().stream()
+                .map(quota -> Purchase.fromModel(quota.getPurchase()))
+                .collect(Collectors.toList());
+            
+            // TODO: It is not clear how "Payment.surcharge", "Payment.firstExpiration" and
+            //       "Payment.secondExpiration" must be used. In my understanding the Payment entity
+            //       is to record a Card holder payment, so why the record has the expirations? 
+            //       In my opinion, the expirations and the surcharge must reside in the Quota entity, 
+            //       because this entity contains all the quotas (thr already payed and the pending ones)
+            //       Having said that, and for the sake of simplicity, I will ignore the "Payment.surcharge"
+            //       using only the "Payment.totalPrice" to represents the amount of money that
+            //       a Card holder has payed in the given period (year and month)            
+
+            return new MonthlyPayment(
+                payment.getCard().getNumber(),
+                payment.getYear(),
+                payment.getMonth(),
+                payment.getTotalPrice(),
+                purchases
+            );
+        }
     }
 }

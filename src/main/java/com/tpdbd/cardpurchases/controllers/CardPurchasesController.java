@@ -102,6 +102,63 @@ public class CardPurchasesController {
     }
 
     /**
+     * 03 - Get card montly payment with its purchases
+     * 
+     * URL: 
+     *      PUT /cards/{number}/montlyPayment
+     * 
+     * ContentType: 
+     *      application/json
+     * 
+     * Params:
+     *      - URL: {number} Card number
+     *      - Body:
+     *          {
+     *              "year": 2023, 
+     *              "month": 10
+     *          }
+     * 
+     * Return:
+     *      {
+     *          "cardNumber", "5876-1948-6884-1575",
+     *          "year": 2021,
+     *          "month": 8,
+     *          "totalPrice": 72423.0,
+     *          "purchases": [
+     *             {
+     *                 "id": 2,
+     *                 "cardNumber": "5876-1948-6884-1575",
+     *                 "PaymentVoucher": null,
+     *                 "store": "Florentin S.A.",
+     *                 "cuitStore": "14",
+     *                 "ammount": 36740.8,
+     *                 "finalAmount": 36740.8,
+     *                 "quotas": [
+     *                     {
+     *                         "number": 1,
+     *                         "price": 36740.8,
+     *                         "month": 8,
+     *                         "year": 2021,
+     *                         "store": "Florentin S.A.",
+     *                         "cardNumber": "5876-1948-6884-1575"
+     *                     }
+     *                 ],
+     *                 "storeDiscount": 0.0,
+     *                 "type": "CashPurchase"
+     *              },
+     *              ...
+     *          ]
+     *      }
+     */
+    @GetMapping("/cards/{number}/montlyPayment")
+    ResponseDTO.MonthlyPayment cardsGetMonthtlyPayment(@PathVariable String number, 
+                                                       @RequestBody RequestDTO.CardsMonthtlyPayment body) 
+    {
+        return ResponseDTO.MonthlyPayment.fromModel(
+            this.service.cardsGetMonthtlyPayment(number, body.year(), body.month()));
+    }
+
+    /**
      * 04 - Lists cards that expire in the following days (by default 30 days starting
      * from the moment of calling this endpoint if the days and the date are not 
      * specified)
@@ -209,7 +266,6 @@ public class CardPurchasesController {
     void promotionsDelete(@PathVariable String code) {
         this.service.promotionsDelete(code);
     }
-
 
     /**
      * 08 - List promotions for the specified store in the specified date range

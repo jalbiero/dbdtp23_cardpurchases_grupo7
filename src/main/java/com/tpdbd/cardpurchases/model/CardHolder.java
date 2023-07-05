@@ -25,14 +25,12 @@ public class CardHolder {
     }
 
     public CardHolder(
-    // @formatter:off
         String completeName, 
         String dni, 
         String cuil, 
         String address, 
         String telephone, 
         LocalDate entry) 
-    // @formatter:on
     {
         this.completeName = completeName;
         this.dni = dni;

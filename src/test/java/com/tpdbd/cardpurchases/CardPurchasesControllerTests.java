@@ -127,6 +127,43 @@ public class CardPurchasesControllerTests {
                     Matchers.equalTo(NEW_DATES.secondExpiration().toString()));
     }
 
+    @Test 
+    void testCardsGetMonthtlyPaymentHappyPath() {
+        // TODO This test is not well designed because the card number, year and month
+        //      are hardcoded (test data is repeatable, but if not, the test will fail.
+        //      See TestDataGeneratorService.random for more information about repeatable data)
+
+        final var CARD_NUMBER = "5876-1948-6884-1575";
+        final var PERIOD = new RequestDTO.CardsMonthtlyPayment(2021, 8);
+
+        given()
+            .when()
+                .contentType(ContentType.JSON)    
+                .body(PERIOD)
+                .get("/cards/{number}/montlyPayment", CARD_NUMBER)
+            .then()
+                .statusCode(200)
+                .contentType(ContentType.JSON)
+                .body("cardNumber", Matchers.equalTo(CARD_NUMBER))
+                .body("year", Matchers.equalTo(PERIOD.year()))
+                .body("month", Matchers.equalTo(PERIOD.month()))
+                .body("purchases", Matchers.not(Matchers.emptyArray()));
+    }
+
+    @Test 
+    void testCardsGetMonthtlyPaymentNotFound() {
+        final var CARD_NUMBER = "5876-1948-6884-1575";
+        final var PERIOD = new RequestDTO.CardsMonthtlyPayment(1900, 1);
+
+        given()
+            .when()
+                .contentType(ContentType.JSON)    
+                .body(PERIOD)
+                .get("/cards/{number}/montlyPayment", CARD_NUMBER)
+            .then()
+                .statusCode(404);
+    }
+
     @Test
     public void testCardsGetSoonToExpire() {
         // Some unique date (the database already has data from TestDataGeneratorService)
@@ -241,8 +278,8 @@ public class CardPurchasesControllerTests {
     @Test
     public void testStoresGetBestSellerHappyPath() {
         // TODO This test is not well designed because the year and month are 
-        // hardcoded (test data is repeatable, but if not, the test will fail.
-        // See TestDataGeneratorService.random for more information about repeatable data)
+        //       hardcoded (test data is repeatable, but if not, the test will fail.
+        //       See TestDataGeneratorService.random for more information about repeatable data)
 
         given()
             .when()

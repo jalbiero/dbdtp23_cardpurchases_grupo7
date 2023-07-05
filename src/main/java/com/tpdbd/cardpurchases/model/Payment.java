@@ -19,39 +19,44 @@ public class Payment {
 
     private int year;
 
+    // TODO See comments in ResponseDTO.MonthlyPayment about these 3 attribues
     private LocalDate firstExpiration;
-
     private LocalDate secondExpiration;
-
-    private float surchase; // TODO "Purchase or Surcharge" ?
+    private float surcharge; 
 
     private float totalPrice;
 
     @OneToMany(cascade = CascadeType.ALL)
     private Set<Quota> quotas;
 
+    // This allow an easy navigation to the card used in the payment (another
+    // complex way it is to use one of the associated quotas in order to reach 
+    // the Purchase and then the Card)
+    @ManyToOne
+    private Card card;
+    
     public Payment() {
     }
 
     public Payment(
-    // @formatter:off        
         String code, 
         int month, 
         int year, 
         LocalDate firstExpiration, 
         LocalDate secondExpiration,
-        float surchase, 
-        float totalPrice) 
-    // @formatter:on
+        float surcharge, 
+        float totalPrice, 
+        Card card) 
     {
         this.code = code;
         this.month = month;
         this.year = year;
         this.firstExpiration = firstExpiration;
         this.secondExpiration = secondExpiration;
-        this.surchase = surchase;
+        this.surcharge = surcharge;
         this.totalPrice = totalPrice;
         this.quotas = new LinkedHashSet<Quota>();
+        this.card = card;
     }
 
     public String getCode() {
@@ -94,12 +99,12 @@ public class Payment {
         this.secondExpiration = secondExpiration;
     }
 
-    public float getSurchase() {
-        return this.surchase;
+    public float getSurcharge() {
+        return this.surcharge;
     }
 
-    public void setSurchase(float surchase) {
-        this.surchase = surchase;
+    public void setSurcharge(float surchase) {
+        this.surcharge = surchase;
     }
 
     public float getTotalPrice() {
@@ -122,11 +127,19 @@ public class Payment {
         this.quotas.remove(quota);
     }
 
+    public Card getCard() {
+        return this.card;
+    }
+
+    public void setCard(Card card) {
+        this.card = card;
+    }
+
     @Override
     public String toString() {
         return "Payment [id=" + id + ", code=" + code + ", month=" + month + ", year=" + year + ", firstExpiration="
-                + firstExpiration + ", secondExpiration=" + secondExpiration + ", surchase=" + surchase
-                + ", totalPrice=" + totalPrice + ", quotas=" + quotas + "]";
+                + firstExpiration + ", secondExpiration=" + secondExpiration + ", surcharge=" + surcharge
+                + ", totalPrice=" + totalPrice + ", quotas=" + quotas + ", card=" + card + "]";
     }
 
 }

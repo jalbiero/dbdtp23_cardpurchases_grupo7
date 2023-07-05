@@ -8,6 +8,6 @@ import org.springframework.data.repository.CrudRepository;
 import com.tpdbd.cardpurchases.model.Purchase;
 
 public interface PurchaseRepository<T extends Purchase> extends CrudRepository<T, Long> {
-    @Query("SELECT u.id FROM Purchase u")
+    @Query("SELECT p.id FROM Purchase p")
     List<Long> findAllIds();
 }

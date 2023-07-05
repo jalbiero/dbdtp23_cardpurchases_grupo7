@@ -11,6 +11,6 @@ import com.tpdbd.cardpurchases.model.CardHolder;
 public interface CardHolderRepository extends CrudRepository<CardHolder, Long> {
     Optional<CardHolder> findByDni(String dni);
 
-    @Query("SELECT u.dni FROM CardHolder u")
+    @Query("SELECT c.dni FROM CardHolder c")
     List<String> findAllDnis();
 }

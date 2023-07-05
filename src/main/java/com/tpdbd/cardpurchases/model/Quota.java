@@ -35,14 +35,12 @@ public class Quota {
     }
 
     public Quota(
-    // @formatter:off
         Purchase purchase,
         int number, 
         float price, 
         int month, 
         int year, 
         Payment payment)
-    // @formatter:on
     {
         this.purchase = purchase;
         this.number = number;
