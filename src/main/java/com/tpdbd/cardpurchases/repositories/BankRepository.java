@@ -11,6 +11,6 @@ import com.tpdbd.cardpurchases.model.Bank;
 public interface BankRepository extends CrudRepository<Bank, Long> {
     Optional<Bank> findByCuit(String cuit);
 
-    @Query("SELECT u.cuit FROM Bank u")
+    @Query("SELECT b.cuit FROM Bank b")
     List<String> findAllCuits();
 }

@@ -12,7 +12,7 @@ import com.tpdbd.cardpurchases.model.Card;
 public interface CardRepository extends CrudRepository<Card, Long> {
     Optional<Card> findByNumber(String number);
 
-    @Query("SELECT u.number FROM Card u")
+    @Query("SELECT c.number FROM Card c")
     List<String> findAllNumbers();
 
     List<Card> findByExpirationDateBetween(LocalDate dt1, LocalDate dt2);
