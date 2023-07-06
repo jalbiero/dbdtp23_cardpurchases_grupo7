@@ -12,6 +12,7 @@ import com.tpdbd.cardpurchases.dto.ResponseDTO;
 import com.tpdbd.cardpurchases.errors.BankNotFoundException;
 import com.tpdbd.cardpurchases.errors.BestSellerStoreNotFoundException;
 import com.tpdbd.cardpurchases.errors.MonthlyPaymentNotFoundException;
+import com.tpdbd.cardpurchases.errors.NotFoundException;
 import com.tpdbd.cardpurchases.errors.PaymentNotFoundException;
 import com.tpdbd.cardpurchases.errors.PromotionNotFoundException;
 import com.tpdbd.cardpurchases.errors.PurchaseNotFoundException;
@@ -96,6 +97,22 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
     public List<Promotion> storesGetAvailblePromotions(String cuitStore, LocalDate from, LocalDate to) {
         return this.promotionRepository
             .findByCuitStoreAndValidityStartDateGreaterThanEqualAndValidityEndDateLessThanEqual(cuitStore, from, to);
+    }
+
+    @Override
+    public List<ResponseDTO.PurchaserCardHolder> cardsGetTop10Purchasers() {
+        var top10PurchaserCards = this.purchaseRepository.findTopPurchaserCards(PageRequest.of(0, 10));
+
+        // This is a rare case (practically, the database must be empty)
+        if (top10PurchaserCards.isEmpty())
+            throw new NotFoundException("No purchases could be found for any card");
+
+        return top10PurchaserCards.get()
+            .map(numOfPurchasesByCard -> new ResponseDTO.PurchaserCardHolder(
+                numOfPurchasesByCard.getCard().getCardHolder().getCompleteName(),
+                numOfPurchasesByCard.getNumOfPurchases(),
+                numOfPurchasesByCard.getCard().getNumber()))
+            .toList();
     }
 
     @Override

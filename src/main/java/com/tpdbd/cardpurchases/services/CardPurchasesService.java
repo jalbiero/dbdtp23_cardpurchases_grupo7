@@ -40,6 +40,8 @@ public interface CardPurchasesService {
     List<Promotion> storesGetAvailblePromotions(String cuitStore, LocalDate from, LocalDate to);
 
     // 9 Obtener los titulares de las 10 tarjetas con más compras.
+    // > Asumo que es total, no de un período específico
+    List<ResponseDTO.PurchaserCardHolder> cardsGetTop10Purchasers();
 
     // 10 Obtener la promoción mas utilizada en las compras registradas
 
