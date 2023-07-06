@@ -10,6 +10,7 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.tpdbd.cardpurchases.dto.RequestDTO;
+import com.tpdbd.cardpurchases.dto.ResponseDTO;
 
 import io.restassured.RestAssured;
 import io.restassured.common.mapper.TypeRef;
@@ -232,6 +233,21 @@ public class CardPurchasesControllerTests {
                 .body("quotas", Matchers.hasSize(Matchers.greaterThanOrEqualTo(0)));
     }
 
+    @Test 
+    public void testPromotionsDelete() {
+        var promoCodes = getPromotionCodes();
+        var codeToBeDeleted = promoCodes.get(0);
+
+        given()
+            .when()
+                .delete("/promotions/{code}", codeToBeDeleted)
+            .then()
+                .statusCode(200);
+
+        promoCodes = getPromotionCodes();
+        assertThat("Promotion not deleted", !promoCodes.contains(codeToBeDeleted));
+    }
+
     @Test
     public void testStoresGetPromotions() {
         var storeCuit = getSomeStoreCuit();
@@ -276,6 +292,30 @@ public class CardPurchasesControllerTests {
     }
 
     @Test
+    public void testCardsGetTop10Purchasers() {
+        var response = given()
+            .when()
+                .get("/cards/getTop10Purchasers");
+
+        response
+            .then()
+                .statusCode(200)
+                .contentType(ContentType.JSON)
+                .body("$", Matchers.hasSize(Matchers.greaterThan(0)));
+                
+        // Validate the data, incluiding the array order (sorted by numOfPurchases in descending order)
+        var purchasers = response.jsonPath().getList("$", ResponseDTO.PurchaserCardHolder.class);
+
+        int lastNumOfPurchases = Integer.MAX_VALUE;
+        for (var item: purchasers) {
+            assertThat(item.cardHolderName(), Matchers.not(Matchers.emptyString()));
+            assertThat(item.numOfPurchases(), Matchers.lessThanOrEqualTo(lastNumOfPurchases));
+            assertThat(item.cardNumber(), Matchers.not(Matchers.emptyString())); 
+            lastNumOfPurchases = item.numOfPurchases();
+        }
+    }
+
+    @Test
     public void testStoresGetBestSellerHappyPath() {
         // TODO This test is not well designed because the year and month are 
         //       hardcoded (test data is repeatable, but if not, the test will fail.
@@ -300,21 +340,6 @@ public class CardPurchasesControllerTests {
                 .get("/stores/bestSeller?year={year}&month={month}", 1610, 1)
             .then()
                 .statusCode(404);
-    }
-
-    @Test 
-    public void testPromotionsDelete() {
-        var promoCodes = getPromotionCodes();
-        var codeToBeDeleted = promoCodes.get(0);
-
-        given()
-            .when()
-                .delete("/promotions/{code}", codeToBeDeleted)
-            .then()
-                .statusCode(200);
-
-        promoCodes = getPromotionCodes();
-        assertThat("Promotion not deleted", !promoCodes.contains(codeToBeDeleted));
     }
 
 

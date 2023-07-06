@@ -272,7 +272,7 @@ public interface ResponseDTO {
             //       "Payment.secondExpiration" must be used. In my understanding the Payment entity
             //       is to record a Card holder payment, so why the record has the expirations? 
             //       In my opinion, the expirations and the surcharge must reside in the Quota entity, 
-            //       because this entity contains all the quotas (thr already payed and the pending ones)
+            //       because this entity contains all the quotas (the already payed and the pending ones)
             //       Having said that, and for the sake of simplicity, I will ignore the "Payment.surcharge"
             //       using only the "Payment.totalPrice" to represents the amount of money that
             //       a Card holder has payed in the given period (year and month)            
@@ -286,4 +286,13 @@ public interface ResponseDTO {
             );
         }
     }
+
+    ////////////////////////////////////////////////////////
+    record PurchaserCardHolder(
+        String cardHolderName,
+        int numOfPurchases,
+        String cardNumber)
+    {
+    }
+    
 }
