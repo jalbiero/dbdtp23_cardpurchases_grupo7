@@ -317,6 +317,34 @@ public class CardPurchasesController {
     }
 
     /**
+     * 09 - Gets the top 10 cards (and their respective owners) with more purchases
+     * 
+     * URL: 
+     *      GET /cards/getTop10Purchasers
+     * 
+     * Return:
+     *      The top 10 list sorted by numOfPurchases in descending order:
+     * 
+     *      [
+     *          {
+     *              "cardHolderName": "Nanci Gonzalez Zamora",
+     *              "numOfPurchases": 20,
+     *              "cardNumber": "2225-7984-4074-9687"
+     *          },
+     *          {
+     *              "cardHolderName": "Eliseo Castillo Peña",
+     *              "numOfPurchases": 19,
+     *              "cardNumber": "1800-3054-0373-2545"
+     *          },
+     *          ...
+     *      ]
+     */
+    @GetMapping("/cards/getTop10Purchasers")
+    List<ResponseDTO.PurchaserCardHolder> cardsGetTop10Purchasers() {
+        return this.service.cardsGetTop10Purchasers();
+    }
+
+    /**
      * 11 - Returns the best seller store for the speficied year and month
      * 
      * URL: 
