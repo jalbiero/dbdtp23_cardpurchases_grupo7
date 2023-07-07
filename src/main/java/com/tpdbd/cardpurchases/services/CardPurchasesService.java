@@ -22,6 +22,9 @@ public interface CardPurchasesService {
     Payment cardsGetMonthtlyPayment(String cardNumber, int year, int month);
   
     // 4 Obtener el listado de tarjetas que vencen en los siguientes 30 días.
+    // > Para mayor flexibilidad y facilidad de prueba, se optó por generalizar 
+    // > este servicio (es decir posibilidad de pasar la fecha y los días de vencimiento) 
+    // > como parámetro.
     List<Card> cardsGetSoonToExpire(LocalDate baseDate, Integer daysFromBaseDate);
 
     // 5 Obtener la información de una compra, incluyendo el listado de cuotas si
