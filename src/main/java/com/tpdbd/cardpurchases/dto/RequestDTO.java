@@ -61,22 +61,4 @@ public interface RequestDTO {
         LocalDate since,
         LocalDate expirationDate)
     {}
-
-    ////////////////////////////////////////////////////////
-    record CardsGetPurchasesBody(
-        String cuitStore)
-    {}
-
-    ////////////////////////////////////////////////////////
-    record StoresGetAvailablePromotionsBody(
-        LocalDate from, 
-        LocalDate to)
-    {}
-
-    ////////////////////////////////////////////////////////
-    record CardsMonthtlyPayment(
-        int year,
-        int month)
-    {}   
-
 }

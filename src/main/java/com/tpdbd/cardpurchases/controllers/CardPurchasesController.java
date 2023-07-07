@@ -1,5 +1,6 @@
 package com.tpdbd.cardpurchases.controllers;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -102,21 +103,14 @@ public class CardPurchasesController {
     }
 
     /**
-     * 03 - Get card montly payment with its purchases
+     * 03 - Get card monthly payment with its purchases
      * 
      * URL: 
-     *      PUT /cards/{number}/montlyPayment
+     *      PUT /cards/{number}/monthlyPayment?year={someYear}&month={someMonth}
      * 
-     * ContentType: 
-     *      application/json
-     * 
-     * Params:
-     *      - URL: {number} Card number
-     *      - Body:
-     *          {
-     *              "year": 2023, 
-     *              "month": 10
-     *          }
+     * URL params:
+     *      - URL: {someYear} the specified year
+     *             {someMonth} the specified month
      * 
      * Return:
      *      {
@@ -150,18 +144,24 @@ public class CardPurchasesController {
      *          ]
      *      }
      */
-    @GetMapping("/cards/{number}/montlyPayment")
+    @GetMapping("/cards/{number}/monthlyPayment")
     ResponseDTO.MonthlyPayment cardsGetMonthtlyPayment(@PathVariable String number, 
-                                                       @RequestBody RequestDTO.CardsMonthtlyPayment body) 
+                                                       @RequestParam int year, 
+                                                       @RequestParam int month)
     {
         return ResponseDTO.MonthlyPayment.fromModel(
-            this.service.cardsGetMonthtlyPayment(number, body.year(), body.month()));
+            this.service.cardsGetMonthtlyPayment(number, year, month));
     }
 
     /**
      * 04 - Lists cards that expire in the following days (by default 30 days starting
-     * from the moment of calling this endpoint if the days and the date are not 
-     * specified)
+     *      from the moment of calling this endpoint if the days and the date are not 
+     *      specified)
+     * 
+     *      Note: GET endpoints shouldn't use a request body (although most web framework supported
+     *            it), but current RFC and some companies use them. See the following for more 
+     *            information: https://stackoverflow.com/questions/978061/http-get-with-request-body 
+     *            Having said that, this particular endpoint use an optional request body.
      *
      * URL: 
      *      GET /cards/soonToExpire
@@ -173,7 +173,7 @@ public class CardPurchasesController {
      *      - Body (optional):
      *          {
      *              "baseDate": "2023/10/15",       
-     *              "daysFromBaseDate": 25 
+     *              "daysFromBaseDate": 30 
      *          }     
      * 
      * Return:
@@ -271,18 +271,11 @@ public class CardPurchasesController {
      * 08 - List promotions for the specified store in the specified date range
      * 
      * URL: 
-     *      GET /stores/{cuit}/availablePromotions
+     *      GET /stores/{cuit}/availablePromotions?from={from}&to={to}
      * 
-     * ContentType: 
-     *      application/json
-     * 
-     * Params:
-     *      - URL: {cuit} the CUIT store
-     *      - Body:
-     *          {
-     *              "from": "2021-12-31",
-     *              "to": "2022-09-20"
-     *          }     
+     * URL params:
+     *      - URL: {from} the specified 'from' date
+     *             {to} the specified 'to' date
      * 
      * Return:
      *      A list of store promotions:
@@ -305,11 +298,11 @@ public class CardPurchasesController {
      *
      */
     @GetMapping("/stores/{cuit}/availablePromotions")
-    List<ResponseDTO.Promotion> storesGetAvailablePromotions(
-        @PathVariable String cuit, 
-        @RequestBody RequestDTO.StoresGetAvailablePromotionsBody body) 
+    List<ResponseDTO.Promotion> storesGetAvailablePromotions(@PathVariable String cuit, 
+                                                             @RequestParam LocalDate from,
+                                                             @RequestParam LocalDate to)
     {
-        var promotions = this.service.storesGetAvailblePromotions(cuit, body.from(), body.to());
+        var promotions = this.service.storesGetAvailblePromotions(cuit, from, to);
     
         return promotions.stream()
             .map(ResponseDTO.Promotion::fromModel)
@@ -352,7 +345,7 @@ public class CardPurchasesController {
      * 
      * URL params:
      *      - URL: {someYear} the specified year
-     *             {someMonth} the speficified month
+     *             {someMonth} the specified month
      * 
      * Return:
      *      The store found (name, cuit and profit for the specified year and month)
