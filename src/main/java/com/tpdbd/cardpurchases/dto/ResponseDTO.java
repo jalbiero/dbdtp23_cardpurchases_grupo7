@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 
 // This interface is a sort of namespace in order to group a set of DTO types
 public interface ResponseDTO {
@@ -79,13 +81,22 @@ public interface ResponseDTO {
 
 
     ////////////////////////////////////////////////////////
+    @JsonInclude(JsonInclude.Include.NON_ABSENT) // Ignore Optional.empty fields when serialize them to json
     interface Promotion {
         String getType();
 
         static Promotion fromModel(com.tpdbd.cardpurchases.model.Promotion promotion) {
+            return fromModel(promotion, Optional.empty());
+        }
+
+        static Promotion fromModel(com.tpdbd.cardpurchases.model.Promotion promotion, int numOfPurchases) {
+            return fromModel(promotion, Optional.of(numOfPurchases));
+        }
+
+        private static Promotion fromModel(com.tpdbd.cardpurchases.model.Promotion promotion, Optional<Integer> numOfPurchases) {
             return switch (promotion) {
-                case com.tpdbd.cardpurchases.model.Discount d -> Discount.fromModel(d);
-                case com.tpdbd.cardpurchases.model.Financing f -> Financing.fromModel(f);
+                case com.tpdbd.cardpurchases.model.Discount d -> Discount.fromModel(d, numOfPurchases);
+                case com.tpdbd.cardpurchases.model.Financing f -> Financing.fromModel(f, numOfPurchases);
                 default -> throw new IllegalArgumentException("Unknow type of promotion");
             };
         }
@@ -100,10 +111,11 @@ public interface ResponseDTO {
         LocalDate validityEndDate,
         String comments,
         float discountPercentage,
-        float priceCap)
+        float priceCap,
+        Optional<Integer> numOfPurchases)
         implements Promotion
     {
-        public static Discount fromModel(com.tpdbd.cardpurchases.model.Discount discount) {
+        public static Discount fromModel(com.tpdbd.cardpurchases.model.Discount discount, Optional<Integer> numOfPurchases) {
             return new Discount(
                 discount.getCode(), 
                 discount.getPromotionTitle(), 
@@ -113,7 +125,8 @@ public interface ResponseDTO {
                 discount.getValidityEndDate(),
                 discount.getComments(),
                 discount.getDiscountPercentage(),
-                discount.getPriceCap());
+                discount.getPriceCap(),
+                numOfPurchases);
         } 
 
         @Override
@@ -131,10 +144,11 @@ public interface ResponseDTO {
         LocalDate validityEndDate,
         String comments,
         int numberOfQuotas,
-        float interest)
+        float interest,
+        Optional<Integer> numOfPurchases) 
         implements Promotion
     {
-        public static Financing fromModel(com.tpdbd.cardpurchases.model.Financing financing) {
+        public static Financing fromModel(com.tpdbd.cardpurchases.model.Financing financing, Optional<Integer> numOfPurchases) {
             return new Financing(
                 financing.getCode(), 
                 financing.getPromotionTitle(), 
@@ -144,7 +158,8 @@ public interface ResponseDTO {
                 financing.getValidityEndDate(),
                 financing.getComments(),
                 financing.getNumberOfQuotas(),
-                financing.getInterest());
+                financing.getInterest(),
+                numOfPurchases);
         }
 
         @Override

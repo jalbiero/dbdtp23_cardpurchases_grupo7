@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-// @formatter:off
 
 /**
  * Integration tests for Card Purchase Application
@@ -98,7 +97,7 @@ public class CardPurchasesControllerTests {
     }
 
     @Test
-    public void testPaymentsUpdateDate() {
+    public void testPaymentsUpdateDates() {
         final var NEW_DATES = new RequestDTO.PaymentsUpdateDatesBody(
             LocalDate.of(2030, 12, 31), LocalDate.of(2040, 10, 15));
 
@@ -247,7 +246,7 @@ public class CardPurchasesControllerTests {
     }
 
     @Test
-    public void testStoresGetPromotions() {
+    public void testStoresGetAvailblePromotions() {
         BiFunction<String, String, String> makeParams = 
             (from, to) -> String.format("from=%s&to=%s", from, to); 
 
@@ -302,6 +301,18 @@ public class CardPurchasesControllerTests {
             assertThat(item.cardNumber(), Matchers.not(Matchers.emptyString())); 
             lastNumOfPurchases = item.numOfPurchases();
         }
+    }
+
+    @Test
+    void testPromotionsGetMostUsed() {
+        given()
+            .when()
+                .get("/promotions/mostUsed")
+            .then()
+                .statusCode(200)
+                .contentType(ContentType.JSON)
+                .body("code", Matchers.not(Matchers.emptyString()))
+                .body("numOfPurchases", Matchers.greaterThan(0));
     }
 
     @Test

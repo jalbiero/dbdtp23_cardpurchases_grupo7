@@ -268,7 +268,7 @@ public class CardPurchasesController {
      * URL: 
      *      GET /stores/{cuit}/availablePromotions?from={from}&to={to}
      * 
-     * URL params:
+     * Params:
      *      - URL: {from} the specified 'from' date
      *             {to} the specified 'to' date
      * 
@@ -326,6 +326,32 @@ public class CardPurchasesController {
     @GetMapping("/cards/getTop10Purchasers")
     List<ResponseDTO.PurchaserCardHolder> cardsGetTop10Purchasers() {
         return this.service.cardsGetTop10Purchasers();
+    }
+
+    /**
+     * 10 - Gets the most used promotion across all purchases. 
+     * 
+     * URL: 
+     *      GET /promotions/mostUsed
+     * 
+     * Return:
+     *      {
+     *          "code": "promo129",
+     *          "promotionTitle": "conjunto de instrucciones generada por el cliente Fácil",
+     *          "nameStore": "Albornoz, Argañaraz y Bustamante Asociados",
+     *          "cuitStore": "12",
+     *          "validityStartDate": "2016-04-05",
+     *          "validityEndDate": "2018-02-04",
+     *          "comments": "David Garfield",
+     *          "numberOfQuotas": 8,
+     *          "interest": 0.06,
+     *          "numOfPurchases": 6,
+     *          "type": "Financing"
+     *      }
+     */
+    @GetMapping("/promotions/mostUsed")
+    ResponseDTO.Promotion promotionsGetMostUsed() {
+        return this.service.promotionsGetMostUsed();
     }
 
     /**

@@ -18,7 +18,6 @@ import static io.restassured.RestAssured.given;
 
 import java.time.LocalDate;
 
-// @formatter:off
 
 /**
  * Integration tests for helper endpoints
