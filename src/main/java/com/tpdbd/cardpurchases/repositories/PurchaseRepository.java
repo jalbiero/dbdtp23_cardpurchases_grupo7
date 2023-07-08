@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
 import com.tpdbd.cardpurchases.model.Purchase;
+import com.tpdbd.cardpurchases.repositories.projections.MostUsedVoucher;
 import com.tpdbd.cardpurchases.repositories.projections.NumOfPurchasesByCard;
 
 public interface PurchaseRepository<T extends Purchase> extends CrudRepository<T, Long> {
@@ -21,5 +22,15 @@ public interface PurchaseRepository<T extends Purchase> extends CrudRepository<T
         "FROM Purchase p " + 
         "GROUP BY p.card " +
         "ORDER BY COUNT(p) DESC")
-    Page<NumOfPurchasesByCard> findTopPurchaserCards(Pageable pageable);    
+    Page<NumOfPurchasesByCard> findTopPurchaserCards(Pageable pageable);  
+    
+    @Query(
+        "SELECT " + 
+        "   COUNT(p) AS numOfPurchases, " + 
+        "   p.paymentVoucher AS code " + 
+        "FROM Purchase p " + 
+        "WHERE p.paymentVoucher IS NOT NULL " +
+        "GROUP BY p.paymentVoucher " +
+        "ORDER BY COUNT(p) DESC ")
+    Page<MostUsedVoucher> findMostUsedVouchers(Pageable pageable);  
 }
