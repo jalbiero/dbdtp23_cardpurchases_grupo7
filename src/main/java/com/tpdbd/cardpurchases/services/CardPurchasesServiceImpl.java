@@ -74,16 +74,21 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
     }
 
     @Override
-    public Payment cardsGetMonthtlyPayment(String cardNumber, int year, int month) {
-        return this.paymentRepository
-            .findMonthlyPayment(cardNumber, year, month)
-            .orElseThrow(() -> new MonthlyPaymentNotFoundException(cardNumber, year, month));
+    public ResponseDTO.MonthlyPayment cardsGetMonthtlyPayment(String cardNumber, int year, int month) {
+        return ResponseDTO.MonthlyPayment.fromModel(
+            this.paymentRepository
+                .findMonthlyPayment(cardNumber, year, month)
+                .orElseThrow(() -> new MonthlyPaymentNotFoundException(cardNumber, year, month)));
     }
   
     @Override
-    public List<Card> cardsGetSoonToExpire(LocalDate baseDate, Integer daysFromBaseDate) {
+    public List<ResponseDTO.Card> cardsGetSoonToExpire(LocalDate baseDate, Integer daysFromBaseDate) {
         var finalDate = baseDate.plusDays(daysFromBaseDate);
-        return this.cardRepository.findByExpirationDateBetween(baseDate, finalDate);
+        var cards = this.cardRepository.findByExpirationDateBetween(baseDate, finalDate);
+        
+        return cards.stream()
+            .map(ResponseDTO.Card::fromModel)
+            .toList();
     }
 
     @Override
@@ -94,9 +99,13 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
     }
 
     @Override
-    public List<Promotion> storesGetAvailblePromotions(String cuitStore, LocalDate from, LocalDate to) {
-        return this.promotionRepository
+    public List<ResponseDTO.Promotion> storesGetAvailblePromotions(String cuitStore, LocalDate from, LocalDate to) {
+        var promotions = this.promotionRepository
             .findByCuitStoreAndValidityStartDateGreaterThanEqualAndValidityEndDateLessThanEqual(cuitStore, from, to);
+
+        return promotions.stream()
+            .map(ResponseDTO.Promotion::fromModel)
+            .toList();            
     }
 
     @Override

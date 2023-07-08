@@ -66,7 +66,8 @@ Para aislar la funcionalidad pedida de lo que se necesita para probarla se decid
 - En la clase `Quota`, por conveniencia, se cambiaron los tipos de datos de los attributos `month`y `year`, ambos originalmente `String` a `int`
 - Con respecto a los DTO:
   - El _mapper_ más simple y directo de usar es en mi opinión "modelmapper", pero lamentablemente no soporta objetos DTO basados en _records_ (los cuales son muy sencillos de definir y usar)
-  -  Por lo dicho anteriomente, opté por hacer el mapeo de los objetos basados en entidades a DTO, en los controladores de manera manual.
+  -  Por lo dicho anteriomente, opté por hacer el mapeo de los objetos basados en entidades a DTO de manera manual (agregando un para de métodos estáticos a los DTO para la conversión entre y hace entidades del modelo).
+  -  Hay mucha discusión sobre en qué capa usar los DTOs, muchos a favor (y con cierta razón) que los mismos deben usarse en la capa de transporte, es decir en la de los controladores. El problema es que en esa capa muchas veces no se cuenta con datos que el servicio posee para generar correctamente el DTO. Por lo anterior tomé la decisión de que la capa de servicio devuelva resultados directamente en DTO para la capa de controladores.
 
 - TODO 
   
