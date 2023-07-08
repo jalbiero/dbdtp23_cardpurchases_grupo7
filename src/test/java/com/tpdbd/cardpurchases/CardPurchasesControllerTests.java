@@ -341,6 +341,19 @@ public class CardPurchasesControllerTests {
             .then()
                 .statusCode(404);
     }
+    
+    @Test
+    public void testBanksGetTheOneWithMostPaymentValues() {
+        given()
+            .when()
+                .get("/banks/theOneWithMostPaymentValues")
+            .then()
+                .statusCode(200)
+                .contentType(ContentType.JSON)
+                .body("name", Matchers.not(Matchers.emptyString()))
+                .body("cuit", Matchers.not(Matchers.emptyString()))
+                .body("totalPaymentValueFromItsCards", Matchers.greaterThan(0.f));
+    }
 
 
     ///////////////////
