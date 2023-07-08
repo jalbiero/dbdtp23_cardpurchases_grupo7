@@ -18,6 +18,6 @@ public interface QuotaRepository extends CrudRepository<Quota, Long> {
         "FROM Quota q " + 
         "WHERE q.year = :year AND q.month = :month " +
         "GROUP BY q.purchase.store, q.purchase.cuitStore " +
-        "ORDER BY SUM(q.price) DESC")
-    Page<Store> findBestSellerStores(@Param("year") int year, @Param("month") int month, Pageable pageable);
+        "ORDER BY monthlyProfit DESC")
+    Page<Store> findTheBestSellerStores(@Param("year") int year, @Param("month") int month, Pageable pageable);
 }
