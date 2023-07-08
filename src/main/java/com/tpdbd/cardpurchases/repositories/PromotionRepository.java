@@ -2,6 +2,7 @@ package com.tpdbd.cardpurchases.repositories;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -15,6 +16,8 @@ import jakarta.transaction.Transactional;
 public interface PromotionRepository extends Repository<Promotion, Long> {
    @Query("SELECT p.code FROM Promotion p")
    List<String> findAllCodes();
+
+   Optional<Promotion> findByCode(String code);
 
    // This is an awful name, maybe the @Query alternative is better
    List<Promotion> findByCuitStoreAndValidityStartDateGreaterThanEqualAndValidityEndDateLessThanEqual(String cuitStore, LocalDate from, LocalDate to);
