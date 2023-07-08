@@ -304,10 +304,10 @@ public class CardPurchasesControllerTests {
     }
 
     @Test
-    void testPromotionsGetMostUsed() {
+    void testPromotionsGetTheMostUsed() {
         given()
             .when()
-                .get("/promotions/mostUsed")
+                .get("/promotions/theMostUsed")
             .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)

@@ -44,7 +44,7 @@ public interface CardPurchasesService {
     List<ResponseDTO.PurchaserCardHolder> cardsGetTop10Purchasers();
 
     // 10 Obtener la promoción mas utilizada en las compras registradas
-    ResponseDTO.Promotion promotionsGetMostUsed();
+    ResponseDTO.Promotion promotionsGetTheMostUsed();
 
     // 11 Obtener el nombre y cuit del local, que mas facturo en cierto mes
     ResponseDTO.Store storesGetBestSeller(int year, int month);

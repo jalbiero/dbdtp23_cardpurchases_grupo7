@@ -332,7 +332,7 @@ public class CardPurchasesController {
      * 10 - Gets the most used promotion across all purchases. 
      * 
      * URL: 
-     *      GET /promotions/mostUsed
+     *      GET /promotions/theMostUsed
      * 
      * Return:
      *      {
@@ -349,9 +349,9 @@ public class CardPurchasesController {
      *          "type": "Financing"
      *      }
      */
-    @GetMapping("/promotions/mostUsed")
-    ResponseDTO.Promotion promotionsGetMostUsed() {
-        return this.service.promotionsGetMostUsed();
+    @GetMapping("/promotions/theMostUsed")
+    ResponseDTO.Promotion promotionsGetTheMostUsed() {
+        return this.service.promotionsGetTheMostUsed();
     }
 
     /**
