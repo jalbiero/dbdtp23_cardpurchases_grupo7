@@ -134,7 +134,7 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
         // logging code a few lines below
         final var NUM_OF_VOUCHERS = 1; 
 
-        var mostUsedVouchers = this.purchaseRepository.findMostUsedVouchers(PageRequest.of(0, NUM_OF_VOUCHERS));
+        var mostUsedVouchers = this.purchaseRepository.findTheMostUsedVouchers(PageRequest.of(0, NUM_OF_VOUCHERS));
 
         if (mostUsedVouchers.isEmpty())
             throw new NotFoundException("No promotions used in all purchases");
@@ -158,7 +158,7 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
 
     @Override
     public ResponseDTO.Store storesGetBestSeller(int year, int month) {
-        var bestSellers = this.quotaRepository.findBestSellerStores(year, month, PageRequest.of(0, 1));
+        var bestSellers = this.quotaRepository.findTheBestSellerStores(year, month, PageRequest.of(0, 1));
 
         if (bestSellers.isEmpty())
             throw new BestSellerStoreNotFoundException(year, month);
@@ -169,4 +169,29 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
             bestSeller.getStore(), bestSeller.getCuitStore(), bestSeller.getMonthlyProfit());
     }
 
+    @Override
+    @Transactional
+    public ResponseDTO.Bank banksGetTheOneWithMostPaymentValues() {
+        // For debugging purposes: Set a greater value and uncomment the 
+        // logging code a few lines below
+        final var NUM_OF_BANKS = 1; 
+
+        var mostEarnerBanks = this.paymentRepository.findTheMostEarnerBanks(PageRequest.of(0, NUM_OF_BANKS));
+
+        // This is a rare case (practically, the database must be empty)
+        if (mostEarnerBanks.isEmpty())
+            throw new NotFoundException("No banks with payments from their cards");
+
+        // TODO Add a propper logger instead of console output
+        // mostEarnerBanks.getContent().stream()
+        //     .forEach(earnerBank -> {
+        //         System.out.println(
+        //             "Bank: " + earnerBank.getBank().getName() + 
+        //             ", total payment value: " + earnerBank.getTotalPaymentValue());
+        //     });
+
+        var mostEarnerBank = mostEarnerBanks.getContent().get(0);
+
+        return ResponseDTO.Bank.fromModel(mostEarnerBank.getBank(), mostEarnerBank.getTotalPaymentValue());
+    }
 }

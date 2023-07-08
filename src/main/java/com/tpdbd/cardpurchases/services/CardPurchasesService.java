@@ -51,4 +51,5 @@ public interface CardPurchasesService {
 
     // 12 Obtener el banco que registre la mayor sumatoria de los importes en pagos
     // con su tarjeta.
+    ResponseDTO.Bank banksGetTheOneWithMostPaymentValues();
 }
