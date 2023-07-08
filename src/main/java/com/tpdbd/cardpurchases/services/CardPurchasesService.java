@@ -5,8 +5,6 @@ import java.util.List;
 
 import com.tpdbd.cardpurchases.dto.RequestDTO;
 import com.tpdbd.cardpurchases.dto.ResponseDTO;
-import com.tpdbd.cardpurchases.model.Card;
-import com.tpdbd.cardpurchases.model.Payment;
 import com.tpdbd.cardpurchases.model.Promotion;
 import com.tpdbd.cardpurchases.model.Purchase;
 
@@ -19,13 +17,13 @@ public interface CardPurchasesService {
 
     // 3 Generar el total de pago de un mes dado, informando las compras
     // correspondientes
-    Payment cardsGetMonthtlyPayment(String cardNumber, int year, int month);
+    ResponseDTO.MonthlyPayment cardsGetMonthtlyPayment(String cardNumber, int year, int month);
   
     // 4 Obtener el listado de tarjetas que vencen en los siguientes 30 días.
     // > Para mayor flexibilidad y facilidad de prueba, se optó por generalizar 
     // > este servicio (es decir posibilidad de pasar la fecha y los días de vencimiento) 
     // > como parámetro.
-    List<Card> cardsGetSoonToExpire(LocalDate baseDate, Integer daysFromBaseDate);
+    List<ResponseDTO.Card> cardsGetSoonToExpire(LocalDate baseDate, Integer daysFromBaseDate);
 
     // 5 Obtener la información de una compra, incluyendo el listado de cuotas si
     // esta posee.
@@ -40,7 +38,7 @@ public interface CardPurchasesService {
 
     // 8 Obtener el listado de las promociones disponibles de un local entre dos
     // fechas
-    List<Promotion> storesGetAvailblePromotions(String cuitStore, LocalDate from, LocalDate to);
+    List<ResponseDTO.Promotion> storesGetAvailblePromotions(String cuitStore, LocalDate from, LocalDate to);
 
     // 9 Obtener los titulares de las 10 tarjetas con más compras.
     // > Asumo que es total, no de un período específico

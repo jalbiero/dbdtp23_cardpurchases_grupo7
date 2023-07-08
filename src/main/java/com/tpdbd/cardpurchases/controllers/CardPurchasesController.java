@@ -149,8 +149,7 @@ public class CardPurchasesController {
                                                        @RequestParam int year, 
                                                        @RequestParam int month)
     {
-        return ResponseDTO.MonthlyPayment.fromModel(
-            this.service.cardsGetMonthtlyPayment(number, year, month));
+        return this.service.cardsGetMonthtlyPayment(number, year, month);
     }
 
     /**
@@ -159,10 +158,10 @@ public class CardPurchasesController {
      *      specified)
      * 
      *      Note: GET endpoints shouldn't use a request body (although most web framework supported
-     *            it), but current RFC and some companies use them. See the following for more 
-     *            information: https://stackoverflow.com/questions/978061/http-get-with-request-body 
+     *            it), but current RFC is not against them, and some companies also use them. See 
+     *            the following for more information: 
+     *                 https://stackoverflow.com/questions/978061/http-get-with-request-body 
      *            Having said that, this particular endpoint use an optional request body.
-     *
      * URL: 
      *      GET /cards/soonToExpire
      * 
@@ -197,11 +196,7 @@ public class CardPurchasesController {
                                                  Optional<RequestDTO.CardsGetSoonToExpiredBody> body) 
     {
         var params = body.orElse(new RequestDTO.CardsGetSoonToExpiredBody());
-        var cards = this.service.cardsGetSoonToExpire(params.baseDate(), params.daysFromBaseDate());
-
-        return cards.stream()
-            .map(ResponseDTO.Card::fromModel)
-            .toList();
+        return this.service.cardsGetSoonToExpire(params.baseDate(), params.daysFromBaseDate());
     }
 
     /**
@@ -302,11 +297,7 @@ public class CardPurchasesController {
                                                              @RequestParam LocalDate from,
                                                              @RequestParam LocalDate to)
     {
-        var promotions = this.service.storesGetAvailblePromotions(cuit, from, to);
-    
-        return promotions.stream()
-            .map(ResponseDTO.Promotion::fromModel)
-            .toList();
+        return this.service.storesGetAvailblePromotions(cuit, from, to);
     }
 
     /**
