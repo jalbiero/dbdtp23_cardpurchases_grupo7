@@ -129,7 +129,7 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
 
     @Override
     @Transactional
-    public ResponseDTO.Promotion promotionsGetMostUsed() {
+    public ResponseDTO.Promotion promotionsGetTheMostUsed() {
         // For debugging purposes: Set a greater value and uncomment the 
         // logging code a few lines below
         final var NUM_OF_VOUCHERS = 1; 
