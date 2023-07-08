@@ -381,10 +381,10 @@ public class CardPurchasesController {
     }
 
     /**
-     * 12 - Gets the bank with most payments in its cards
+     * 12 - Gets the bank with most payment values in its cards
      * 
      * URL: 
-     *      GET /banks/theOneWithMostPayments
+     *      GET /banks/theOneWithMostPaymentValues
      * 
      * Return:
      *      {
@@ -410,8 +410,8 @@ public class CardPurchasesController {
      *          ]
      *      }
      */
-    @GetMapping("/banks/theOneWithMostPayments")
-    ResponseDTO.Bank banksTheOneWithMostPayments() {
-        return this.service.banksGetTheOneWithMostPayments();
+    @GetMapping("/banks/theOneWithMostPaymentValues")
+    ResponseDTO.Bank banksTheOneWithMostPaymentValues() {
+        return this.service.banksGetTheOneWithMostPaymentValues();
     }
 }
