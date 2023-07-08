@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+// Used to ignore Optional.empty fields when serialize them to json
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 
@@ -12,14 +13,28 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 public interface ResponseDTO {
 
     ////////////////////////////////////////////////////////
+    @JsonInclude(JsonInclude.Include.NON_ABSENT)
     record Bank(
         String name,
         String cuit,
         String address,
         String telephone,
-        List<Promotion> promotions)
+        List<Promotion> promotions,
+        Optional<Float> totalPaymentValueFromItsCards)
     {
         public static Bank fromModel(com.tpdbd.cardpurchases.model.Bank bank) {
+            return fromModel(bank, Optional.empty());
+        }
+
+        public static Bank fromModel(com.tpdbd.cardpurchases.model.Bank bank,
+                                     float totalPaymentValueFromItsCards) 
+        {
+            return fromModel(bank, Optional.of(totalPaymentValueFromItsCards));
+        }
+
+        private static Bank fromModel(com.tpdbd.cardpurchases.model.Bank bank, 
+                                      Optional<Float> totalPaymentValueFromItsCards) 
+        {
             return new Bank(
                 bank.getName(),
                 bank.getCuit(),
@@ -27,7 +42,8 @@ public interface ResponseDTO {
                 bank.getTelephone(),
                 bank.getPromotions().stream()
                     .map(Promotion::fromModel)
-                    .toList());
+                    .toList(),
+                totalPaymentValueFromItsCards);
         }
     }
 
@@ -81,7 +97,7 @@ public interface ResponseDTO {
 
 
     ////////////////////////////////////////////////////////
-    @JsonInclude(JsonInclude.Include.NON_ABSENT) // Ignore Optional.empty fields when serialize them to json
+    @JsonInclude(JsonInclude.Include.NON_ABSENT) 
     interface Promotion {
         String getType();
 

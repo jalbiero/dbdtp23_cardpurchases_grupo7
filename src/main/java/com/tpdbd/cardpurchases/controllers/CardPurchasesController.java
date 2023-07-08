@@ -379,4 +379,39 @@ public class CardPurchasesController {
     ResponseDTO.Store storesGetBestSeller(@RequestParam int year, @RequestParam int month) {
         return this.service.storesGetBestSeller(year, month);
     }
+
+    /**
+     * 12 - Gets the bank with most payment values in its cards
+     * 
+     * URL: 
+     *      GET /banks/theOneWithMostPaymentValues
+     * 
+     * Return:
+     *      {
+     *          "name": "Gonzalez Ocampo S.R.L.",
+     *          "cuit": "52",
+     *          "address": "Avda. Cintia Chaves 16254 - Puerta blanca, Lanus, ER (2528)",
+     *          "telephone": "0371 462-3380",
+     *          "totalPaymentValueFromItsCards": 500000.76
+     *          "promotions": [
+     *              {
+     *                  "code": "promo45",
+     *                  "promotionTitle": "jerarquía explícita Centrado en el negocio",
+     *                  "nameStore": "Avalos, Yapura y Cordoba Asociados",
+     *                  "cuitStore": "46",
+     *                  "validityStartDate": "2022-08-23",
+     *                  "validityEndDate": "2022-09-22",
+     *                  "comments": "Tony Longworth",
+     *                  "numberOfQuotas": 5,
+     *                  "interest": 0.09,
+     *                  "type": "Financing"
+     *              },
+     *              ...
+     *          ]
+     *      }
+     */
+    @GetMapping("/banks/theOneWithMostPaymentValues")
+    ResponseDTO.Bank banksTheOneWithMostPaymentValues() {
+        return this.service.banksGetTheOneWithMostPaymentValues();
+    }
 }

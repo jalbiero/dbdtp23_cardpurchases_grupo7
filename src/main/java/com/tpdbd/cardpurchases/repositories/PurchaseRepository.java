@@ -21,7 +21,7 @@ public interface PurchaseRepository<T extends Purchase> extends CrudRepository<T
         "   p.card AS card " + 
         "FROM Purchase p " + 
         "GROUP BY p.card " +
-        "ORDER BY COUNT(p) DESC")
+        "ORDER BY numOfPurchases DESC")
     Page<NumOfPurchasesByCard> findTopPurchaserCards(Pageable pageable);  
     
     @Query(
@@ -31,6 +31,6 @@ public interface PurchaseRepository<T extends Purchase> extends CrudRepository<T
         "FROM Purchase p " + 
         "WHERE p.paymentVoucher IS NOT NULL " +
         "GROUP BY p.paymentVoucher " +
-        "ORDER BY COUNT(p) DESC ")
-    Page<MostUsedVoucher> findMostUsedVouchers(Pageable pageable);  
+        "ORDER BY numOfPurchases DESC")
+    Page<MostUsedVoucher> findTheMostUsedVouchers(Pageable pageable);  
 }
