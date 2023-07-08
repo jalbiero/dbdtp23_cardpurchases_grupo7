@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.tpdbd.cardpurchases.dto.RequestDTO;
 import com.tpdbd.cardpurchases.dto.ResponseDTO;
-import com.tpdbd.cardpurchases.model.Promotion;
 import com.tpdbd.cardpurchases.model.Purchase;
 
 public interface CardPurchasesService {
@@ -45,6 +44,7 @@ public interface CardPurchasesService {
     List<ResponseDTO.PurchaserCardHolder> cardsGetTop10Purchasers();
 
     // 10 Obtener la promoción mas utilizada en las compras registradas
+    ResponseDTO.Promotion promotionsGetMostUsed();
 
     // 11 Obtener el nombre y cuit del local, que mas facturo en cierto mes
     ResponseDTO.Store storesGetBestSeller(int year, int month);

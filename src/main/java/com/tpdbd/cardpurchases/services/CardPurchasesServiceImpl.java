@@ -16,9 +16,6 @@ import com.tpdbd.cardpurchases.errors.NotFoundException;
 import com.tpdbd.cardpurchases.errors.PaymentNotFoundException;
 import com.tpdbd.cardpurchases.errors.PromotionNotFoundException;
 import com.tpdbd.cardpurchases.errors.PurchaseNotFoundException;
-import com.tpdbd.cardpurchases.model.Card;
-import com.tpdbd.cardpurchases.model.Payment;
-import com.tpdbd.cardpurchases.model.Promotion;
 import com.tpdbd.cardpurchases.model.Purchase;
 import com.tpdbd.cardpurchases.repositories.BankRepository;
 import com.tpdbd.cardpurchases.repositories.CardRepository;
@@ -99,6 +96,12 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
     }
 
     @Override
+    public void promotionsDelete(String code) {
+        if (this.promotionRepository.deleteByCode(code) == 0) 
+            throw new PromotionNotFoundException(code);
+    }
+
+    @Override
     public List<ResponseDTO.Promotion> storesGetAvailblePromotions(String cuitStore, LocalDate from, LocalDate to) {
         var promotions = this.promotionRepository
             .findByCuitStoreAndValidityStartDateGreaterThanEqualAndValidityEndDateLessThanEqual(cuitStore, from, to);
@@ -125,6 +128,35 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
     }
 
     @Override
+    @Transactional
+    public ResponseDTO.Promotion promotionsGetMostUsed() {
+        // For debugging purposes: Set a greater value and uncomment the 
+        // logging code a few lines below
+        final var NUM_OF_VOUCHERS = 1; 
+
+        var mostUsedVouchers = this.purchaseRepository.findMostUsedVouchers(PageRequest.of(0, NUM_OF_VOUCHERS));
+
+        if (mostUsedVouchers.isEmpty())
+            throw new NotFoundException("No promotions used in all purchases");
+
+        // TODO Add a propper logger instead of console output
+        // mostUsedVouchers.getContent().stream()
+        //     .forEach(voucher -> {
+        //         System.out.println(
+        //             "Voucher: " + voucher.getPaymentVoucher() + 
+        //             ", # of purchases: " + voucher.getNumOfPurchases());
+        //     });
+
+        var voucher = mostUsedVouchers.getContent().get(0);
+
+        var promotion = this.promotionRepository
+            .findByCode(voucher.getCode())
+            .orElseThrow(() -> new PromotionNotFoundException(voucher.getCode()));
+
+        return ResponseDTO.Promotion.fromModel(promotion, voucher.getNumOfPurchases());
+    }
+
+    @Override
     public ResponseDTO.Store storesGetBestSeller(int year, int month) {
         var bestSellers = this.quotaRepository.findBestSellerStores(year, month, PageRequest.of(0, 1));
 
@@ -135,12 +167,6 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
 
         return new ResponseDTO.Store(
             bestSeller.getStore(), bestSeller.getCuitStore(), bestSeller.getMonthlyProfit());
-    }
-
-    @Override
-    public void promotionsDelete(String code) {
-        if (this.promotionRepository.deleteByCode(code) == 0) 
-            throw new PromotionNotFoundException(code);
     }
 
 }
