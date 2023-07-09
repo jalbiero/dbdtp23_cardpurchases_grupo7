@@ -7,7 +7,7 @@ import org.hibernate.annotations.Where;
 
 @Entity
 @Inheritance
-@Where(clause = "deleted = false") // Note: SQL specific, Mongo vesion could need another solution 
+@Where(clause = "deleted = false") // Note: SQL specific, Mongo version will need another solution 
 public abstract class Promotion {
     @Id
     @GeneratedValue
@@ -16,8 +16,7 @@ public abstract class Promotion {
     @ManyToOne(cascade = CascadeType.ALL)
     private Bank bank;
 
-    // TODO Check if this 'code' is the 'paymentVoucher' in Purchase class
-    private String code;
+    private String code; // aka 'paymentVoucher' (in Purchase class)
 
     private String promotionTitle;
 
@@ -31,7 +30,8 @@ public abstract class Promotion {
 
     private String comments;
 
-    // See PromotionRepository.deleteByCode for more information about its usage
+    // Implements a logical delete with the help of @Where annotation (see 
+    // PromotionRepository.deleteByCode for more information about its usage
     @SuppressWarnings("unused")
     private Boolean deleted; 
 

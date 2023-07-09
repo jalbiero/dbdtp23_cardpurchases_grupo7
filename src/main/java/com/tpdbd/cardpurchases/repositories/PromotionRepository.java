@@ -22,6 +22,7 @@ public interface PromotionRepository extends Repository<Promotion, Long> {
    // This is an awful name, maybe the @Query alternative is better
    List<Promotion> findByCuitStoreAndValidityStartDateGreaterThanEqualAndValidityEndDateLessThanEqual(String cuitStore, LocalDate from, LocalDate to);
 
+   // Performs a logical delete
    @Transactional
    @Modifying
    @Query(
