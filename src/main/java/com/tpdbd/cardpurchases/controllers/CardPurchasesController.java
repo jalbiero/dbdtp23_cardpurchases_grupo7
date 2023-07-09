@@ -241,7 +241,7 @@ public class CardPurchasesController {
      */
     @GetMapping("/purchases/{id}")
     ResponseDTO.Purchase purchasesGetInfo(@PathVariable Long id) {
-        return ResponseDTO.Purchase.fromModel(this.service.purchasesGetInfo(id));
+        return this.service.purchasesGetInfo(id);
     }
 
     /**

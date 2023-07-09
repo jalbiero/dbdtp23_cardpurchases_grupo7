@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.tpdbd.cardpurchases.dto.RequestDTO;
 import com.tpdbd.cardpurchases.dto.ResponseDTO;
-import com.tpdbd.cardpurchases.model.Purchase;
 
 public interface CardPurchasesService {
     // 1 Agregar una nueva promoción de tipo descuento a un banco dado
@@ -26,7 +25,7 @@ public interface CardPurchasesService {
 
     // 5 Obtener la información de una compra, incluyendo el listado de cuotas si
     // esta posee.
-    Purchase purchasesGetInfo(long purchaseId);
+    ResponseDTO.Purchase purchasesGetInfo(long purchaseId);
 
     // 6 Eliminar una promoción a traves de su código (tener en cuenta que esta
     // puede haber sido aplicada alguna compra)

@@ -89,10 +89,11 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
     }
 
     @Override
-    public Purchase purchasesGetInfo(long id) {
-        return this.purchaseRepository
-            .findById(id)
-            .orElseThrow(() -> new PurchaseNotFoundException(id));
+    public ResponseDTO.Purchase purchasesGetInfo(long id) {
+        return ResponseDTO.Purchase.fromModel(
+            this.purchaseRepository
+                .findById(id)
+                .orElseThrow(() -> new PurchaseNotFoundException(id)));
     }
 
     @Override
