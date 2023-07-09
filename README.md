@@ -4,28 +4,32 @@ Trabajo final de Diseño de Bases de Datos 2022/23 - **GRUPO 7**
 
 ## Introducción
 
-Esta es una aplicación que expone funcionalidad mediante una API REST, la misma puede ser accedida mediante algún cliente de prueba tal como [Postman](https://www.postman.com/) o [JMeter](https://jmeter.apache.org/). La base de datos usada es MySQL 8.0
+Esta es una aplicación que expone funcionalidad mediante una API REST, la misma puede ser accedida mediante algún cliente de prueba tal como [Postman](https://www.postman.com/), [JMeter](https://jmeter.apache.org/) o la misma interfaz gráfica expuesta por la aplicación (ver la sección de [documentación y prueba](#documentación-y-prueba-manual-de-los-endpoints-implementados) para más detalles). La base de datos usada es MySQL 8.0
 
 Para simplificar el desarrollo los tests unitarios son de integración es decir que la aplicación se prueba desde la API REST misma (podría hacerse desde los servicios, pero para evitar cierta duplicación en las pruebas, se prueba directamente desde la capa más externa)
 
 ## Requerimientos
 
-- Desarrollo
-  - Docker
-  - Docker compose (ver [pom.xml](pom.xml) para más detalles)
-  - Java 19
-  - Maven
-- Sólo ejecución (TODO)
-  - Docker
-  - Docker compose
+- Docker
+- Docker compose (ver [pom.xml](pom.xml) para más detalles)
+- Java 19
+- Maven
 
 El desarrollo se hizo bajo Linux (openSUSE 15.4), no se probó en otras plataformas (macOS, Windows), pero debería funcionar sin problemas en ambas.
 
-## Instalación y Ejecución (en modo desarrollo)
+## Instalación y tests
 
 ```bash
 $ git clone -b sql_version git@github.com:jalbiero/dbdtp23_cardpurchases_grupo7.git
-$ cd dbdtp23_cardpurchases
+$ cd dbdtp23_cardpurchases_grupo7
+$ mvn test
+```
+
+## Ejecución
+
+Se asume terminal en la carpeta del proyecto (*dbdtp23_cardpurchases_grupo7*)
+
+```bash
 $ mvn spring-boot:run
 ```
 
@@ -36,6 +40,10 @@ $ mvn spring-boot:run
 - MySQL (via docker container): 
   - **4360**
 
+### Documentación y prueba manual de los endpoints implementados
+
+- Documentación concreta: [CardPurchasesController.java](src/main/java/com/tpdbd/cardpurchases/controllers/CardPurchasesController.java)
+- Prueba (requiere la aplicación funcionando): http://localhost:9080/swagger-ui/index.html
 
 ## Decisiones de desarrollo
 
@@ -53,9 +61,9 @@ $ mvn spring-boot:run
 
 Para aislar la funcionalidad pedida de lo que se necesita para probarla se decidió dividir las capas de controladores y servicios en 2 partes:
 
-1. El controlador `CardPurchasesController` y su servicio asociado `CardPurchasesService` implementan solamente lo que se pide como tarea.
-2. El controlador `TestController` y su servicio asociado `TestService` implementan funcionalidad necesaria para probar lo pedido en la tarea. En una aplicación completa lo pedido sería sólo una parte del total, el cual se complementaría con lo que está en `TestController/TestService`.
-3. Por cuestiones de tiempo la documentación de los _endpoints_ se hace solamente para el `CardPurchasesController` de una forma sencilla (no se usa swagger por ejemplo). Para más detalles ir directamente al archivo [CardPurchasesController.java](src/main/java/com/tpdbd/cardpurchases/controllers/CardPurchasesController.java)
+1. El controlador [CardPurchasesController](src/main/java/com/tpdbd/cardpurchases/controllers/CardPurchasesController.java) y su servicio asociado [CardPurchasesService](src/main/java/com/tpdbd/cardpurchases/services/CardPurchasesService.java) implementan solamente lo que se pide como tarea (sus _tests_ unitarios asociados están en [CardPurchasesControllerTests](src/test/java/com/tpdbd/cardpurchases/CardPurchasesControllerTests.java).
+2. El controlador [TestController](src/main/java/com/tpdbd/cardpurchases/controllers/TestController.java) y su servicio asociado [TestService](src/main/java/com/tpdbd/cardpurchases/services/TestService.java) (_tests_ unitarios asociados en [TestControllerTests](src/test/java/com/tpdbd/cardpurchases/TestControllerTests.java)) implementan funcionalidad necesaria para probar lo pedido en la tarea. En una aplicación completa lo pedido sería sólo una parte del total, el cual se complementaría con lo que está en `TestController/TestService`.
+3. Por cuestiones de tiempo la documentación de los _endpoints_ se hace solamente para el controlador `CardPurchasesController` de una forma sencilla agregándose además [swagger para listar/probar los mismos en _runtime_](#documentación-y-prueba-manual-de-los-endpoints-implementados).
 
 ### Entidades
 
