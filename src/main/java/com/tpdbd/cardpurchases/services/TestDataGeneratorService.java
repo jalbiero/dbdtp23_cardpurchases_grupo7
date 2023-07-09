@@ -65,7 +65,7 @@ public class TestDataGeneratorService {
     @Autowired private PurchaseRepository<CashPurchase> cashRepository; 
     @Autowired private PurchaseRepository<CreditPurchase> creditRepository; 
 
-    private Random random = new Random(0); // all is "repeatable"
+    private Random random = new Random(0); // Same seed (0) -> all is "repeatable"
     private Faker faker; 
 
     private SequenceGenerator cuitGenerator = new SequenceGenerator();
