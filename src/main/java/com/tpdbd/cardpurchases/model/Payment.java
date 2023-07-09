@@ -29,7 +29,7 @@ public class Payment {
     @OneToMany(cascade = CascadeType.ALL)
     private Set<Quota> quotas;
 
-    // This allow an easy navigation to the card used in the payment (another
+    // This allows an easy navigation to the card used in the payment (another
     // complex way it is to use one of the associated quotas in order to reach 
     // the Purchase and then the Card)
     @ManyToOne
