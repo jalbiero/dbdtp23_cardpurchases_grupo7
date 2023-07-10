@@ -39,9 +39,9 @@ public interface CardPurchasesService {
     // > base de datos mediante Purchase.finalAmount. Para más detalles ver lo siguiente:
     // >    - TestDataGeneratorService.generateCashPurchases
     // >    - TestDataGeneratorService.generateCreditPurchases
-    // > Dicho lo anterior, este servicio no tiene mucho sentido ya que consultando una
-    // > compra con 'purchasesGetInfo' se obtiene el valor de 'finalAmount'
-    float purchasesGetTotalPrice(long purchaseId);
+    // > Dicho lo anterior, este servicio es una variante menor de 'purchaseGetInfo' ya
+    // > va a fallar si el ID de compra no corresponde a una compra en cuotas.
+    ResponseDTO.CreditPurchaseTotalPrice purchasesCreditGetTotalPrice(long purchaseId);
 
     // 8 Obtener el listado de las promociones disponibles de un local entre dos
     // fechas

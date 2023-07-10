@@ -11,11 +11,13 @@ import com.tpdbd.cardpurchases.dto.RequestDTO;
 import com.tpdbd.cardpurchases.dto.ResponseDTO;
 import com.tpdbd.cardpurchases.errors.BankNotFoundException;
 import com.tpdbd.cardpurchases.errors.BestSellerStoreNotFoundException;
+import com.tpdbd.cardpurchases.errors.CreditPurchaseNotFoundException;
 import com.tpdbd.cardpurchases.errors.MonthlyPaymentNotFoundException;
 import com.tpdbd.cardpurchases.errors.NotFoundException;
 import com.tpdbd.cardpurchases.errors.PaymentNotFoundException;
 import com.tpdbd.cardpurchases.errors.PromotionNotFoundException;
 import com.tpdbd.cardpurchases.errors.PurchaseNotFoundException;
+import com.tpdbd.cardpurchases.model.CreditPurchase;
 import com.tpdbd.cardpurchases.model.Purchase;
 import com.tpdbd.cardpurchases.repositories.BankRepository;
 import com.tpdbd.cardpurchases.repositories.CardRepository;
@@ -45,12 +47,6 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
 
     @Autowired
     private QuotaRepository quotaRepository;
-
-    private Purchase purchasesGetModelInfo(long id) {
-        return this.purchaseRepository
-            .findById(id)
-            .orElseThrow(() -> new PurchaseNotFoundException(id));
-    }
 
     @Override
     @Transactional
@@ -96,7 +92,10 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
 
     @Override
     public ResponseDTO.Purchase purchasesGetInfo(long purchaseId) {
-        return ResponseDTO.Purchase.fromModel(this.purchasesGetModelInfo(purchaseId));
+        return ResponseDTO.Purchase.fromModel(
+            this.purchaseRepository
+                .findById(purchaseId)
+                .orElseThrow(() -> new PurchaseNotFoundException(purchaseId)));
     }
 
     @Override
@@ -106,8 +105,14 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
     }
 
     @Override
-    public float purchasesGetTotalPrice(long purchaseId) {
-        return this.purchasesGetModelInfo(purchaseId).getFinalAmount();
+    public ResponseDTO.CreditPurchaseTotalPrice purchasesCreditGetTotalPrice(long purchaseId) {
+        var purchase = this.purchaseRepository
+            .findById(purchaseId)
+            .filter(p -> CreditPurchase.class.isInstance(p))
+            .map(p -> CreditPurchase.class.cast(p))
+            .orElseThrow(() -> new CreditPurchaseNotFoundException(purchaseId));
+
+        return new ResponseDTO.CreditPurchaseTotalPrice(purchaseId, purchase.getFinalAmount());
     }
 
     @Override
