@@ -1,6 +1,8 @@
 package com.tpdbd.cardpurchases;
 
-import static org.hamcrest.MatcherAssert.assertThat; 
+import static org.hamcrest.MatcherAssert.assertThat;
+
+import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -243,6 +245,41 @@ public class CardPurchasesControllerTests {
 
         promoCodes = getPromotionCodes();
         assertThat("Promotion not deleted", !promoCodes.contains(codeToBeDeleted));
+    }
+
+    @Test
+    public void testPurchasesCreditGetTotalPriceHappyPath() {
+        // TODO This test is not well designed because the ID is hardcoded. 
+        //      (test data is repeatable, but if not, the test will fail.
+        //      See TestDataGeneratorService.random for more information about 
+        //      repeatable data)
+
+        final var CREDIT_PURCHASE_ID = 45;
+     
+        given()
+            .when()
+                .get("/purchases/{id}/creditTotalPrice", CREDIT_PURCHASE_ID)
+            .then()
+                .statusCode(200)
+                .contentType(ContentType.JSON)
+                .body("id", Matchers.equalTo((int)CREDIT_PURCHASE_ID))
+                .body("totalPrice", Matchers.greaterThanOrEqualTo(0.f));
+    }
+
+    @Test
+    public void testPurchasesCreditGetTotalPriceNotFound() {
+        // TODO This test is not well designed because the ID is hardcoded. 
+        //      (test data is repeatable, but if not, the test will fail.
+        //      See TestDataGeneratorService.random for more information about 
+        //      repeatable data)
+
+        final var CASH_PURCHASE_ID = 1;
+     
+        given()
+            .when()
+                .get("/purchases/{id}/creditTotalPrice", CASH_PURCHASE_ID)
+            .then()
+                .statusCode(404);
     }
 
     @Test
