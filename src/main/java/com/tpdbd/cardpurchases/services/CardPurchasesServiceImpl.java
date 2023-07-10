@@ -11,11 +11,13 @@ import com.tpdbd.cardpurchases.dto.RequestDTO;
 import com.tpdbd.cardpurchases.dto.ResponseDTO;
 import com.tpdbd.cardpurchases.errors.BankNotFoundException;
 import com.tpdbd.cardpurchases.errors.BestSellerStoreNotFoundException;
+import com.tpdbd.cardpurchases.errors.CreditPurchaseNotFoundException;
 import com.tpdbd.cardpurchases.errors.MonthlyPaymentNotFoundException;
 import com.tpdbd.cardpurchases.errors.NotFoundException;
 import com.tpdbd.cardpurchases.errors.PaymentNotFoundException;
 import com.tpdbd.cardpurchases.errors.PromotionNotFoundException;
 import com.tpdbd.cardpurchases.errors.PurchaseNotFoundException;
+import com.tpdbd.cardpurchases.model.CreditPurchase;
 import com.tpdbd.cardpurchases.model.Purchase;
 import com.tpdbd.cardpurchases.repositories.BankRepository;
 import com.tpdbd.cardpurchases.repositories.CardRepository;
@@ -89,16 +91,28 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
     }
 
     @Override
-    public Purchase purchasesGetInfo(long id) {
-        return this.purchaseRepository
-            .findById(id)
-            .orElseThrow(() -> new PurchaseNotFoundException(id));
+    public ResponseDTO.Purchase purchasesGetInfo(long purchaseId) {
+        return ResponseDTO.Purchase.fromModel(
+            this.purchaseRepository
+                .findById(purchaseId)
+                .orElseThrow(() -> new PurchaseNotFoundException(purchaseId)));
     }
 
     @Override
     public void promotionsDelete(String code) {
         if (this.promotionRepository.deleteByCode(code) == 0) 
             throw new PromotionNotFoundException(code);
+    }
+
+    @Override
+    public ResponseDTO.CreditPurchaseTotalPrice purchasesCreditGetTotalPrice(long purchaseId) {
+        var purchase = this.purchaseRepository
+            .findById(purchaseId)
+            .filter(p -> CreditPurchase.class.isInstance(p))
+            .map(p -> CreditPurchase.class.cast(p))
+            .orElseThrow(() -> new CreditPurchaseNotFoundException(purchaseId));
+
+        return new ResponseDTO.CreditPurchaseTotalPrice(purchaseId, purchase.getFinalAmount());
     }
 
     @Override

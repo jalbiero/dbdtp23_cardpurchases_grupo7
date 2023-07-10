@@ -241,7 +241,7 @@ public class CardPurchasesController {
      */
     @GetMapping("/purchases/{id}")
     ResponseDTO.Purchase purchasesGetInfo(@PathVariable Long id) {
-        return ResponseDTO.Purchase.fromModel(this.service.purchasesGetInfo(id));
+        return this.service.purchasesGetInfo(id);
     }
 
     /**
@@ -260,6 +260,33 @@ public class CardPurchasesController {
     @DeleteMapping("/promotions/{code}")
     void promotionsDelete(@PathVariable String code) {
         this.service.promotionsDelete(code);
+    }
+
+    /**
+     * 07 - Gets the total price of the specified purchase
+     * 
+     * URL: 
+     *      GET /purchases/{id}/creditTotalPrice
+     * 
+     * ContentType: 
+     *      application/json
+     * 
+     * Params:
+     *      - URL: {id} the purchase id
+     * 
+     * Return:
+     *      - The totalPrice (finalAmount) of the specified credit purchase:
+     * 
+     *          {
+     *              "id": 10,
+     *              "totalPrice": 1023.50
+     *          }
+     * 
+     *      - 404 if the specified credit purchase could not be found
+     */ 
+    @GetMapping("/purchases/{id}/creditTotalPrice")
+    ResponseDTO.CreditPurchaseTotalPrice purchasesCreditGetTotalPrice(@PathVariable Long id) {
+        return this.service.purchasesCreditGetTotalPrice(id);
     }
 
     /**

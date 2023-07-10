@@ -325,5 +325,11 @@ public interface ResponseDTO {
         String cardNumber)
     {
     }
+
+    record CreditPurchaseTotalPrice(
+        long id,
+        float totalPrice)
+    { 
+    }
     
 }

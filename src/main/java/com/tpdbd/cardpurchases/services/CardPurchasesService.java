@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.tpdbd.cardpurchases.dto.RequestDTO;
 import com.tpdbd.cardpurchases.dto.ResponseDTO;
-import com.tpdbd.cardpurchases.model.Purchase;
 
 public interface CardPurchasesService {
     // 1 Agregar una nueva promoción de tipo descuento a un banco dado
@@ -26,7 +25,7 @@ public interface CardPurchasesService {
 
     // 5 Obtener la información de una compra, incluyendo el listado de cuotas si
     // esta posee.
-    Purchase purchasesGetInfo(long purchaseId);
+    ResponseDTO.Purchase purchasesGetInfo(long purchaseId);
 
     // 6 Eliminar una promoción a traves de su código (tener en cuenta que esta
     // puede haber sido aplicada alguna compra)
@@ -34,6 +33,15 @@ public interface CardPurchasesService {
 
     // 7 Obtener el precio total a pagar de una compra en cuotas (tener en cuenta
     // que pueden existir promociones aplicadas)
+    //
+    // > No entiendo la aclaración (me confunde), se supone que el total calculado para una 
+    // > compra (sea de contado, en cuotas, con o sin promociones) ya está asentado en la 
+    // > base de datos mediante Purchase.finalAmount. Para más detalles ver lo siguiente:
+    // >    - TestDataGeneratorService.generateCashPurchases
+    // >    - TestDataGeneratorService.generateCreditPurchases
+    // > Dicho lo anterior, este servicio es una variante menor de 'purchaseGetInfo' ya
+    // > va a fallar si el ID de compra no corresponde a una compra en cuotas.
+    ResponseDTO.CreditPurchaseTotalPrice purchasesCreditGetTotalPrice(long purchaseId);
 
     // 8 Obtener el listado de las promociones disponibles de un local entre dos
     // fechas
