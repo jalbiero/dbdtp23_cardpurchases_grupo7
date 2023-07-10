@@ -33,6 +33,15 @@ public interface CardPurchasesService {
 
     // 7 Obtener el precio total a pagar de una compra en cuotas (tener en cuenta
     // que pueden existir promociones aplicadas)
+    //
+    // > No entiendo la aclaración (me confunde), se supone que el total calculado para una 
+    // > compra (sea de contado, en cuotas, con o sin promociones) ya está asentado en la 
+    // > base de datos mediante Purchase.finalAmount. Para más detalles ver lo siguiente:
+    // >    - TestDataGeneratorService.generateCashPurchases
+    // >    - TestDataGeneratorService.generateCreditPurchases
+    // > Dicho lo anterior, este servicio no tiene mucho sentido ya que consultando una
+    // > compra con 'purchasesGetInfo' se obtiene el valor de 'finalAmount'
+    float purchasesGetTotalPrice(long purchaseId);
 
     // 8 Obtener el listado de las promociones disponibles de un local entre dos
     // fechas

@@ -46,6 +46,12 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
     @Autowired
     private QuotaRepository quotaRepository;
 
+    private Purchase purchasesGetModelInfo(long id) {
+        return this.purchaseRepository
+            .findById(id)
+            .orElseThrow(() -> new PurchaseNotFoundException(id));
+    }
+
     @Override
     @Transactional
     public void banksAddDiscountPromotion(String cuit, RequestDTO.Discount discount) {
@@ -89,17 +95,19 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
     }
 
     @Override
-    public ResponseDTO.Purchase purchasesGetInfo(long id) {
-        return ResponseDTO.Purchase.fromModel(
-            this.purchaseRepository
-                .findById(id)
-                .orElseThrow(() -> new PurchaseNotFoundException(id)));
+    public ResponseDTO.Purchase purchasesGetInfo(long purchaseId) {
+        return ResponseDTO.Purchase.fromModel(this.purchasesGetModelInfo(purchaseId));
     }
 
     @Override
     public void promotionsDelete(String code) {
         if (this.promotionRepository.deleteByCode(code) == 0) 
             throw new PromotionNotFoundException(code);
+    }
+
+    @Override
+    public float purchasesGetTotalPrice(long purchaseId) {
+        return this.purchasesGetModelInfo(purchaseId).getFinalAmount();
     }
 
     @Override
