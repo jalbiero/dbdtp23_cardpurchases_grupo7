@@ -86,7 +86,7 @@ public class TestDataGeneratorService {
     public void generateData() {
         this.stores = generateStores();
 
-        var banks = this.bankRepository.saveAll(generateBanks(this.stores));
+        var banks = this.bankRepository.saveAll(generateBanksAndPromotions(this.stores));
         var cardHolders = this.cardHolderRepository.saveAll(generateCardHolders());
         var cards = this.cardRepository.saveAll(generateCards(banks, cardHolders));
 
@@ -168,9 +168,9 @@ public class TestDataGeneratorService {
     }
 
     /**
-     * Get random items from an iterable. It is a very simple implementation especially 
+     * Gets random items from an iterable. It is a very simple implementation especially 
      * suitable for 'numOfItems' to be much smaller than data.size() (otherwise this 
-     * function will be very slow, see internal todo).
+     * function will be very slow, see internal TODO).
      * @param <T>
      * @param data
      * @param numOfItems
@@ -219,7 +219,7 @@ public class TestDataGeneratorService {
      * Generates a random list of Banks (and their Promotions)
      * @return
      */
-    private Iterable<Bank> generateBanks(Iterable<Store> stores) {        
+    private Iterable<Bank> generateBanksAndPromotions(Iterable<Store> stores) {        
         // For the sake of clearity, it generates Banks first and later 
         // their promotions for each one of them
         List<Bank> banks = this.faker.collection(() -> new Bank(
@@ -253,7 +253,7 @@ public class TestDataGeneratorService {
                         faker.theItCrowd().characters(),
                         faker.number().numberBetween(1, getIntParam("maxDiscount")) / 100.f, 
                         faker.number().numberBetween(getIntParam("minCapPrice"), getIntParam("maxCapPrice")), 
-                        true));
+                        faker.bool().bool()));
 
                     validityStart = getFakeDate();
                     validityEnd = getFakeDate(validityStart);
@@ -338,17 +338,24 @@ public class TestDataGeneratorService {
             getIntParam("maxNumOfCashPurchasesPerCard"),
             stores, 
             cards, 
-            Discount.class, 
-            (store, card, promo) -> {
+            (store, card, promotions) -> {
+                var promo = promotions.stream()
+                    .filter(p -> Discount.class.isInstance(p))
+                    .map(p -> Discount.class.cast(p))
+                    .findAny();
+
                 var voucher = promo.map(Discount::getCode).orElse(null);
                 var priceCap = promo.map(Discount::getPriceCap).orElse(0.f);                       
-                var storeDiscount = promo.map(Discount::getDiscountPercentage).orElse(0.f);
-                // TODO Discount::isOnlyCash, see comments about its underlying attribute
+                var promoDiscount = promo.map(Discount::getDiscountPercentage).orElse(0.f);
+                var storeDiscount = faker.number().numberBetween(1, getIntParam("maxDiscount")) / 100.f;
 
                 var amount = (float)this.faker.number().randomDouble(2, 1, getIntParam("maxCashPurchaseAmount"));
-                var finalDiscount = amount <= priceCap ? storeDiscount : 0.f;
-                var finalAmount = amount * (1 - finalDiscount);
+                var finalPromoDiscount = amount <= priceCap ? promoDiscount : 0.f;
+                var finalDiscount = finalPromoDiscount + storeDiscount;
+                assert finalDiscount < 1; // TODO Add a proper error management
 
+                var finalAmount = amount * (1 - finalDiscount);
+                
                 var purchase = new CashPurchase(
                     card, 
                     voucher,
@@ -366,6 +373,7 @@ public class TestDataGeneratorService {
 
     /**
      * Generates some credit purchases for each card in some random stores
+     * 
      * @param stores
      * @param cards
      * @return
@@ -375,38 +383,70 @@ public class TestDataGeneratorService {
             getIntParam("maxNumOfCreditPurchasesPerCard"), 
             stores, 
             cards, 
-            Financing.class, 
-            (store, card, promo) -> {
-                @Nullable var voucher = promo
-                    .map(Financing::getCode)
-                    .orElse(null); // No promotion
-                
-                var interest = promo
-                    .map(Financing::getInterest)
-                    .orElse(this.faker.number().numberBetween(1, getIntParam("maxNoPromoInterest")) / 100.f);
-                
-                var numOfQuotas = promo
-                    .map(Financing::getNumberOfQuotas)
-                    .orElse(this.faker.number().numberBetween(1, getIntParam("maxNoPromoNumOfQuotas")));
+            (store, card, promotions) -> {
+                // TODO I am not sure about the following way of calculating the 'finalAmount' (1st apply the 
+                //      discount promotion to get 'disAmount', and 2nd apply the financial promotion interest
+                //      rate on the 'disAmount' in order to calculte the 'finalAmount')
+                //
+                //      Note: The following paragraph from 'TP-Final-202223.pdf' is confusing to me:
+                //
+                //       "En caso de existir más de una posible descuento para una misma compra, estos 
+                //        pueden acumularse, exceptuando el caso donde existen diferentes opciones en cuotas,
+                //        solo una aplicable, y cuando el descuento especi que que es solo al contado"
 
                 var amount = (float)this.faker.number().randomDouble(2, 1, getIntParam("maxCreditPurchaseAmount"));
 
-                // TODO I am not sure about this:
-                //    1- does interest depends on the number of quotas?
-                //    2- Is is just a plain interest aplicable to amount? (like below)
-                var finalAmount = amount * (1 + interest); 
+                ///////////////////////////////////
+                // Discount part
+
+                var discountPromo = promotions.stream()
+                    .filter(p -> Discount.class.isInstance(p))
+                    .map(p -> Discount.class.cast(p))
+                    .filter(p -> !p.isOnlyCash())
+                    .findAny();  
+
+                var disPriceCap = discountPromo.map(Discount::getPriceCap).orElse(0.f);  
+                var disPromoDiscount = discountPromo.map(Discount::getDiscountPercentage).orElse(0.f);
+                var disFinalPromoDiscount = amount <= disPriceCap ? disPromoDiscount : 0.f;
+
+                var disAmount = amount * (1 - disFinalPromoDiscount);
+
+                ///////////////////////////////////
+                // Financial part
+
+                var financialPromo = promotions.stream()
+                    .filter(p -> Financing.class.isInstance(p))
+                    .map(p -> Financing.class.cast(p))
+                    .findAny();
+
+                @Nullable var finVoucher = financialPromo
+                    .map(Financing::getCode)
+                    .orElse(null); // No promotion
                 
+                var finInterest = financialPromo
+                    .map(Financing::getInterest)
+                    .orElse(this.faker.number().numberBetween(1, getIntParam("maxNoPromoInterest")) / 100.f);
+                
+                var finNumOfQuotas = financialPromo
+                    .map(Financing::getNumberOfQuotas)
+                    .orElse(this.faker.number().numberBetween(1, getIntParam("maxNoPromoNumOfQuotas")));
+
+                var finalAmount = disAmount * (1 + finInterest); 
+
+                ///////////////////////////////////
+                // Purchase part
+
                 var purchase = new CreditPurchase(
                     card, 
-                    voucher,
+                    finVoucher,
                     store.name(), 
                     store.cuit(), 
                     amount, 
                     finalAmount,
-                    interest,
-                    numOfQuotas);
+                    finInterest,
+                    finNumOfQuotas);
 
-                generateQuotasTo(purchase, numOfQuotas, finalAmount);
+                generateQuotasTo(purchase, finNumOfQuotas, finalAmount);
 
                 return purchase;
             });
@@ -414,20 +454,19 @@ public class TestDataGeneratorService {
 
     /**
      * Defines the purchase template algorithm, it can generates cash or credit purchases
+     * 
      * @param <T>
      * @param <U>
      * @param stores
      * @param cards
-     * @param promotionClass
      * @param paymentCreator
-     * @return
+     * @return Iterable<T>
      */
-    private <T extends Purchase, U extends Promotion> 
+    private <T extends Purchase> 
         Iterable<T> generatePurchases(int maxNumOfPurchases,
                                       Iterable<Store> stores, 
                                       Iterable<Card> cards, 
-                                      Class<U> promotionClass,
-                                      TriFunction<Store, Card, Optional<U>, T> purchaseCreator)     
+                                      TriFunction<Store, Card, List<Promotion>, T> purchaseCreator)     
     {
         var purchases = new ArrayList<T>();
 
@@ -439,16 +478,13 @@ public class TestDataGeneratorService {
 
             getRandomItemsFrom(stores, numOfPurchases)
                 .forEach(store -> {
-                    // Check if the store has a promotion for the card bank
-                    var promotion = card.getBank().getPromotions().stream()
-                        .filter(promo -> 
-                            promo.getCuitStore() == store.cuit() &&
-                            promotionClass.isInstance(promo)) 
-                        .map(promo -> promotionClass.cast(promo))
-                        .findAny();
+                    var promotions = card.getBank().getPromotions().stream()
+                        .filter(promo -> promo.getCuitStore() == store.cuit())
+                        .toList();
 
-                    // 'store' is necessary because 'promotion' can be empty
-                    purchases.add(purchaseCreator.apply(store, card, promotion));
+                    assert promotions.size() <=2; // A bank has at most 2 promotions for each store
+
+                    purchases.add(purchaseCreator.apply(store, card, promotions));
                 });
         });
 
