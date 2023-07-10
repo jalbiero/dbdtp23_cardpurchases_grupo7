@@ -2,7 +2,6 @@ package com.tpdbd.cardpurchases;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 
-import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
