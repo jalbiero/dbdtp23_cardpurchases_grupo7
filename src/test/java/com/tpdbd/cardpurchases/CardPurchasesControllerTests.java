@@ -391,7 +391,7 @@ public class CardPurchasesControllerTests {
         return given()
             .get("/test/stores/cuits")
             .jsonPath()
-            .getObject("cuits[0]", String.class);
+            .getObject("cuits[1]", String.class);
     }
 
     static public long getSomePurchaseId() {
