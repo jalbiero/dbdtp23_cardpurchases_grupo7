@@ -266,7 +266,7 @@ public class CardPurchasesController {
      * 07 - Gets the total price of the specified purchase
      * 
      * URL: 
-     *      GET /purchases/{id}/totalPrice
+     *      GET /purchases/{id}/creditTotalPrice
      * 
      * ContentType: 
      *      application/json
@@ -275,11 +275,18 @@ public class CardPurchasesController {
      *      - URL: {id} the purchase id
      * 
      * Return:
-     *      The finalAmount of the purchase. e.g. 1050.0
+     *      - The totalPrice (finalAmount) of the specified credit purchase:
+     * 
+     *          {
+     *              "id": 10,
+     *              "totalPrice": 1023.50
+     *          }
+     * 
+     *      - 404 if the specified credit purchase could not be found
      */ 
-    @GetMapping("/purchases/{id}/getTotalPrice")
-    Float purchasesGetTotalPrice(@PathVariable Long id) {
-        return this.service.purchasesGetTotalPrice(id);
+    @GetMapping("/purchases/{id}/creditTotalPrice")
+    ResponseDTO.CreditPurchaseTotalPrice purchasesCreditGetTotalPrice(@PathVariable Long id) {
+        return this.service.purchasesCreditGetTotalPrice(id);
     }
 
     /**
