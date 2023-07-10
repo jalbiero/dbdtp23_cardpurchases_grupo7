@@ -263,6 +263,26 @@ public class CardPurchasesController {
     }
 
     /**
+     * 07 - Gets the total price of the specified purchase
+     * 
+     * URL: 
+     *      GET /purchases/{id}/totalPrice
+     * 
+     * ContentType: 
+     *      application/json
+     * 
+     * Params:
+     *      - URL: {id} the purchase id
+     * 
+     * Return:
+     *      The finalAmount of the purchase. e.g. 1050.0
+     */ 
+    @GetMapping("/purchases/{id}/getTotalPrice")
+    Float purchasesGetTotalPrice(@PathVariable Long id) {
+        return this.service.purchasesGetTotalPrice(id);
+    }
+
+    /**
      * 08 - List promotions for the specified store in the specified date range
      * 
      * URL: 
