@@ -95,7 +95,6 @@ public interface ResponseDTO {
         }
     }
 
-
     ////////////////////////////////////////////////////////
     @JsonInclude(JsonInclude.Include.NON_ABSENT) 
     interface Promotion {
@@ -282,9 +281,11 @@ public interface ResponseDTO {
     }
 
     ////////////////////////////////////////////////////////
-    record Store(String name, String cuit, float profit) {
-        
-    }
+    record Store(
+        String name, 
+        String cuit, 
+        float profit) 
+    {}
 
     ////////////////////////////////////////////////////////
     record MonthlyPayment(
@@ -300,10 +301,8 @@ public interface ResponseDTO {
                 .collect(Collectors.toList());
             
             // TODO: It is not clear how "Payment.surcharge", "Payment.firstExpiration" and
-            //       "Payment.secondExpiration" must be used. In my understanding the Payment entity
-            //       is to record a Card holder payment, so why the record has the expirations? 
-            //       In my opinion, the expirations and the surcharge must reside in the Quota entity, 
-            //       because this entity contains all the quotas (the already payed and the pending ones)
+            //       "Payment.secondExpiration" must be used. Is the Payment class a "payment order"
+            //       or a "payment record"? Sometimes seems to the 1st one, sometimes the 2nd one.
             //       Having said that, and for the sake of simplicity, I will ignore the "Payment.surcharge"
             //       using only the "Payment.totalPrice" to represents the amount of money that
             //       a Card holder has payed in the given period (year and month)            
@@ -323,13 +322,12 @@ public interface ResponseDTO {
         String cardHolderName,
         int numOfPurchases,
         String cardNumber)
-    {
-    }
+    {}
 
+    ////////////////////////////////////////////////////////
     record CreditPurchaseTotalPrice(
         long id,
         float totalPrice)
-    { 
-    }
+    {}
     
 }

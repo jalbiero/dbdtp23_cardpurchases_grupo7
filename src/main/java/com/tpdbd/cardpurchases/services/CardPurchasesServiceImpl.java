@@ -83,9 +83,8 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
     @Override
     public List<ResponseDTO.Card> cardsGetSoonToExpire(LocalDate baseDate, Integer daysFromBaseDate) {
         var finalDate = baseDate.plusDays(daysFromBaseDate);
-        var cards = this.cardRepository.findByExpirationDateBetween(baseDate, finalDate);
-        
-        return cards.stream()
+        return this.cardRepository
+            .findByExpirationDateBetweenOrderByExpirationDate(baseDate, finalDate).stream()
             .map(ResponseDTO.Card::fromModel)
             .toList();
     }
