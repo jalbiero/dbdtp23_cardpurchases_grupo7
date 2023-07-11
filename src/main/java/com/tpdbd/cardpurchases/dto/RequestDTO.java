@@ -43,16 +43,6 @@ public interface RequestDTO {
     {}
 
     ////////////////////////////////////////////////////////
-    record CardsGetSoonToExpiredBody(
-        LocalDate baseDate,        
-        Integer daysFromBaseDate) 
-    {
-        public CardsGetSoonToExpiredBody() {
-            this(LocalDate.now(), 30);
-        }
-    }
-
-    ////////////////////////////////////////////////////////
     record Card(
         String bankCuit,
         String cardHolderDni,
