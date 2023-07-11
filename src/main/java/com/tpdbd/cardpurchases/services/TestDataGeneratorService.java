@@ -541,7 +541,7 @@ public class TestDataGeneratorService {
                             .reduce(0.f, (accum, price) -> accum + price);
 
                         // All quotas belong to purchases made with the same card,
-                        // so just use one of the to get the card
+                        // so just use one of them to get the card
                         var card = quotas.get(0).getPurchase().getCard();
 
                         var payment = new Payment(
@@ -550,7 +550,7 @@ public class TestDataGeneratorService {
                             period.year(),
                             LocalDate.of(period.year(), period.month(), 15),
                             LocalDate.of(period.year(), period.month(), 25),
-                            totalPrice * 0.5f, // TODO 5% is harcoded 
+                            totalPrice * 0.5f, // TODO Surcharfe of 5% is harcoded
                             totalPrice,
                             card);
 
