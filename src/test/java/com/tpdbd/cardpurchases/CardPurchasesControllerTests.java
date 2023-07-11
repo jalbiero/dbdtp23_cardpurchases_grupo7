@@ -25,7 +25,6 @@ import java.time.LocalDate;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.BiFunction;
-import java.util.function.Function;
 
 
 /**
@@ -187,31 +186,29 @@ public class CardPurchasesControllerTests {
         
         // Test some expiration paths
 
-        Function<RequestDTO.CardsGetSoonToExpiredBody, ValidatableResponse> getSoonToExpire = 
-            (body) -> {
+        BiFunction<LocalDate, Integer, ValidatableResponse> getSoonToExpire = 
+            (baseDate, daysFromBaseDate) -> {
                 return given()
                     .when()
-                        .contentType(ContentType.JSON)    
-                        .body(body)
-                        .get("/cards/soonToExpire")
+                        .get("/cards/soonToExpire?baseDate={1}&daysFromBaseDate={2}", 
+                            baseDate.toString(), daysFromBaseDate)
                     .then()
                         .statusCode(200)
                         .contentType(ContentType.JSON);
-            };
+            };    
 
-
-        var noCardsInTheNext30days = new RequestDTO.CardsGetSoonToExpiredBody(BASE_DATE, 30);
-        getSoonToExpire.apply(noCardsInTheNext30days)
+        // No card in the next 30 days starting from BASE_DATE
+        getSoonToExpire.apply(BASE_DATE, 30)
             .body("$", Matchers.hasSize(0));
             
-        var oneCardInTheNext30days = new RequestDTO.CardsGetSoonToExpiredBody(BASE_DATE.plusDays(5), 30);
-        getSoonToExpire.apply(oneCardInTheNext30days)
+        // One card in the next 30 days
+        getSoonToExpire.apply(BASE_DATE.plusDays(5), 30)
             .body("$", Matchers.hasSize(1))
             .body("[0].number", Matchers.equalTo(CARD_NUMBER));
 
-        var noCardsAllAlreadyExpired = new RequestDTO.CardsGetSoonToExpiredBody(BASE_DATE.plusDays(DAYS_TO_EXPIRATION + 1), 30);
-        getSoonToExpire.apply(noCardsAllAlreadyExpired)
-            .body("$", Matchers.hasSize(0));
+        // No cards, all already expired
+        getSoonToExpire.apply(BASE_DATE.plusDays(DAYS_TO_EXPIRATION + 1), 30)
+             .body("$", Matchers.hasSize(0));
 
         // Remove the test card
         given().delete("/test/cards/{number}", CARD_NUMBER);
