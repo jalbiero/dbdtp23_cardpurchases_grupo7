@@ -15,7 +15,7 @@ public interface CardRepository extends CrudRepository<Card, Long> {
     @Query("SELECT c.number FROM Card c")
     List<String> findAllNumbers();
 
-    List<Card> findByExpirationDateBetween(LocalDate dt1, LocalDate dt2);
+    List<Card> findByExpirationDateBetweenOrderByExpirationDate(LocalDate dt1, LocalDate dt2);
 
     void deleteByNumber(String number);
 }
