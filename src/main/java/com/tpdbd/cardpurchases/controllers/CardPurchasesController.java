@@ -108,7 +108,7 @@ public class CardPurchasesController {
      * URL: 
      *      PUT /cards/{number}/monthlyPayment?year={someYear}&month={someMonth}
      * 
-     * URL params:
+     * Params:
      *      - URL: {someYear} the specified year
      *             {someMonth} the specified month
      * 
@@ -157,23 +157,15 @@ public class CardPurchasesController {
      *      from the moment of calling this endpoint if the days and the date are not 
      *      specified)
      * 
-     *      Note: GET endpoints shouldn't use a request body (although most web framework supported
-     *            it), but current RFC is not against them, and some companies also use them. See 
-     *            the following for more information: 
-     *                 https://stackoverflow.com/questions/978061/http-get-with-request-body 
-     *            Having said that, this particular endpoint use an optional request body.
      * URL: 
-     *      GET /cards/soonToExpire
+     *      GET /cards/soonToExpire?baseDate={baseDate}&daysFromBaseDate={daysFromBaseDate}
      * 
      * ContentType: 
      *      application/json
      * 
      * Params:
-     *      - Body (optional):
-     *          {
-     *              "baseDate": "2023/10/15",       
-     *              "daysFromBaseDate": 30 
-     *          }     
+     *      - URL: [Optional] {baseDate} the starting date to look up. Default = now(), (format: 'yyyy-MM-dd')
+     *             [Optional] {daysFromBaseDate}: default = 30 (days)
      * 
      * Return:
      *      A list of Cards:
@@ -192,11 +184,13 @@ public class CardPurchasesController {
      *      ]
      */
     @GetMapping("/cards/soonToExpire")
-    List<ResponseDTO.Card> cardsGetSoonToExpired(@RequestBody(required=false) 
-                                                 Optional<RequestDTO.CardsGetSoonToExpiredBody> body) 
+    List<ResponseDTO.Card> cardsGetSoonToExpired(@RequestParam Optional<LocalDate> baseDate,
+                                                 @RequestParam Optional<Integer> daysFromBaseDate)
     {
-        var params = body.orElse(new RequestDTO.CardsGetSoonToExpiredBody());
-        return this.service.cardsGetSoonToExpire(params.baseDate(), params.daysFromBaseDate());
+        var finalBaseDate = baseDate.orElse(LocalDate.now());
+        var finalDaysFromBaseDate = daysFromBaseDate.orElse(30);
+
+        return this.service.cardsGetSoonToExpire(finalBaseDate, finalDaysFromBaseDate);
     }
 
     /**
@@ -296,8 +290,8 @@ public class CardPurchasesController {
      *      GET /stores/{cuit}/availablePromotions?from={from}&to={to}
      * 
      * Params:
-     *      - URL: {from} the specified 'from' date
-     *             {to} the specified 'to' date
+     *      - URL: {from} the specified 'from' date (format: 'yyyy-MM-dd')
+     *             {to} the specified 'to' date (format: 'yyyy-MM-dd')
      * 
      * Return:
      *      A list of store promotions:
