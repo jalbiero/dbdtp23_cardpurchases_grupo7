@@ -4,32 +4,27 @@ Trabajo final de Diseño de Bases de Datos 2022/23 - **GRUPO 7**
 
 ## Introducción
 
-Esta es una aplicación que expone funcionalidad mediante una API REST, la misma puede ser accedida mediante algún cliente de prueba tal como [Postman](https://www.postman.com/), [JMeter](https://jmeter.apache.org/) o la misma interfaz gráfica expuesta por la aplicación (ver la sección de [documentación y prueba](#documentación-y-prueba-manual-de-los-endpoints-implementados) para más detalles). La base de datos usada es MySQL 8.0
+Esta es una aplicación que expone funcionalidad mediante una API REST, la misma puede ser accedida mediante algún cliente de prueba tal como [Postman](https://www.postman.com/), [JMeter](https://jmeter.apache.org/) o la misma interfaz gráfica expuesta por la aplicación, lo cual se recomienda (ver la sección de [documentación y prueba](#documentación-y-prueba-manual-de-los-endpoints-implementados) para más detalles). La base de datos usada es MySQL 8.0
 
 Para simplificar el desarrollo los tests unitarios son de integración es decir que la aplicación se prueba desde la API REST misma (podría hacerse desde los servicios, pero para evitar cierta duplicación en las pruebas, se prueba directamente desde la capa más externa)
 
 ## Requerimientos
 
 - Docker
-- Docker compose (ver [pom.xml](pom.xml) para más detalles)
+- Docker compose
 - Java 19
 - Maven
+- git
 
 El desarrollo se hizo bajo Linux (openSUSE 15.4), no se probó en otras plataformas (macOS, Windows), pero debería funcionar sin problemas en ambas.
 
-## Instalación y tests
+Nota: En el archivo [pom.xml](pom.xml) se agregó una tarea (ver `Start-up dependant services`) que automáticamente levanta el docker de SQL mediante `docker compose` tanto al ejecutar la aplicación como al ejecutar sus test unitarios. Todo es automático.
+
+## Instalación y ejecución
 
 ```bash
 $ git clone -b sql_version git@github.com:jalbiero/dbdtp23_cardpurchases_grupo7.git
 $ cd dbdtp23_cardpurchases_grupo7
-$ mvn test
-```
-
-## Ejecución
-
-Se asume terminal en la carpeta del proyecto (*dbdtp23_cardpurchases_grupo7*)
-
-```bash
 $ mvn spring-boot:run
 ```
 
@@ -69,6 +64,23 @@ Para aislar la funcionalidad pedida de lo que se necesita para probarla se decid
 
 ¿Cómo identificar unívocamente las entidades? En aquellas en los que hubiera un campo que permita hacerlo (CUIT, DNI, Number, etc) se optó por usar los mismos (ej: `Bank`, `CardHolder`, `Card`). En los que no, se usa directamente el ID autogenerado (ej: `Purchases`)
 
+### Pruebas
+
+Para las pruebas (tanto manuales con la aplicación funcionando, como para los _tests_ unitarios) se diseño un servicio ([TestDataGeneratorService](src/main/java/com/tpdbd/cardpurchases/services/TestDataGeneratorService.java)) que se ejecuta al arrancar la aplicación. La funcionalidad del mismo es generar datos de prueba (lo más real posibles) en la base de datos. Inicialmente se evaluó la opción de tener un archivo .sql, pero no iba a escalar ya que:
+   
+   1. Era muy dependiente de la estructura de datos generada por JPA (un cambio en las anotaciones y la estructura difiere)
+   2. Iba a ser necesario tener un archivo similar para Mongo.
+
+En conclusión. El código del servicio trabaja con las entidades del modelo por lo cual es independiente de la base de datos subyacente.
+
+La generación de datos se controle mediante el [archivo de propiedades de la aplicación](src/main/resources/application.properties). Por simplicidad, sobre todo para ciertos tests, y a menos que esas propiedades sean modificadas, los datos generados en cada corrida de la aplicación, o de los _test_ unitarios, van a ser los mismos.
+
+Los _tests_ unitarios se ejecutan con:
+
+```bash
+$ mvn test
+```
+
 ### Otros
 
 - En la clase `Quota`, por conveniencia, se cambiaron los tipos de datos de los attributos `month`y `year`, ambos originalmente `String` a `int`
@@ -76,6 +88,4 @@ Para aislar la funcionalidad pedida de lo que se necesita para probarla se decid
   - El _mapper_ más simple y directo de usar es en mi opinión "modelmapper", pero lamentablemente no soporta objetos DTO basados en _records_ (los cuales son muy sencillos de definir y usar)
   -  Por lo dicho anteriomente, opté por hacer el mapeo de los objetos basados en entidades a DTO de manera manual (agregando un par de métodos estáticos a los DTO para la conversión entre y hace entidades del modelo).
   -  Hay mucha discusión sobre en qué capa usar los DTOs, muchos a favor (y con cierta razón) que los mismos deben usarse en la capa de transporte, es decir en la de los controladores. El problema es que en esa capa muchas veces no se cuenta con datos que el servicio posee para generar correctamente el DTO. Por lo anterior tomé la decisión de que la capa de servicio devuelva resultados directamente en DTO para la capa de controladores.
-
-- TODO 
   
