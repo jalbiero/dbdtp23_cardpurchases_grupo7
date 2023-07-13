@@ -1,4 +1,4 @@
-package com.tpdbd.cardpurchases.services;
+package com.tpdbd.cardpurchases.services.impl;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -25,6 +25,7 @@ import com.tpdbd.cardpurchases.repositories.PaymentRepository;
 import com.tpdbd.cardpurchases.repositories.PromotionRepository;
 import com.tpdbd.cardpurchases.repositories.PurchaseRepository;
 import com.tpdbd.cardpurchases.repositories.QuotaRepository;
+import com.tpdbd.cardpurchases.services.CardPurchasesService;
 
 import jakarta.transaction.Transactional;
 
