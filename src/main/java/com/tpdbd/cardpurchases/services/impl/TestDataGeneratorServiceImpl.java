@@ -1,4 +1,4 @@
-package com.tpdbd.cardpurchases.services;
+package com.tpdbd.cardpurchases.services.impl;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -56,7 +56,7 @@ record PaymentPeriod(Integer month, Integer year) {
 }
 
 @Service
-public class TestDataGeneratorService {
+public class TestDataGeneratorServiceImpl {
     @Autowired private Environment environment;
     @Autowired private BankRepository bankRepository;
     @Autowired private CardHolderRepository cardHolderRepository;
@@ -72,7 +72,7 @@ public class TestDataGeneratorService {
     private SequenceGenerator paymentCode = new SequenceGenerator("payment");
     private Iterable<Store> stores;
 
-    public TestDataGeneratorService() {
+    public TestDataGeneratorServiceImpl() {
         var locale = new Locale.Builder()
             .setLanguage("es")
             .setRegion("AR")
