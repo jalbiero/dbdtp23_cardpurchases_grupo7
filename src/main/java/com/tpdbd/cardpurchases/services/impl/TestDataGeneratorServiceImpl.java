@@ -35,6 +35,7 @@ import com.tpdbd.cardpurchases.repositories.BankRepository;
 import com.tpdbd.cardpurchases.repositories.CardHolderRepository;
 import com.tpdbd.cardpurchases.repositories.CardRepository;
 import com.tpdbd.cardpurchases.repositories.PurchaseRepository;
+import com.tpdbd.cardpurchases.services.TestDataGeneratorService;
 import com.tpdbd.cardpurchases.util.SequenceGenerator;
 import com.tpdbd.cardpurchases.util.TriFunction;
 
@@ -56,7 +57,7 @@ record PaymentPeriod(Integer month, Integer year) {
 }
 
 @Service
-public class TestDataGeneratorServiceImpl {
+public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
     @Autowired private Environment environment;
     @Autowired private BankRepository bankRepository;
     @Autowired private CardHolderRepository cardHolderRepository;
@@ -81,6 +82,7 @@ public class TestDataGeneratorServiceImpl {
         this.faker = new Faker(locale, this.random);
     }
 
+    @Override
     @Transactional
     public void generateData() {
         this.stores = generateStores();
@@ -100,6 +102,7 @@ public class TestDataGeneratorServiceImpl {
         this.creditRepository.saveAll(creditPurchases);
     }
 
+    @Override
     public List<String> getStoreCuits() {
         return StreamSupport.stream(this.stores.spliterator() , false)
             .map(store -> store.cuit())
