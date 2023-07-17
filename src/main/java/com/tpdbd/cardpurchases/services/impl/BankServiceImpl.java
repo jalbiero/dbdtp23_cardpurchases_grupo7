@@ -1,6 +1,7 @@
 package com.tpdbd.cardpurchases.services.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.tpdbd.cardpurchases.dto.RequestDTO;
 import com.tpdbd.cardpurchases.errors.BankNotFoundException;
@@ -9,6 +10,7 @@ import com.tpdbd.cardpurchases.services.BankService;
 
 import jakarta.transaction.Transactional;
 
+@Service
 public class BankServiceImpl implements BankService {
     @Autowired
     private BankRepository bankRepository;
