@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import com.tpdbd.cardpurchases.dto.RequestDTO;
 import com.tpdbd.cardpurchases.dto.ResponseDTO;
-import com.tpdbd.cardpurchases.errors.BestSellerStoreNotFoundException;
 import com.tpdbd.cardpurchases.errors.CreditPurchaseNotFoundException;
 import com.tpdbd.cardpurchases.errors.MonthlyPaymentNotFoundException;
 import com.tpdbd.cardpurchases.errors.NotFoundException;
@@ -21,10 +20,10 @@ import com.tpdbd.cardpurchases.model.Purchase;
 import com.tpdbd.cardpurchases.repositories.PaymentRepository;
 import com.tpdbd.cardpurchases.repositories.PromotionRepository;
 import com.tpdbd.cardpurchases.repositories.PurchaseRepository;
-import com.tpdbd.cardpurchases.repositories.QuotaRepository;
 import com.tpdbd.cardpurchases.services.BankService;
 import com.tpdbd.cardpurchases.services.CardPurchasesService;
 import com.tpdbd.cardpurchases.services.CardService;
+import com.tpdbd.cardpurchases.services.QuotaService;
 
 import jakarta.transaction.Transactional;
 
@@ -39,15 +38,15 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
     @Autowired
     private PromotionRepository promotionRepository;
 
-    @Autowired
-    private QuotaRepository quotaRepository;
-
     //------
     @Autowired
     private BankService bankService;
 
     @Autowired
     private CardService cardService;
+
+    @Autowired
+    private QuotaService quotaService;
 
     @Override
     @Transactional
@@ -165,15 +164,12 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
 
     @Override
     public ResponseDTO.Store storesGetBestSeller(int year, int month) {
-        var bestSellers = this.quotaRepository.findTheBestSellerStores(year, month, PageRequest.of(0, 1));
-
-        if (bestSellers.isEmpty())
-            throw new BestSellerStoreNotFoundException(year, month);
-
-        var bestSeller = bestSellers.getContent().get(0);
+        var bestSellerStore = this.quotaService.getTheBestSellerStore(year, month);
 
         return new ResponseDTO.Store(
-            bestSeller.getStore(), bestSeller.getCuitStore(), bestSeller.getMonthlyProfit());
+            bestSellerStore.getStore(), 
+            bestSellerStore.getCuitStore(), 
+            bestSellerStore.getMonthlyProfit());
     }
 
     @Override
