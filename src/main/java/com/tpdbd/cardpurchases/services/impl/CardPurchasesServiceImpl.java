@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import com.tpdbd.cardpurchases.dto.RequestDTO;
 import com.tpdbd.cardpurchases.dto.ResponseDTO;
-import com.tpdbd.cardpurchases.errors.BankNotFoundException;
 import com.tpdbd.cardpurchases.errors.BestSellerStoreNotFoundException;
 import com.tpdbd.cardpurchases.errors.CreditPurchaseNotFoundException;
 import com.tpdbd.cardpurchases.errors.MonthlyPaymentNotFoundException;
@@ -19,26 +18,20 @@ import com.tpdbd.cardpurchases.errors.PromotionNotFoundException;
 import com.tpdbd.cardpurchases.errors.PurchaseNotFoundException;
 import com.tpdbd.cardpurchases.model.CreditPurchase;
 import com.tpdbd.cardpurchases.model.Purchase;
-import com.tpdbd.cardpurchases.repositories.BankRepository;
-import com.tpdbd.cardpurchases.repositories.CardRepository;
 import com.tpdbd.cardpurchases.repositories.PaymentRepository;
 import com.tpdbd.cardpurchases.repositories.PromotionRepository;
 import com.tpdbd.cardpurchases.repositories.PurchaseRepository;
 import com.tpdbd.cardpurchases.repositories.QuotaRepository;
+import com.tpdbd.cardpurchases.services.BankService;
 import com.tpdbd.cardpurchases.services.CardPurchasesService;
+import com.tpdbd.cardpurchases.services.CardService;
 
 import jakarta.transaction.Transactional;
 
 @Service
 public class CardPurchasesServiceImpl implements CardPurchasesService {
     @Autowired
-    private BankRepository bankRepository;
-
-    @Autowired
     private PaymentRepository paymentRepository;
-
-    @Autowired
-    private CardRepository cardRepository;
 
     @Autowired
     private PurchaseRepository<Purchase> purchaseRepository; 
@@ -49,15 +42,17 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
     @Autowired
     private QuotaRepository quotaRepository;
 
+    //------
+    @Autowired
+    private BankService bankService;
+
+    @Autowired
+    private CardService cardService;
+
     @Override
     @Transactional
     public void banksAddDiscountPromotion(String cuit, RequestDTO.Discount discount) {
-        var bank = this.bankRepository
-            .findByCuit(cuit)
-            .orElseThrow(() -> new BankNotFoundException(cuit));
-
-        bank.addPromotion(RequestDTO.Discount.toModel(discount, bank));
-        this.bankRepository.save(bank);
+        this.bankService.addDiscountPromotion(cuit, discount);
     }
 
     @Override
@@ -83,9 +78,7 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
   
     @Override
     public List<ResponseDTO.Card> cardsGetSoonToExpire(LocalDate baseDate, Integer daysFromBaseDate) {
-        var finalDate = baseDate.plusDays(daysFromBaseDate);
-        return this.cardRepository
-            .findByExpirationDateBetweenOrderByExpirationDate(baseDate, finalDate).stream()
+        return this.cardService.getSoonToExpire(baseDate, daysFromBaseDate).stream()
             .map(ResponseDTO.Card::fromModel)
             .toList();
     }
