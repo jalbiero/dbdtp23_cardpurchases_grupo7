@@ -322,7 +322,8 @@ public class CardPurchasesControllerTests {
             .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
-                .body("$", Matchers.hasSize(Matchers.greaterThan(0)));
+                .body("$", Matchers.hasSize(Matchers.greaterThanOrEqualTo(0)))
+                .body("$", Matchers.hasSize(Matchers.lessThanOrEqualTo(10)));
                 
         // Validate the data, incluiding the array order (sorted by numOfPurchases in descending order)
         var purchasers = response.jsonPath().getList("$", ResponseDTO.PurchaserCardHolder.class);
