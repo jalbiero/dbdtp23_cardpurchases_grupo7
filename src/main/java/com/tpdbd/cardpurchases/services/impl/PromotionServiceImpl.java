@@ -28,7 +28,7 @@ public class PromotionServiceImpl implements PromotionService {
     }
  
     @Override
-    public List<Promotion> GetAvailblePromotions(String cuitStore, LocalDate from, LocalDate to) {
+    public List<Promotion> GetAvailablePromotions(String cuitStore, LocalDate from, LocalDate to) {
         return this.promotionRepository
             .findByCuitStoreAndValidityStartDateGreaterThanEqualAndValidityEndDateLessThanEqual(
                 cuitStore, from, to);

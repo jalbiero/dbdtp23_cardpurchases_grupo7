@@ -11,7 +11,7 @@ public interface PromotionService {
  
     Optional<Promotion> findByCode(String code);
  
-    List<Promotion> GetAvailblePromotions(String cuitStore, LocalDate from, LocalDate to);
+    List<Promotion> GetAvailablePromotions(String cuitStore, LocalDate from, LocalDate to);
  
     boolean deleteByCode(String code);    
 }
