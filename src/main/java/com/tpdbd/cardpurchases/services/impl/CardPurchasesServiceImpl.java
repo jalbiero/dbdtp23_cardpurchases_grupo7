@@ -16,13 +16,12 @@ import com.tpdbd.cardpurchases.errors.PaymentNotFoundException;
 import com.tpdbd.cardpurchases.errors.PromotionNotFoundException;
 import com.tpdbd.cardpurchases.errors.PurchaseNotFoundException;
 import com.tpdbd.cardpurchases.model.CreditPurchase;
-import com.tpdbd.cardpurchases.model.Purchase;
 import com.tpdbd.cardpurchases.repositories.PaymentRepository;
 import com.tpdbd.cardpurchases.repositories.PromotionRepository;
-import com.tpdbd.cardpurchases.repositories.PurchaseRepository;
 import com.tpdbd.cardpurchases.services.BankService;
 import com.tpdbd.cardpurchases.services.CardPurchasesService;
 import com.tpdbd.cardpurchases.services.CardService;
+import com.tpdbd.cardpurchases.services.PurchaseService;
 import com.tpdbd.cardpurchases.services.QuotaService;
 
 import jakarta.transaction.Transactional;
@@ -31,9 +30,6 @@ import jakarta.transaction.Transactional;
 public class CardPurchasesServiceImpl implements CardPurchasesService {
     @Autowired
     private PaymentRepository paymentRepository;
-
-    @Autowired
-    private PurchaseRepository<Purchase> purchaseRepository; 
 
     @Autowired
     private PromotionRepository promotionRepository;
@@ -47,6 +43,9 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
 
     @Autowired
     private QuotaService quotaService;
+
+    @Autowired
+    private PurchaseService purchaseService;
 
     @Override
     @Transactional
@@ -85,7 +84,7 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
     @Override
     public ResponseDTO.Purchase purchasesGetInfo(long purchaseId) {
         return ResponseDTO.Purchase.fromModel(
-            this.purchaseRepository
+            this.purchaseService
                 .findById(purchaseId)
                 .orElseThrow(() -> new PurchaseNotFoundException(purchaseId)));
     }
@@ -98,7 +97,7 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
 
     @Override
     public ResponseDTO.CreditPurchaseTotalPrice purchasesCreditGetTotalPrice(long purchaseId) {
-        var purchase = this.purchaseRepository
+        var purchase = this.purchaseService
             .findById(purchaseId)
             .filter(p -> CreditPurchase.class.isInstance(p))
             .map(p -> CreditPurchase.class.cast(p))
@@ -119,13 +118,7 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
 
     @Override
     public List<ResponseDTO.PurchaserCardHolder> cardsGetTop10Purchasers() {
-        var top10PurchaserCards = this.purchaseRepository.findTopPurchaserCards(PageRequest.of(0, 10));
-
-        // This is a rare case (practically, the database must be empty)
-        if (top10PurchaserCards.isEmpty())
-            throw new NotFoundException("No purchases could be found for any card");
-
-        return top10PurchaserCards.get()
+        return this.purchaseService.findTopPurchasers(10)
             .map(numOfPurchasesByCard -> new ResponseDTO.PurchaserCardHolder(
                 numOfPurchasesByCard.getCard().getCardHolder().getCompleteName(),
                 numOfPurchasesByCard.getNumOfPurchases(),
@@ -140,20 +133,19 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
         // logging code a few lines below
         final var NUM_OF_VOUCHERS = 1; 
 
-        var mostUsedVouchers = this.purchaseRepository.findTheMostUsedVouchers(PageRequest.of(0, NUM_OF_VOUCHERS));
+        var mostUsedVouchers = this.purchaseService.findTheMostUsedVouchers(NUM_OF_VOUCHERS).toList();
 
         if (mostUsedVouchers.isEmpty())
             throw new NotFoundException("No promotions used in all purchases");
 
         // TODO Add a propper logger instead of console output
-        // mostUsedVouchers.getContent().stream()
-        //     .forEach(voucher -> {
+        // mostUsedVouchers.forEach(voucher -> {
         //         System.out.println(
-        //             "Voucher: " + voucher.getPaymentVoucher() + 
+        //             "Voucher: " + voucher.getCode() + 
         //             ", # of purchases: " + voucher.getNumOfPurchases());
         //     });
 
-        var voucher = mostUsedVouchers.getContent().get(0);
+        var voucher = mostUsedVouchers.get(0);
 
         var promotion = this.promotionRepository
             .findByCode(voucher.getCode())
