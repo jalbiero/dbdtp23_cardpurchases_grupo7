@@ -15,11 +15,11 @@ import com.tpdbd.cardpurchases.errors.PaymentNotFoundException;
 import com.tpdbd.cardpurchases.errors.PromotionNotFoundException;
 import com.tpdbd.cardpurchases.errors.PurchaseNotFoundException;
 import com.tpdbd.cardpurchases.model.CreditPurchase;
-import com.tpdbd.cardpurchases.repositories.PromotionRepository;
 import com.tpdbd.cardpurchases.services.BankService;
 import com.tpdbd.cardpurchases.services.CardPurchasesService;
 import com.tpdbd.cardpurchases.services.CardService;
 import com.tpdbd.cardpurchases.services.PaymentService;
+import com.tpdbd.cardpurchases.services.PromotionService;
 import com.tpdbd.cardpurchases.services.PurchaseService;
 import com.tpdbd.cardpurchases.services.QuotaService;
 
@@ -27,10 +27,6 @@ import jakarta.transaction.Transactional;
 
 @Service
 public class CardPurchasesServiceImpl implements CardPurchasesService {
-    @Autowired
-    private PromotionRepository promotionRepository;
-
-    //------
     @Autowired
     private BankService bankService;
 
@@ -42,6 +38,9 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
 
     @Autowired
     private PaymentService paymentService;
+
+    @Autowired
+    private PromotionService promotionService;
 
     @Autowired
     private PurchaseService purchaseService;
@@ -90,7 +89,7 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
 
     @Override
     public void promotionsDelete(String code) {
-        if (this.promotionRepository.deleteByCode(code) == 0) 
+        if (!this.promotionService.deleteByCode(code)) 
             throw new PromotionNotFoundException(code);
     }
 
@@ -107,8 +106,7 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
 
     @Override
     public List<ResponseDTO.Promotion> storesGetAvailblePromotions(String cuitStore, LocalDate from, LocalDate to) {
-        var promotions = this.promotionRepository
-            .findByCuitStoreAndValidityStartDateGreaterThanEqualAndValidityEndDateLessThanEqual(cuitStore, from, to);
+        var promotions = this.promotionService.GetAvailablePromotions(cuitStore, from, to);
 
         return promotions.stream()
             .map(ResponseDTO.Promotion::fromModel)
@@ -146,7 +144,7 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
 
         var voucher = mostUsedVouchers.get(0);
 
-        var promotion = this.promotionRepository
+        var promotion = this.promotionService
             .findByCode(voucher.getCode())
             .orElseThrow(() -> new PromotionNotFoundException(voucher.getCode()));
 
