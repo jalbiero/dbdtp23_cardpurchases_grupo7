@@ -21,6 +21,7 @@ import com.tpdbd.cardpurchases.repositories.PromotionRepository;
 import com.tpdbd.cardpurchases.services.BankService;
 import com.tpdbd.cardpurchases.services.CardPurchasesService;
 import com.tpdbd.cardpurchases.services.CardService;
+import com.tpdbd.cardpurchases.services.PaymentService;
 import com.tpdbd.cardpurchases.services.PurchaseService;
 import com.tpdbd.cardpurchases.services.QuotaService;
 
@@ -28,9 +29,6 @@ import jakarta.transaction.Transactional;
 
 @Service
 public class CardPurchasesServiceImpl implements CardPurchasesService {
-    @Autowired
-    private PaymentRepository paymentRepository;
-
     @Autowired
     private PromotionRepository promotionRepository;
 
@@ -45,6 +43,9 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
     private QuotaService quotaService;
 
     @Autowired
+    private PaymentService paymentService;
+
+    @Autowired
     private PurchaseService purchaseService;
 
     @Override
@@ -56,20 +57,20 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
     @Override
     @Transactional
     public void paymentsUpdateDates(String code, LocalDate firstExpiration, LocalDate secondExpiration) {
-        var payment = this.paymentRepository
+        var payment = this.paymentService
             .findByCode(code)
-            .orElseThrow(() -> new PaymentNotFoundException(code));
+            .orElseThrow(() -> new PaymentNotFoundException(code));            
 
         payment.setFirstExpiration(firstExpiration);
         payment.setSecondExpiration(secondExpiration);
 
-        this.paymentRepository.save(payment);
+        this.paymentService.save(payment);
     }
 
     @Override
     public ResponseDTO.MonthlyPayment cardsGetMonthtlyPayment(String cardNumber, int year, int month) {
         return ResponseDTO.MonthlyPayment.fromModel(
-            this.paymentRepository
+            this.paymentService
                 .findMonthlyPayment(cardNumber, year, month)
                 .orElseThrow(() -> new MonthlyPaymentNotFoundException(cardNumber, year, month)));
     }
@@ -140,10 +141,10 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
 
         // TODO Add a propper logger instead of console output
         // mostUsedVouchers.forEach(voucher -> {
-        //         System.out.println(
-        //             "Voucher: " + voucher.getCode() + 
-        //             ", # of purchases: " + voucher.getNumOfPurchases());
-        //     });
+        //     System.out.println(
+        //         "Voucher: " + voucher.getCode() + 
+        //         ", # of purchases: " + voucher.getNumOfPurchases());
+        // });
 
         var voucher = mostUsedVouchers.get(0);
 
@@ -171,21 +172,20 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
         // logging code a few lines below
         final var NUM_OF_BANKS = 1; 
 
-        var mostEarnerBanks = this.paymentRepository.findTheMostEarnerBanks(PageRequest.of(0, NUM_OF_BANKS));
+        var mostEarnerBanks = this.paymentService.findTheMostEarnerBanks(NUM_OF_BANKS).toList();
 
         // This is a rare case (practically, the database must be empty)
         if (mostEarnerBanks.isEmpty())
             throw new NotFoundException("No banks with payments from their cards");
 
         // TODO Add a propper logger instead of console output
-        // mostEarnerBanks.getContent().stream()
-        //     .forEach(earnerBank -> {
-        //         System.out.println(
-        //             "Bank: " + earnerBank.getBank().getName() + 
-        //             ", total payment value: " + earnerBank.getTotalPaymentValue());
-        //     });
+        // mostEarnerBanks.forEach(earnerBank -> {
+        //     System.out.println(
+        //         "Bank: " + earnerBank.getBank().getName() + 
+        //         ", total payment value: " + earnerBank.getTotalPaymentValue());
+        // });
 
-        var mostEarnerBank = mostEarnerBanks.getContent().get(0);
+        var mostEarnerBank = mostEarnerBanks.get(0);
 
         return ResponseDTO.Bank.fromModel(mostEarnerBank.getBank(), mostEarnerBank.getTotalPaymentValue());
     }
