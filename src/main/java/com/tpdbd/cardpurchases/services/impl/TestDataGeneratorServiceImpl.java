@@ -43,7 +43,6 @@ import jakarta.annotation.Nullable;
 import jakarta.transaction.Transactional;
 import net.datafaker.Faker;
 
-
 /**
  * Store entity
  */

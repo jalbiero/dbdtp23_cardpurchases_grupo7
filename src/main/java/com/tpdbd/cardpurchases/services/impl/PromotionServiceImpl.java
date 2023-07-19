@@ -11,7 +11,6 @@ import com.tpdbd.cardpurchases.model.Promotion;
 import com.tpdbd.cardpurchases.repositories.PromotionRepository;
 import com.tpdbd.cardpurchases.services.PromotionService;
 
-
 @Service
 public class PromotionServiceImpl implements PromotionService {
     @Autowired

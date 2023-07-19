@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import com.tpdbd.cardpurchases.errors.PaymentNotFoundException;
 import com.tpdbd.cardpurchases.model.Payment;
 import com.tpdbd.cardpurchases.repositories.PaymentRepository;
 import com.tpdbd.cardpurchases.repositories.projections.MostEarnerBank;
@@ -19,8 +20,10 @@ public class PaymentServiceImpl implements PaymentService {
     private PaymentRepository paymentRepository;
 
     @Override
-    public Optional<Payment> findByCode(String code) {
-        return this.paymentRepository.findByCode(code);
+    public Payment find(String code) {
+        return this.paymentRepository
+            .findByCode(code)
+            .orElseThrow(() -> new PaymentNotFoundException(code));    
     }
 
     @Override
