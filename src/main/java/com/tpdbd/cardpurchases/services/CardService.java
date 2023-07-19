@@ -6,5 +6,13 @@ import java.util.List;
 import com.tpdbd.cardpurchases.model.Card;
 
 public interface CardService {
-    List<Card> getSoonToExpire(LocalDate baseDate, Integer daysFromBaseDate);
+    Card find(String cardNumber);
+
+    List<String> findAllNumbers();
+    
+    List<Card> findSoonToExpire(LocalDate baseDate, Integer daysFromBaseDate);
+
+    Card save(Card card);
+
+    void delete(String cardNumber);
 }
