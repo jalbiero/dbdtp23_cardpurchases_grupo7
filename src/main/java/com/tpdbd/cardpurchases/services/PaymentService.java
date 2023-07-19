@@ -1,7 +1,6 @@
 package com.tpdbd.cardpurchases.services;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 import com.tpdbd.cardpurchases.model.Payment;
