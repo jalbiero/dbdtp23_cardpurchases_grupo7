@@ -11,7 +11,6 @@ import com.tpdbd.cardpurchases.dto.ResponseDTO;
 import com.tpdbd.cardpurchases.errors.CreditPurchaseNotFoundException;
 import com.tpdbd.cardpurchases.errors.MonthlyPaymentNotFoundException;
 import com.tpdbd.cardpurchases.errors.NotFoundException;
-import com.tpdbd.cardpurchases.errors.PaymentNotFoundException;
 import com.tpdbd.cardpurchases.errors.PromotionNotFoundException;
 import com.tpdbd.cardpurchases.errors.PurchaseNotFoundException;
 import com.tpdbd.cardpurchases.model.CreditPurchase;
@@ -54,10 +53,8 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
     @Override
     @Transactional
     public void paymentsUpdateDates(String code, LocalDate firstExpiration, LocalDate secondExpiration) {
-        var payment = this.paymentService
-            .findByCode(code)
-            .orElseThrow(() -> new PaymentNotFoundException(code));            
-
+        var payment = this.paymentService.find(code);
+     
         payment.setFirstExpiration(firstExpiration);
         payment.setSecondExpiration(secondExpiration);
 
@@ -74,7 +71,7 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
   
     @Override
     public List<ResponseDTO.Card> cardsGetSoonToExpire(LocalDate baseDate, Integer daysFromBaseDate) {
-        return this.cardService.getSoonToExpire(baseDate, daysFromBaseDate).stream()
+        return this.cardService.findSoonToExpire(baseDate, daysFromBaseDate).stream()
             .map(ResponseDTO.Card::fromModel)
             .toList();
     }
