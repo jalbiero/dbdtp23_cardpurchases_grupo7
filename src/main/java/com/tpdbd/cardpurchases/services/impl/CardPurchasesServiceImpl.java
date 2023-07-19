@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import com.tpdbd.cardpurchases.dto.RequestDTO;
 import com.tpdbd.cardpurchases.dto.ResponseDTO;
 import com.tpdbd.cardpurchases.errors.CreditPurchaseNotFoundException;
-import com.tpdbd.cardpurchases.errors.MonthlyPaymentNotFoundException;
 import com.tpdbd.cardpurchases.errors.NotFoundException;
 import com.tpdbd.cardpurchases.errors.PromotionNotFoundException;
 import com.tpdbd.cardpurchases.errors.PurchaseNotFoundException;
@@ -64,9 +63,7 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
     @Override
     public ResponseDTO.MonthlyPayment cardsGetMonthtlyPayment(String cardNumber, int year, int month) {
         return ResponseDTO.MonthlyPayment.fromModel(
-            this.paymentService
-                .findMonthlyPayment(cardNumber, year, month)
-                .orElseThrow(() -> new MonthlyPaymentNotFoundException(cardNumber, year, month)));
+            this.paymentService.findMonthlyPayment(cardNumber, year, month));
     }
   
     @Override

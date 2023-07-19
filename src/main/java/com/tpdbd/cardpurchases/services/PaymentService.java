@@ -12,9 +12,7 @@ public interface PaymentService {
 
     List<String> findAllCodes();
 
-    Optional<Payment> findMonthlyPayment(String cardNumber,
-                                         int year, 
-                                         int month);
+    Payment findMonthlyPayment(String cardNumber, int year, int month);
 
     Stream<MostEarnerBank> findTheMostEarnerBanks(int count);  
 

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import com.tpdbd.cardpurchases.errors.MonthlyPaymentNotFoundException;
 import com.tpdbd.cardpurchases.errors.PaymentNotFoundException;
 import com.tpdbd.cardpurchases.model.Payment;
 import com.tpdbd.cardpurchases.repositories.PaymentRepository;
@@ -32,11 +33,11 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public Optional<Payment> findMonthlyPayment(String cardNumber,
-                                                int year, 
-                                                int month)
+    public Payment findMonthlyPayment(String cardNumber, int year, int month)
     {
-        return this.paymentRepository.findMonthlyPayment(cardNumber, year, month);
+        return this.paymentRepository
+            .findMonthlyPayment(cardNumber, year, month)
+            .orElseThrow(() -> new MonthlyPaymentNotFoundException(cardNumber, year, month));
     }
 
     @Override
