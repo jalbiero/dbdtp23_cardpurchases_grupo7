@@ -1,5 +1,6 @@
 package com.tpdbd.cardpurchases.services.impl;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -17,6 +18,11 @@ import com.tpdbd.cardpurchases.services.PurchaseService;
 public class PurchaseServiceImpl implements PurchaseService {
     @Autowired
     private PurchaseRepository<Purchase> purchaseRepository; 
+
+    @Override
+    public List<Long> findAllIds() {
+        return this.purchaseRepository.findAllIds();
+    }
 
     @Override
     public Optional<Purchase> findById(long purchaseId) {
