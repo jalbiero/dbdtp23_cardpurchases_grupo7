@@ -1,4 +1,4 @@
-package com.tpdbd.cardpurchases.services;
+package com.tpdbd.cardpurchases.services.impl;
 
 import java.util.List;
 
@@ -9,28 +9,35 @@ import com.tpdbd.cardpurchases.dto.RequestDTO;
 import com.tpdbd.cardpurchases.model.Bank;
 import com.tpdbd.cardpurchases.model.Card;
 import com.tpdbd.cardpurchases.model.Payment;
-import com.tpdbd.cardpurchases.model.Purchase;
-import com.tpdbd.cardpurchases.repositories.PromotionRepository;
-import com.tpdbd.cardpurchases.repositories.PurchaseRepository;
+import com.tpdbd.cardpurchases.services.BankService;
+import com.tpdbd.cardpurchases.services.CardHolderService;
+import com.tpdbd.cardpurchases.services.CardService;
+import com.tpdbd.cardpurchases.services.PaymentService;
+import com.tpdbd.cardpurchases.services.PromotionService;
+import com.tpdbd.cardpurchases.services.PurchaseService;
+import com.tpdbd.cardpurchases.services.TestService;
 
 import jakarta.transaction.Transactional;
 
 @Service
 public class TestServiceImpl implements TestService {
-    @Autowired
-    PurchaseRepository<Purchase> purchaseRepository;
+    @Autowired 
+    BankService bankService;
+
+    @Autowired 
+    CardService cardService;
+
+    @Autowired 
+    CardHolderService cardHolderService;
+
+    @Autowired 
+    PaymentService paymentService;
 
     @Autowired
-    PromotionRepository promotionRepository;
+    PromotionService promotionService;
 
-    //-------
-    @Autowired BankService bankService;
-
-    @Autowired CardService cardService;
-
-    @Autowired CardHolderService cardHolderService;
-
-    @Autowired PaymentService paymentService;
+    @Autowired 
+    PurchaseService purchaseService;
 
 
     @Override
@@ -93,11 +100,11 @@ public class TestServiceImpl implements TestService {
 
     @Override
     public List<Long> getPurchaseIds() {
-        return this.purchaseRepository.findAllIds();
+        return this.purchaseService.findAllIds();
     }
 
     @Override
     public List<String> getPromotionCodes() {
-        return this.promotionRepository.findAllCodes();
+        return this.promotionService.findAllCodes();
     }
 }
