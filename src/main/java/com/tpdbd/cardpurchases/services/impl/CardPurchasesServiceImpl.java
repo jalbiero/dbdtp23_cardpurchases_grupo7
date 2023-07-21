@@ -8,11 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.tpdbd.cardpurchases.dto.RequestDTO;
 import com.tpdbd.cardpurchases.dto.ResponseDTO;
-import com.tpdbd.cardpurchases.errors.CreditPurchaseNotFoundException;
 import com.tpdbd.cardpurchases.errors.NotFoundException;
-import com.tpdbd.cardpurchases.errors.PromotionNotFoundException;
-import com.tpdbd.cardpurchases.errors.PurchaseNotFoundException;
-import com.tpdbd.cardpurchases.model.CreditPurchase;
 import com.tpdbd.cardpurchases.services.BankService;
 import com.tpdbd.cardpurchases.services.CardPurchasesService;
 import com.tpdbd.cardpurchases.services.CardService;
@@ -76,24 +72,21 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
     @Override
     public ResponseDTO.Purchase purchasesGetInfo(long purchaseId) {
         return ResponseDTO.Purchase.fromModel(
-            this.purchaseService
-                .findById(purchaseId)
-                .orElseThrow(() -> new PurchaseNotFoundException(purchaseId)));
+            this.purchaseService.findById(purchaseId));
     }
 
     @Override
     public void promotionsDelete(String code) {
-        if (!this.promotionService.deleteByCode(code)) 
-            throw new PromotionNotFoundException(code);
+        this.promotionService.deleteByCode(code); 
     }
 
     @Override
     public ResponseDTO.CreditPurchaseTotalPrice purchasesCreditGetTotalPrice(long purchaseId) {
-        var purchase = this.purchaseService
-            .findById(purchaseId)
-            .filter(p -> CreditPurchase.class.isInstance(p))
-            .map(p -> CreditPurchase.class.cast(p))
-            .orElseThrow(() -> new CreditPurchaseNotFoundException(purchaseId));
+        var purchase = this.purchaseService.findCreditTotalPrice(purchaseId);
+            // .findById(purchaseId)
+            // .filter(p -> CreditPurchase.class.isInstance(p))
+            // .map(p -> CreditPurchase.class.cast(p))
+            // .orElseThrow(() -> new CreditPurchaseNotFoundException(purchaseId));
 
         return new ResponseDTO.CreditPurchaseTotalPrice(purchaseId, purchase.getFinalAmount());
     }
@@ -109,7 +102,7 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
 
     @Override
     public List<ResponseDTO.PurchaserCardHolder> cardsGetTop10Purchasers() {
-        return this.purchaseService.findTopPurchasers(10)
+        return this.purchaseService.findTopPurchasers(10).stream()
             .map(numOfPurchasesByCard -> new ResponseDTO.PurchaserCardHolder(
                 numOfPurchasesByCard.getCard().getCardHolder().getCompleteName(),
                 numOfPurchasesByCard.getNumOfPurchases(),
@@ -124,7 +117,7 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
         // logging code a few lines below
         final var NUM_OF_VOUCHERS = 1; 
 
-        var mostUsedVouchers = this.purchaseService.findTheMostUsedVouchers(NUM_OF_VOUCHERS).toList();
+        var mostUsedVouchers = this.purchaseService.findTheMostUsedVouchers(NUM_OF_VOUCHERS);
 
         if (mostUsedVouchers.isEmpty())
             throw new NotFoundException("No promotions used in all purchases");
@@ -137,10 +130,7 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
         // });
 
         var voucher = mostUsedVouchers.get(0);
-
-        var promotion = this.promotionService
-            .findByCode(voucher.getCode())
-            .orElseThrow(() -> new PromotionNotFoundException(voucher.getCode()));
+        var promotion = this.promotionService.findByCode(voucher.getCode());
 
         return ResponseDTO.Promotion.fromModel(promotion, voucher.getNumOfPurchases());
     }
@@ -162,7 +152,7 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
         // logging code a few lines below
         final var NUM_OF_BANKS = 1; 
 
-        var mostEarnerBanks = this.paymentService.findTheMostEarnerBanks(NUM_OF_BANKS).toList();
+        var mostEarnerBanks = this.paymentService.findTheMostEarnerBanks(NUM_OF_BANKS);
 
         // This is a rare case (practically, the database must be empty)
         if (mostEarnerBanks.isEmpty())

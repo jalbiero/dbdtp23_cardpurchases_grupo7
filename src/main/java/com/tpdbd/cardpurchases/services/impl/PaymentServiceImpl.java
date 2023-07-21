@@ -1,7 +1,6 @@
 package com.tpdbd.cardpurchases.services.impl;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -40,11 +39,11 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public Stream<MostEarnerBank> findTheMostEarnerBanks(int count) {
+    public List<MostEarnerBank> findTheMostEarnerBanks(int count) {
         var mostEarnerBanks = this.paymentRepository
             .findTheMostEarnerBanks(PageRequest.of(0, count));
 
-        return mostEarnerBanks.get();
+        return mostEarnerBanks.get().toList();
     }
 
     @Override

@@ -2,11 +2,11 @@ package com.tpdbd.cardpurchases.services.impl;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.tpdbd.cardpurchases.errors.PromotionNotFoundException;
 import com.tpdbd.cardpurchases.model.Promotion;
 import com.tpdbd.cardpurchases.repositories.PromotionRepository;
 import com.tpdbd.cardpurchases.services.PromotionService;
@@ -22,8 +22,10 @@ public class PromotionServiceImpl implements PromotionService {
     }
  
     @Override
-    public Optional<Promotion> findByCode(String code) {
-        return this.promotionRepository.findByCode(code);
+    public Promotion findByCode(String code) {
+        return this.promotionRepository
+            .findByCode(code)
+            .orElseThrow(() -> new PromotionNotFoundException(code));
     }
  
     @Override
@@ -34,7 +36,8 @@ public class PromotionServiceImpl implements PromotionService {
     }
  
     @Override
-    public boolean deleteByCode(String code) {
-        return this.promotionRepository.deleteByCode(code) > 0;
+    public void deleteByCode(String code) {
+        if (this.promotionRepository.deleteByCode(code) == 0)
+            throw new PromotionNotFoundException(code);
     } 
 }

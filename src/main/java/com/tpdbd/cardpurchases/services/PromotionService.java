@@ -2,16 +2,15 @@ package com.tpdbd.cardpurchases.services;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 import com.tpdbd.cardpurchases.model.Promotion;
 
 public interface PromotionService {
     List<String> findAllCodes();
  
-    Optional<Promotion> findByCode(String code);
+    Promotion findByCode(String code);
  
     List<Promotion> GetAvailablePromotions(String cuitStore, LocalDate from, LocalDate to);
  
-    boolean deleteByCode(String code);    
+    void deleteByCode(String code);    
 }

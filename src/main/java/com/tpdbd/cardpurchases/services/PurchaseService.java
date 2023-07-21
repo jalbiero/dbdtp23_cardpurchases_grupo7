@@ -1,8 +1,6 @@
 package com.tpdbd.cardpurchases.services;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Stream;
 
 import com.tpdbd.cardpurchases.model.Purchase;
 import com.tpdbd.cardpurchases.repositories.projections.MostUsedVoucher;
@@ -11,9 +9,11 @@ import com.tpdbd.cardpurchases.repositories.projections.NumOfPurchasesByCard;
 public interface PurchaseService {
     List<Long> findAllIds();
     
-    Optional<Purchase> findById(long purchaseId);
+    Purchase findById(long purchaseId);
 
-    Stream<NumOfPurchasesByCard> findTopPurchasers(int count);
+    Purchase findCreditTotalPrice(long purchaseId);
 
-    Stream<MostUsedVoucher> findTheMostUsedVouchers(int count);
+    List<NumOfPurchasesByCard> findTopPurchasers(int count);
+
+    List<MostUsedVoucher> findTheMostUsedVouchers(int count);
 }
