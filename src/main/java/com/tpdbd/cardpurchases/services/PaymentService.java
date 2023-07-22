@@ -10,7 +10,7 @@ public interface PaymentService {
 
     List<Long> findAllIds();
 
-    Payment findMonthlyPayment(String cardNumber, int year, int month);
+    Payment findMonthlyPayment(long id, int year, int month);
 
     List<MostEarnerBank> findTheMostEarnerBanks(int count);  
 

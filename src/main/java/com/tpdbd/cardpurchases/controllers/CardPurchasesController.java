@@ -67,7 +67,9 @@ public class CardPurchasesController {
      *          }
      */
     @PostMapping("/banks/{id}/addDiscountPromotion")
-    void banksAddDiscountPromotion(@PathVariable Long id, @RequestBody RequestDTO.Discount discount) {
+    void banksAddDiscountPromotion(@PathVariable long id, 
+                                   @RequestBody RequestDTO.Discount discount) 
+    {
         this.service.banksAddDiscountPromotion(id, discount);
     }
 
@@ -75,7 +77,7 @@ public class CardPurchasesController {
      * 02 - Update the dates of the specified payment 
      * 
      * URL: 
-     *      PUT /payments/{code}/updateDates
+     *      PUT /payments/{id}/updateDates
      * 
      * ContentType: 
      *      application/json
@@ -89,7 +91,7 @@ public class CardPurchasesController {
      *          }
      */    
     @PutMapping("/payments/{id}/updateDates")
-    void paymentsUpdateDates(@PathVariable Long id, 
+    void paymentsUpdateDates(@PathVariable long id, 
                              @RequestBody RequestDTO.PaymentsUpdateDatesBody body) 
     {
         if (body.firstExpiration().isAfter(body.secondExpiration())) {
@@ -106,7 +108,7 @@ public class CardPurchasesController {
      * 03 - Get card monthly payment with its purchases
      * 
      * URL: 
-     *      PUT /cards/{number}/monthlyPayment?year={someYear}&month={someMonth}
+     *      PUT /cards/{id}/monthlyPayment?year={someYear}&month={someMonth}
      * 
      * Params:
      *      - URL: {someYear} the specified year
@@ -114,6 +116,7 @@ public class CardPurchasesController {
      * 
      * Return:
      *      {
+     *          "id": 123,
      *          "cardNumber", "5876-1948-6884-1575",
      *          "year": 2021,
      *          "month": 8,
@@ -144,12 +147,12 @@ public class CardPurchasesController {
      *          ]
      *      }
      */
-    @GetMapping("/cards/{number}/monthlyPayment")
-    ResponseDTO.MonthlyPayment cardsGetMonthtlyPayment(@PathVariable String number, 
+    @GetMapping("/cards/{id}/monthlyPayment")
+    ResponseDTO.MonthlyPayment cardsGetMonthtlyPayment(@PathVariable long id, 
                                                        @RequestParam int year, 
                                                        @RequestParam int month)
     {
-        return this.service.cardsGetMonthtlyPayment(number, year, month);
+        return this.service.cardsGetMonthtlyPayment(id, year, month);
     }
 
     /**

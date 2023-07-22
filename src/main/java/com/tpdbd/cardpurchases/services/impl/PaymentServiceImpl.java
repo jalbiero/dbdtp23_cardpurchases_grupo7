@@ -31,11 +31,11 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public Payment findMonthlyPayment(String cardNumber, int year, int month)
+    public Payment findMonthlyPayment(long cardId, int year, int month)
     {
         return this.paymentRepository
-            .findMonthlyPayment(cardNumber, year, month)
-            .orElseThrow(() -> new MonthlyPaymentNotFoundException(cardNumber, year, month));
+            .findMonthlyPayment(cardId, year, month)
+            .orElseThrow(() -> new MonthlyPaymentNotFoundException(cardId, year, month));
     }
 
     @Override

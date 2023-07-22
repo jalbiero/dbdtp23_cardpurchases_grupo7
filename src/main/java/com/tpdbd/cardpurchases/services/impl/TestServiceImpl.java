@@ -52,18 +52,18 @@ public class TestServiceImpl implements TestService {
     }
 
     @Override
-    public List<String> getCardNumbes() {
-        return this.cardService.findAllNumbers();
+    public List<Long> getCardIds() {
+        return this.cardService.findAllIds();
     }
 
     @Override
-    public Card getCard(String number) {
-        return this.cardService.find(number);
+    public Card getCard(long id) {
+        return this.cardService.find(id);
     }
 
     @Override
     @Transactional
-    public String addCard(RequestDTO.Card card) {
+    public long addCard(RequestDTO.Card card) {
         var bank = this.bankService.find(card.bankId());
         var cardHolder = this.cardHolderService.find(card.cardHolderDni());
 
@@ -75,12 +75,12 @@ public class TestServiceImpl implements TestService {
             card.since(),
             card.expirationDate());
 
-        return this.cardService.save(newCard).getNumber();
+        return this.cardService.save(newCard).getId();
     }
 
     @Override
-    public void deleteCard(String number) {
-        this.cardService.delete(number);
+    public void deleteCard(long id) {
+        this.cardService.delete(id);
     }
 
     @Override

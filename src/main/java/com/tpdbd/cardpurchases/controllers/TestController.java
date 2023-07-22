@@ -39,7 +39,7 @@ public class TestController {
     // Banks
 
     @GetMapping("/banks/ids")
-    Map<String, List<Long>> getBankCuits() {
+    Map<String, List<Long>> getBankIds() {
         var result = new LinkedHashMap<String, List<Long>>();
         result.put("ids", this.service.getBankIds());
         return result;
@@ -53,31 +53,37 @@ public class TestController {
     ///////////////////////
     // Cards
 
-    @GetMapping("/cards/numbers")
-    Map<String, List<String>> getCardNumbers() {
-        var result = new LinkedHashMap<String, List<String>>();
-        result.put("numbers", this.service.getCardNumbes());
+    @GetMapping("/cards/ids")
+    Map<String, List<Long>> getCardIds() {
+        var result = new LinkedHashMap<String, List<Long>>();
+        result.put("ids", this.service.getCardIds());
         return result;
     }
 
-    @GetMapping("/cards/{number}")
-    ResponseDTO.Card getCard(@PathVariable String number) {
-        return ResponseDTO.Card.fromModel(this.service.getCard(number));
+    @GetMapping("/cards/{id}")
+    ResponseDTO.Card getCard(@PathVariable long id) {
+        return ResponseDTO.Card.fromModel(this.service.getCard(id));
     }
 
     /**
      * Add a new card
      * @param card
-     * @return The number of the new card
+     * @return The id of the new card:
+     * 
+     *           {
+     *              "id": 123
+     *           }
      */
     @PostMapping("/cards")
-    String addCard(@RequestBody RequestDTO.Card card) {
-        return this.service.addCard(card);
+    Map<String, Long> addCard(@RequestBody RequestDTO.Card card) {
+        var result = new LinkedHashMap<String, Long>();
+        result.put("id", this.service.addCard(card));
+        return result;
     }
 
-    @DeleteMapping("/cards/{number}")
-    void deleteCard(@PathVariable String number) {
-        this.service.deleteCard(number);
+    @DeleteMapping("/cards/{id}")
+    void deleteCard(@PathVariable long id) {
+        this.service.deleteCard(id);
     }
 
     ///////////////////////
@@ -94,7 +100,7 @@ public class TestController {
     // Payments
 
     @GetMapping("/payments/ids")
-    Map<String, List<Long>> getPaymentCodes() {
+    Map<String, List<Long>> getPaymentIds() {
         var result = new LinkedHashMap<String, List<Long>>();
         result.put("ids", this.service.getPaymentIds());
         return result;

@@ -77,35 +77,36 @@ public class TestControllerTests {
             LocalDate.now().plusDays(10));
 
         // Create a new card
-        given()
-            .when()
-                .contentType(ContentType.JSON)    
-                .body(card)
-                .post("/test/cards")
-            .then()
-                .statusCode(200);
+        var newCardId = 
+            given()
+                .when()
+                    .contentType(ContentType.JSON)    
+                    .body(card)
+                    .post("/test/cards")
+                    .jsonPath()
+                    .getObject("id", Long.class);
         
         // Validate the creation
         given()
             .when()
-                .get("/test/cards/{number}", CARD_NUMBER)
+                .get("/test/cards/{id}", newCardId)
             .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
-                .body("number", Matchers.equalTo(CARD_NUMBER));
+                .body("id", Matchers.equalTo(newCardId.intValue()));
                 // TODO Validate other attributes
 
             
         // Remove the new card
         given()
             .when()
-                .delete("/test/cards/{number}", CARD_NUMBER)
+                .delete("/test/cards/{id}", newCardId)
             .then()
                 .statusCode(200);
 
         given()
             .when()
-                .get("/cards/{number}", CARD_NUMBER)
+                .get("/cards/{id}", newCardId)
             .then()
                 .statusCode(404);                
     }

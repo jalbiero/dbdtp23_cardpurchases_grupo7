@@ -8,14 +8,14 @@ import com.tpdbd.cardpurchases.dto.ResponseDTO;
 
 public interface CardPurchasesService {
     // 1 Agregar una nueva promoción de tipo descuento a un banco dado
-    void banksAddDiscountPromotion(Long id, RequestDTO.Discount discount);
+    void banksAddDiscountPromotion(long id, RequestDTO.Discount discount);
 
     // 2 Editar las fecha de vencimiento de un pago con cierto código.
-    void paymentsUpdateDates(Long id, LocalDate firstExpiration, LocalDate secondExpiration);
+    void paymentsUpdateDates(long id, LocalDate firstExpiration, LocalDate secondExpiration);
 
     // 3 Generar el total de pago de un mes dado, informando las compras
     // correspondientes
-    ResponseDTO.MonthlyPayment cardsGetMonthtlyPayment(String cardNumber, int year, int month);
+    ResponseDTO.MonthlyPayment cardsGetMonthtlyPayment(long id, int year, int month);
   
     // 4 Obtener el listado de tarjetas que vencen en los siguientes 30 días.
     // > Para mayor flexibilidad y facilidad de prueba, se optó por generalizar 

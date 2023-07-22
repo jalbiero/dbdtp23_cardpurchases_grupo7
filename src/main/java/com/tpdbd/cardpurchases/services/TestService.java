@@ -14,10 +14,10 @@ public interface TestService {
     List<Long> getBankIds();
     Bank getBank(Long id);
 
-    List<String> getCardNumbes();
-    Card getCard(String number);
-    String addCard(RequestDTO.Card card);
-    void deleteCard(String number);
+    List<Long> getCardIds();
+    Card getCard(long id);
+    long addCard(RequestDTO.Card card);
+    void deleteCard(long id);
 
     List<String> getCardHolderDnis();
 

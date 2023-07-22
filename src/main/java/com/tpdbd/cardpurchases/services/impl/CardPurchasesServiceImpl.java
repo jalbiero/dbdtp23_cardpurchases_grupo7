@@ -41,13 +41,13 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
 
     @Override
     @Transactional
-    public void banksAddDiscountPromotion(Long id, RequestDTO.Discount discount) {
+    public void banksAddDiscountPromotion(long id, RequestDTO.Discount discount) {
         this.bankService.addDiscountPromotion(id, discount);
     }
 
     @Override
     @Transactional
-    public void paymentsUpdateDates(Long id, LocalDate firstExpiration, LocalDate secondExpiration) {
+    public void paymentsUpdateDates(long id, LocalDate firstExpiration, LocalDate secondExpiration) {
         var payment = this.paymentService.find(id);
      
         payment.setFirstExpiration(firstExpiration);
@@ -57,9 +57,9 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
     }
 
     @Override
-    public ResponseDTO.MonthlyPayment cardsGetMonthtlyPayment(String cardNumber, int year, int month) {
+    public ResponseDTO.MonthlyPayment cardsGetMonthtlyPayment(long id, int year, int month) {
         return ResponseDTO.MonthlyPayment.fromModel(
-            this.paymentService.findMonthlyPayment(cardNumber, year, month));
+            this.paymentService.findMonthlyPayment(id, year, month));
     }
   
     @Override
@@ -118,7 +118,7 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
         if (mostUsedVouchers.isEmpty())
             throw new NotFoundException("No promotions used in all purchases");
 
-        // TODO Add a propper logger instead of console output
+        // TODO Add a propper logger instead of the console output
         // mostUsedVouchers.forEach(voucher -> {
         //     System.out.println(
         //         "Voucher: " + voucher.getCode() + 
@@ -154,7 +154,7 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
         if (mostEarnerBanks.isEmpty())
             throw new NotFoundException("No banks with payments from their cards");
 
-        // TODO Add a propper logger instead of console output
+        // TODO Add a propper logger instead of the console output
         // mostEarnerBanks.forEach(earnerBank -> {
         //     System.out.println(
         //         "Bank: " + earnerBank.getBank().getName() + 

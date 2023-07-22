@@ -19,8 +19,8 @@ public interface PaymentRepository extends CrudRepository<Payment, Long> {
     @Query(
         "SELECT p " + 
         "FROM Payment p " + 
-        "WHERE p.card.number = :number AND p.year = :year AND p.month = :month")
-    Optional<Payment> findMonthlyPayment(@Param("number") String cardNumber,
+        "WHERE p.card.id = :cardId AND p.year = :year AND p.month = :month")
+    Optional<Payment> findMonthlyPayment(@Param("cardId") long cardId,
                                          @Param("year") int year, 
                                          @Param("month") int month);
 

@@ -6,13 +6,13 @@ import java.util.List;
 import com.tpdbd.cardpurchases.model.Card;
 
 public interface CardService {
-    Card find(String cardNumber);
+    Card find(long id);
 
-    List<String> findAllNumbers();
+    List<Long> findAllIds();
     
     List<Card> findSoonToExpire(LocalDate baseDate, Integer daysFromBaseDate);
 
     Card save(Card card);
 
-    void delete(String cardNumber);
+    void delete(long id);
 }

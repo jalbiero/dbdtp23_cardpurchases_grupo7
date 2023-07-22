@@ -127,23 +127,23 @@ public class CardPurchasesControllerTests {
                     Matchers.equalTo(NEW_DATES.secondExpiration().toString()));
     }
 
-    //@Test 
+    @Test 
     void testCardsGetMonthtlyPaymentHappyPath() {
-        // TODO This test is not well designed because the card number, year and month
+        // TODO This test is not well designed because the card id, year and month
         //      are hardcoded (test data is repeatable, but if not, the test will fail.
         //      See TestDataGeneratorService.random for more information about repeatable data)
 
-        final var CARD_NUMBER = "5876-1948-6884-1575";
+        final var CARD_ID = 7l; //"5876-1948-6884-1575";
         final var YEAR = 2021;
         final var MONTH = 8;
 
         given()
             .when()
-                .get("/cards/{number}/monthlyPayment?year={year}&month={month}", CARD_NUMBER, YEAR, MONTH) 
+                .get("/cards/{id}/monthlyPayment?year={year}&month={month}", CARD_ID, YEAR, MONTH) 
             .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
-                .body("cardNumber", Matchers.equalTo(CARD_NUMBER))
+                .body("cardId", Matchers.equalTo((int)CARD_ID))
                 .body("year", Matchers.equalTo(YEAR))
                 .body("month", Matchers.equalTo(MONTH))
                 .body("purchases", Matchers.not(Matchers.emptyArray()));
@@ -151,13 +151,13 @@ public class CardPurchasesControllerTests {
 
     @Test 
     void testCardsGetMonthtlyPaymentNotFound() {
-        final var CARD_NUMBER = "5876-1948-6884-1575";
+        final var CARD_ID = 999_999_999_999l;
         final var UNREAL_YEAR = 1900;
         final var MONTH = 1;
 
         given()
             .when()
-                .get("/cards/{number}/monthlyPayment?year={year}&month={month}", CARD_NUMBER, UNREAL_YEAR, MONTH) 
+                .get("/cards/{id}/monthlyPayment?year={year}&month={month}", CARD_ID, UNREAL_YEAR, MONTH) 
             .then()
                 .statusCode(404);
     }
@@ -412,13 +412,6 @@ public class CardPurchasesControllerTests {
             .get("/test/payments/ids")
             .jsonPath()
             .getObject("ids[0]", Long.class);
-    }
-
-    public String getSomeCardNumber() {
-        return given()
-            .get("/test/cards/numbers")
-            .jsonPath()
-            .getObject("numbers[0]", String.class);
     }
 
     static public String getSomeStoreCuit() {

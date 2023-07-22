@@ -15,7 +15,7 @@ public interface ResponseDTO {
     ////////////////////////////////////////////////////////
     @JsonInclude(JsonInclude.Include.NON_ABSENT)
     record Bank(
-        Long id,
+        long id,
         String name,
         String cuit,
         String address,
@@ -51,16 +51,18 @@ public interface ResponseDTO {
 
     ////////////////////////////////////////////////////////
     record Card(
+        long id,
         String number,
         String ccv,
         String cardholderNameInCard,
         LocalDate since,
         LocalDate expirationDate,
         String bankCuit, // In real life part of the card number identifies the bank
-        String userDni) // In real life this is not necessary, the name provides a partial identificaion
+        String userDni) // In real life this is not necessary, the name provides a partial identification
     {
         public static Card fromModel(com.tpdbd.cardpurchases.model.Card card) {
             return new Card(
+                card.getId(),
                 card.getNumber(), 
                 card.getCcv(), 
                 card.getCardholderNameInCard(), 
@@ -73,7 +75,7 @@ public interface ResponseDTO {
 
     ////////////////////////////////////////////////////////
     record Payment(
-        Long id,
+        long id,
         String code,
         int month,
         int year,
@@ -293,6 +295,7 @@ public interface ResponseDTO {
 
     ////////////////////////////////////////////////////////
     record MonthlyPayment(
+        long cardId,
         String cardNumber,
         int year, 
         int month, 
@@ -312,6 +315,7 @@ public interface ResponseDTO {
             //       a Card holder has payed in the given period (year and month)            
 
             return new MonthlyPayment(
+                payment.getCard().getId(),
                 payment.getCard().getNumber(),
                 payment.getYear(),
                 payment.getMonth(),
