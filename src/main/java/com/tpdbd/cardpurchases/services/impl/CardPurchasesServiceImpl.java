@@ -41,8 +41,8 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
 
     @Override
     @Transactional
-    public void banksAddDiscountPromotion(String cuit, RequestDTO.Discount discount) {
-        this.bankService.addDiscountPromotion(cuit, discount);
+    public void banksAddDiscountPromotion(Long id, RequestDTO.Discount discount) {
+        this.bankService.addDiscountPromotion(id, discount);
     }
 
     @Override
@@ -83,11 +83,7 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
     @Override
     public ResponseDTO.CreditPurchaseTotalPrice purchasesCreditGetTotalPrice(long purchaseId) {
         var purchase = this.purchaseService.findCreditTotalPrice(purchaseId);
-            // .findById(purchaseId)
-            // .filter(p -> CreditPurchase.class.isInstance(p))
-            // .map(p -> CreditPurchase.class.cast(p))
-            // .orElseThrow(() -> new CreditPurchaseNotFoundException(purchaseId));
-
+        
         return new ResponseDTO.CreditPurchaseTotalPrice(purchaseId, purchase.getFinalAmount());
     }
 

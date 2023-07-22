@@ -38,38 +38,38 @@ public class TestControllerTests {
     }
 
     @Test
-    public void testGetBanksCuits() {
+    public void testGetBanksIds() {
         given()
             .when()
-                .get("/test/banks/cuits")
+                .get("/test/banks/ids")
             .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
-                .body("cuits", Matchers.hasSize(Matchers.greaterThan((0))));
+                .body("ids", Matchers.hasSize(Matchers.greaterThan((0))));
     }
 
     @Test
     public void testGetBank() {
-        var cuit = getSomeBankCuit();
+        var id = getSomeBankId();
 
         given()
             .when()
-                .get("/test/banks/{cuit}", cuit)
+                .get("/test/banks/{id}", id)
             .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
-                .body("cuit", Matchers.equalTo(cuit));
+                .body("id", Matchers.equalTo((int)id));
     }
 
     @Test
     public void testAddRemoveCard() {
         final var CARD_NUMBER = this.faker.business().creditCardNumber();
 
-        var cuit = getSomeBankCuit();
+        var bankId = getSomeBankId();
         var dni = getSomeCardHolderDni();
 
         var card = new RequestDTO.Card(
-            cuit, 
+            bankId, 
             dni, 
             CARD_NUMBER, 
             this.faker.business().securityCode(),
@@ -125,11 +125,11 @@ public class TestControllerTests {
     ///////////////////
     // Helpers
 
-    static public String getSomeBankCuit() {
+    static public long getSomeBankId() {
         return given()
-            .get("/test/banks/cuits")
+            .get("/test/banks/ids")
             .jsonPath()
-            .getObject("cuits[0]", String.class);
+            .getObject("ids[0]", Long.class);
     }
 
     static public String getSomeCardHolderDni() {

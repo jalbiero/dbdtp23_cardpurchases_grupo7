@@ -15,6 +15,7 @@ public interface ResponseDTO {
     ////////////////////////////////////////////////////////
     @JsonInclude(JsonInclude.Include.NON_ABSENT)
     record Bank(
+        Long id,
         String name,
         String cuit,
         String address,
@@ -36,6 +37,7 @@ public interface ResponseDTO {
                                       Optional<Float> totalPaymentValueFromItsCards) 
         {
             return new Bank(
+                bank.getId(),
                 bank.getName(),
                 bank.getCuit(),
                 bank.getAddress(),

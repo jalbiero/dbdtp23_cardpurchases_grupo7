@@ -38,16 +38,16 @@ public class TestController {
     ///////////////////////
     // Banks
 
-    @GetMapping("/banks/cuits")
-    Map<String, List<String>> getBankCuits() {
-        var result = new LinkedHashMap<String, List<String>>();
-        result.put("cuits", this.service.getBankCuits());
+    @GetMapping("/banks/ids")
+    Map<String, List<Long>> getBankCuits() {
+        var result = new LinkedHashMap<String, List<Long>>();
+        result.put("ids", this.service.getBankIds());
         return result;
     }
 
-    @GetMapping("/banks/{cuit}")
-    ResponseDTO.Bank getBank(@PathVariable String cuit) {
-        return ResponseDTO.Bank.fromModel(this.service.getBank(cuit));
+    @GetMapping("/banks/{id}")
+    ResponseDTO.Bank getBank(@PathVariable Long id) {
+        return ResponseDTO.Bank.fromModel(this.service.getBank(id));
     }
 
     ///////////////////////

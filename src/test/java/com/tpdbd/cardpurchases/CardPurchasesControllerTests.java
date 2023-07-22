@@ -65,7 +65,7 @@ public class CardPurchasesControllerTests {
         final var DISCOUNT = 0.5f;
         final var PCAP = 5000.f;
 
-        var cuit = getSomeBankCuit();
+        var cuit = getSomeBankId();
 
         // Add a new promotion
         var discount = new RequestDTO.Discount(
@@ -172,7 +172,7 @@ public class CardPurchasesControllerTests {
 
         // Create a new card
         var card = new RequestDTO.Card(
-            getSomeBankCuit(), 
+            getSomeBankId(), 
             getSomeCardHolderDni(), 
             CARD_NUMBER,
             this.faker.business().securityCode(),
@@ -393,11 +393,11 @@ public class CardPurchasesControllerTests {
     ///////////////////
     // Helpers
 
-    public String getSomeBankCuit() {
+    public Long getSomeBankId() {
         return given()
-            .get("/test/banks/cuits")
+            .get("/test/banks/ids")
             .jsonPath()
-            .getObject("cuits[0]", String.class);
+            .getObject("ids[0]", Long.class);
     }
 
     public String getSomeCardHolderDni() {

@@ -41,14 +41,14 @@ public class TestServiceImpl implements TestService {
 
 
     @Override
-    public List<String> getBankCuits() {
-        return this.bankService.findAllCuits();
+    public List<Long> getBankIds() {
+        return this.bankService.findAllIds();
 
     }
 
     @Override
-    public Bank getBank(String cuit) {
-        return this.bankService.find(cuit);
+    public Bank getBank(Long id) {
+        return this.bankService.find(id);
     }
 
     @Override
@@ -64,7 +64,7 @@ public class TestServiceImpl implements TestService {
     @Override
     @Transactional
     public String addCard(RequestDTO.Card card) {
-        var bank = this.bankService.find(card.bankCuit());
+        var bank = this.bankService.find(card.bankId());
         var cardHolder = this.cardHolderService.find(card.cardHolderDni());
 
         var newCard = new Card(

@@ -35,8 +35,12 @@ public class Bank {
         this.promotions = new LinkedHashSet<Promotion>();
     }
 
+    public Long getId() {
+        return this.id;
+    }
+
     public String getName() {
-        return name;
+        return this.name;
     }
 
     public void setName(String name) {
@@ -44,7 +48,7 @@ public class Bank {
     }
 
     public String getCuit() {
-        return cuit;
+        return this.cuit;
     }
 
     public void setCuit(String cuit) {
@@ -52,7 +56,7 @@ public class Bank {
     }
 
     public String getAddress() {
-        return address;
+        return this.address;
     }
 
     public void setAddress(String address) {
@@ -60,7 +64,7 @@ public class Bank {
     }
 
     public String getTelephone() {
-        return telephone;
+        return this.telephone;
     }
 
     public void setTelephone(String telephone) {
@@ -84,5 +88,4 @@ public class Bank {
         return "Bank [id=" + id + ", name=" + name + ", cuit=" + cuit + ", address=" + address + ", telephone="
                 + telephone + ", promotions=" + promotions + "]";
     }
-   
 }

@@ -8,7 +8,7 @@ import com.tpdbd.cardpurchases.dto.ResponseDTO;
 
 public interface CardPurchasesService {
     // 1 Agregar una nueva promoción de tipo descuento a un banco dado
-    void banksAddDiscountPromotion(String cuit, RequestDTO.Discount discount);
+    void banksAddDiscountPromotion(Long id, RequestDTO.Discount discount);
 
     // 2 Editar las fecha de vencimiento de un pago con cierto código.
     void paymentsUpdateDates(String code, LocalDate firstExpiration, LocalDate secondExpiration);

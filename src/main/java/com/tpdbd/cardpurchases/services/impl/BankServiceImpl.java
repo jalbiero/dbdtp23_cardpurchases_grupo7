@@ -20,24 +20,23 @@ public class BankServiceImpl implements BankService {
 
     @Override
     @Transactional
-    public void addDiscountPromotion(String cuit, RequestDTO.Discount discount) {
-        var bank = this.bankRepository
-            .findByCuit(cuit)
-            .orElseThrow(() -> new BankNotFoundException(cuit));
+    public void addDiscountPromotion(Long id, RequestDTO.Discount discount) {
+        var bank = find(id);
 
         bank.addPromotion(RequestDTO.Discount.toModel(discount, bank));
         this.bankRepository.save(bank);
     }
 
     @Override
-    public List<String> findAllCuits() {
-        return this.bankRepository.findAllCuits();
+    public List<Long> findAllIds() {
+        return this.bankRepository.findAllIds();
+        
     }
 
     @Override
-    public Bank find(String cuit) {
+    public Bank find(Long id) {
         return this.bankRepository
-            .findByCuit(cuit)
-            .orElseThrow(() -> new BankNotFoundException(cuit));
+            .findById(id)
+            .orElseThrow(() -> new BankNotFoundException(id));
     }
 }

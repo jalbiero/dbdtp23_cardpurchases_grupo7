@@ -42,16 +42,16 @@ public class CardPurchasesController {
     }
 
     /** 
-     * 01 - Adds a new Discount promotion to the speficied bank (identified by its CUIT)
+     * 01 - Adds a new Discount promotion to the specified bank 
      * 
      * URL: 
-     *      POST /banks/{cuit}/addDiscountPromotion
+     *      POST /banks/{id}/addDiscountPromotion
      * 
      * ContentType: 
      *      application/json
      * 
      * Params:
-     *      - URL: {cuit} string that indentifies the bank
+     *      - URL: {id} bank identifier
      *      - Body:
      *          {
      *              "code":               "Promotion code",
@@ -66,9 +66,9 @@ public class CardPurchasesController {
      *              "onlyCash":           true
      *          }
      */
-    @PostMapping("/banks/{cuit}/addDiscountPromotion")
-    void banksAddDiscountPromotion(@PathVariable String cuit, @RequestBody RequestDTO.Discount discount) {
-        this.service.banksAddDiscountPromotion(cuit, discount);
+    @PostMapping("/banks/{id}/addDiscountPromotion")
+    void banksAddDiscountPromotion(@PathVariable Long id, @RequestBody RequestDTO.Discount discount) {
+        this.service.banksAddDiscountPromotion(id, discount);
     }
 
     /**

@@ -6,9 +6,9 @@ import com.tpdbd.cardpurchases.dto.RequestDTO;
 import com.tpdbd.cardpurchases.model.Bank;
 
 public interface BankService {
-    void addDiscountPromotion(String cuit, RequestDTO.Discount discount);
+    void addDiscountPromotion(Long id, RequestDTO.Discount discount);
 
-    Bank find(String cuit);
+    Bank find(Long id);
     
-    List<String> findAllCuits(); 
+    List<Long> findAllIds(); 
 }
