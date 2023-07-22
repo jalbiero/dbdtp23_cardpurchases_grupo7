@@ -16,6 +16,7 @@ public class Card {
     @ManyToOne(fetch = FetchType.LAZY)
     private CardHolder cardHolder;
 
+    @Column(unique = true)
     private String number;
 
     private String ccv;
