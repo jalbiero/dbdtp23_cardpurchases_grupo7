@@ -72,7 +72,7 @@ public class CardPurchasesController {
     }
 
     /**
-     * 02 - Update the dates of the specified payment indentified by its code
+     * 02 - Update the dates of the specified payment 
      * 
      * URL: 
      *      PUT /payments/{code}/updateDates
@@ -81,15 +81,15 @@ public class CardPurchasesController {
      *      application/json
      * 
      * Params:
-     *      - URL: {code} string that indentifies the payment
+     *      - URL: {id} payment identifier
      *      - Body:
      *          {
      *              "firstExpiration": "2023/10/31", 
      *              "secondExpiration": "2023/11/15"
      *          }
      */    
-    @PutMapping("/payments/{code}/updateDates")
-    void paymentsUpdateDates(@PathVariable String code, 
+    @PutMapping("/payments/{id}/updateDates")
+    void paymentsUpdateDates(@PathVariable Long id, 
                              @RequestBody RequestDTO.PaymentsUpdateDatesBody body) 
     {
         if (body.firstExpiration().isAfter(body.secondExpiration())) {
@@ -99,7 +99,7 @@ public class CardPurchasesController {
                 body.firstExpiration());
         }
         
-        this.service.paymentsUpdateDates(code, body.firstExpiration(), body.secondExpiration());
+        this.service.paymentsUpdateDates(id, body.firstExpiration(), body.secondExpiration());
     }
 
     /**

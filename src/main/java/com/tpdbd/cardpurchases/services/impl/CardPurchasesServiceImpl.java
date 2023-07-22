@@ -47,8 +47,8 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
 
     @Override
     @Transactional
-    public void paymentsUpdateDates(String code, LocalDate firstExpiration, LocalDate secondExpiration) {
-        var payment = this.paymentService.find(code);
+    public void paymentsUpdateDates(Long id, LocalDate firstExpiration, LocalDate secondExpiration) {
+        var payment = this.paymentService.find(id);
      
         payment.setFirstExpiration(firstExpiration);
         payment.setSecondExpiration(secondExpiration);

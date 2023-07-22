@@ -89,13 +89,13 @@ public class TestServiceImpl implements TestService {
     }
 
     @Override
-    public List<String> getPaymentCodes() {
-        return this.paymentService.findAllCodes();
+    public List<Long> getPaymentIds() {
+        return this.paymentService.findAllIds();
     }
 
     @Override
-    public Payment getPayment(String code) {
-        return this.paymentService.find(code);
+    public Payment getPayment(Long id) {
+        return this.paymentService.find(id);
     }
 
     @Override

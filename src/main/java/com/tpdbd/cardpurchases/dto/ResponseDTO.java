@@ -73,6 +73,7 @@ public interface ResponseDTO {
 
     ////////////////////////////////////////////////////////
     record Payment(
+        Long id,
         String code,
         int month,
         int year,
@@ -84,6 +85,7 @@ public interface ResponseDTO {
     {
         public static Payment fromModel(com.tpdbd.cardpurchases.model.Payment payment) {
             return new Payment(
+                payment.getId(),
                 payment.getCode(),
                 payment.getMonth(),
                 payment.getYear(),

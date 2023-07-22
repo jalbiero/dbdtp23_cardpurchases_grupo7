@@ -13,10 +13,8 @@ import com.tpdbd.cardpurchases.model.Payment;
 import com.tpdbd.cardpurchases.repositories.projections.MostEarnerBank;
 
 public interface PaymentRepository extends CrudRepository<Payment, Long> {
-    Optional<Payment> findByCode(String code);
-
-    @Query("SELECT p.code FROM Payment p")
-    List<String> findAllCodes();
+    @Query("SELECT p.id FROM Payment p")
+    List<Long> findAllIds();
 
     @Query(
         "SELECT p " + 

@@ -11,7 +11,7 @@ public interface CardPurchasesService {
     void banksAddDiscountPromotion(Long id, RequestDTO.Discount discount);
 
     // 2 Editar las fecha de vencimiento de un pago con cierto código.
-    void paymentsUpdateDates(String code, LocalDate firstExpiration, LocalDate secondExpiration);
+    void paymentsUpdateDates(Long id, LocalDate firstExpiration, LocalDate secondExpiration);
 
     // 3 Generar el total de pago de un mes dado, informando las compras
     // correspondientes

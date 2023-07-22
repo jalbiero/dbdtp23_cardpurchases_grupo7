@@ -19,15 +19,15 @@ public class PaymentServiceImpl implements PaymentService {
     private PaymentRepository paymentRepository;
 
     @Override
-    public Payment find(String code) {
+    public Payment find(Long id) {
         return this.paymentRepository
-            .findByCode(code)
-            .orElseThrow(() -> new PaymentNotFoundException(code));    
+            .findById(id)
+            .orElseThrow(() -> new PaymentNotFoundException(id));    
     }
 
     @Override
-    public List<String> findAllCodes() {
-        return this.paymentRepository.findAllCodes();
+    public List<Long> findAllIds() {
+        return this.paymentRepository.findAllIds();
     }
 
     @Override

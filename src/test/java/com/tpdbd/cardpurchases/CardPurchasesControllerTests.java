@@ -101,21 +101,21 @@ public class CardPurchasesControllerTests {
         final var NEW_DATES = new RequestDTO.PaymentsUpdateDatesBody(
             LocalDate.of(2030, 12, 31), LocalDate.of(2040, 10, 15));
 
-        var code = getSomePaymentCode();
+        var id = getSomePaymentId();
 
         // Update dates
         given()
             .when()
                 .contentType(ContentType.JSON)    
                 .body(NEW_DATES)
-                .put("/payments/{code}/updateDates", code)
+                .put("/payments/{id}/updateDates", id)
             .then()
                 .statusCode(200);
 
         // Check payment
         given()
             .when()
-                .get("/test/payments/{code}", code)
+                .get("/test/payments/{id}", id)
             .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
@@ -407,11 +407,11 @@ public class CardPurchasesControllerTests {
             .getObject("dnis[0]", String.class);
     }
 
-    public String getSomePaymentCode() {
+    public long getSomePaymentId() {
         return given()
-            .get("/test/payments/codes")
+            .get("/test/payments/ids")
             .jsonPath()
-            .getObject("codes[0]", String.class);
+            .getObject("ids[0]", Long.class);
     }
 
     public String getSomeCardNumber() {
