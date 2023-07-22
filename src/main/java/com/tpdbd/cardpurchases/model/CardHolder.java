@@ -11,8 +11,10 @@ public class CardHolder {
 
     private String completeName;
 
+    @Column(unique = true)
     private String dni;
 
+    @Column(unique = true)
     private String cuil;
 
     private String address;
