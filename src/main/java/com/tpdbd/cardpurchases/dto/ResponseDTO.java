@@ -15,6 +15,7 @@ public interface ResponseDTO {
     ////////////////////////////////////////////////////////
     @JsonInclude(JsonInclude.Include.NON_ABSENT)
     record Bank(
+        long id,
         String name,
         String cuit,
         String address,
@@ -36,6 +37,7 @@ public interface ResponseDTO {
                                       Optional<Float> totalPaymentValueFromItsCards) 
         {
             return new Bank(
+                bank.getId(),
                 bank.getName(),
                 bank.getCuit(),
                 bank.getAddress(),
@@ -49,28 +51,31 @@ public interface ResponseDTO {
 
     ////////////////////////////////////////////////////////
     record Card(
+        long id,
         String number,
         String ccv,
         String cardholderNameInCard,
         LocalDate since,
         LocalDate expirationDate,
-        String bankCuit, // In real life part of the card number identifies the bank
-        String userDni) // In real life this is not necessary, the name provides a partial identificaion
+        long bankId, // In real life part of the card number identifies the bank
+        long cardHolderId) // In real life this may not be necessary, the name provides a partial identification
     {
         public static Card fromModel(com.tpdbd.cardpurchases.model.Card card) {
             return new Card(
+                card.getId(),
                 card.getNumber(), 
                 card.getCcv(), 
                 card.getCardholderNameInCard(), 
                 card.getSince(),
                 card.getExpirationDate(),
-                card.getBank().getCuit(),
-                card.getCardHolder().getDni());
+                card.getBank().getId(),
+                card.getCardHolder().getId());
         }
     }
 
     ////////////////////////////////////////////////////////
     record Payment(
+        long id,
         String code,
         int month,
         int year,
@@ -82,6 +87,7 @@ public interface ResponseDTO {
     {
         public static Payment fromModel(com.tpdbd.cardpurchases.model.Payment payment) {
             return new Payment(
+                payment.getId(),
                 payment.getCode(),
                 payment.getMonth(),
                 payment.getYear(),
@@ -289,6 +295,7 @@ public interface ResponseDTO {
 
     ////////////////////////////////////////////////////////
     record MonthlyPayment(
+        long cardId,
         String cardNumber,
         int year, 
         int month, 
@@ -308,6 +315,7 @@ public interface ResponseDTO {
             //       a Card holder has payed in the given period (year and month)            
 
             return new MonthlyPayment(
+                payment.getCard().getId(),
                 payment.getCard().getNumber(),
                 payment.getYear(),
                 payment.getMonth(),

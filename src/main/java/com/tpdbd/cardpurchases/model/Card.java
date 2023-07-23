@@ -47,8 +47,12 @@ public class Card {
         this.expirationDate = expirationDate;
     }
 
+    public Long getId() {
+        return this.id;
+    }
+
     public Bank getBank() {
-        return bank;
+        return this.bank;
     }
 
     public void setBank(Bank bank) {
@@ -56,7 +60,7 @@ public class Card {
     }
 
     public CardHolder getCardHolder() {
-        return cardHolder;
+        return this.cardHolder;
     }
 
     public void setCardHolder(CardHolder cardHolder) {
@@ -65,7 +69,7 @@ public class Card {
     }
 
     public String getNumber() {
-        return number;
+        return this.number;
     }
 
     public void setNumber(String number) {
@@ -73,7 +77,7 @@ public class Card {
     }
 
     public String getCcv() {
-        return ccv;
+        return this.ccv;
     }
 
     public void setCcv(String ccv) {
@@ -81,7 +85,7 @@ public class Card {
     }
 
     public String getCardholderNameInCard() {
-        return cardholderNameInCard;
+        return this.cardholderNameInCard;
     }
 
     public void setCardholderNameInCard(String cardholderNameInCard) {
@@ -89,7 +93,7 @@ public class Card {
     }
 
     public LocalDate getSince() {
-        return since;
+        return this.since;
     }
 
     public void setSince(LocalDate since) {
@@ -97,7 +101,7 @@ public class Card {
     }
 
     public LocalDate getExpirationDate() {
-        return expirationDate;
+        return this.expirationDate;
     }
 
     public void setExpirationDate(LocalDate expirationDate) {

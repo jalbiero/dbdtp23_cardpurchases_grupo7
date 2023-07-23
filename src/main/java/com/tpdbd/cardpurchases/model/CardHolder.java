@@ -42,8 +42,12 @@ public class CardHolder {
         this.entry = entry;
     }
 
+    public Long getId() {
+        return this.id;
+    }
+
     public String getCompleteName() {
-        return completeName;
+        return this.completeName;
     }
 
     public void setCompleteName(String completeName) {
@@ -51,7 +55,7 @@ public class CardHolder {
     }
 
     public String getDni() {
-        return dni;
+        return this.dni;
     }
 
     public void setDni(String dni) {
@@ -59,7 +63,7 @@ public class CardHolder {
     }
 
     public String getCuil() {
-        return cuil;
+        return this.cuil;
     }
 
     public void setCuil(String cuil) {
@@ -67,7 +71,7 @@ public class CardHolder {
     }
 
     public String getAddress() {
-        return address;
+        return this.address;
     }
 
     public void setAddress(String address) {
@@ -75,7 +79,7 @@ public class CardHolder {
     }
 
     public String getTelephone() {
-        return telephone;
+        return this.telephone;
     }
 
     public void setTelephone(String telephone) {
@@ -83,7 +87,7 @@ public class CardHolder {
     }
 
     public LocalDate getEntry() {
-        return entry;
+        return this.entry;
     }
 
     public void setEntry(LocalDate entry) {

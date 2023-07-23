@@ -42,16 +42,16 @@ public class CardPurchasesController {
     }
 
     /** 
-     * 01 - Adds a new Discount promotion to the speficied bank (identified by its CUIT)
+     * 01 - Adds a new Discount promotion to the specified bank 
      * 
      * URL: 
-     *      POST /banks/{cuit}/addDiscountPromotion
+     *      POST /banks/{id}/addDiscountPromotion
      * 
      * ContentType: 
      *      application/json
      * 
      * Params:
-     *      - URL: {cuit} string that indentifies the bank
+     *      - URL: {id} bank identifier
      *      - Body:
      *          {
      *              "code":               "Promotion code",
@@ -66,30 +66,32 @@ public class CardPurchasesController {
      *              "onlyCash":           true
      *          }
      */
-    @PostMapping("/banks/{cuit}/addDiscountPromotion")
-    void banksAddDiscountPromotion(@PathVariable String cuit, @RequestBody RequestDTO.Discount discount) {
-        this.service.banksAddDiscountPromotion(cuit, discount);
+    @PostMapping("/banks/{id}/addDiscountPromotion")
+    void banksAddDiscountPromotion(@PathVariable long id, 
+                                   @RequestBody RequestDTO.Discount discount) 
+    {
+        this.service.banksAddDiscountPromotion(id, discount);
     }
 
     /**
-     * 02 - Update the dates of the specified payment indentified by its code
+     * 02 - Update the dates of the specified payment 
      * 
      * URL: 
-     *      PUT /payments/{code}/updateDates
+     *      PUT /payments/{id}/updateDates
      * 
      * ContentType: 
      *      application/json
      * 
      * Params:
-     *      - URL: {code} string that indentifies the payment
+     *      - URL: {id} payment identifier
      *      - Body:
      *          {
      *              "firstExpiration": "2023/10/31", 
      *              "secondExpiration": "2023/11/15"
      *          }
      */    
-    @PutMapping("/payments/{code}/updateDates")
-    void paymentsUpdateDates(@PathVariable String code, 
+    @PutMapping("/payments/{id}/updateDates")
+    void paymentsUpdateDates(@PathVariable long id, 
                              @RequestBody RequestDTO.PaymentsUpdateDatesBody body) 
     {
         if (body.firstExpiration().isAfter(body.secondExpiration())) {
@@ -99,14 +101,14 @@ public class CardPurchasesController {
                 body.firstExpiration());
         }
         
-        this.service.paymentsUpdateDates(code, body.firstExpiration(), body.secondExpiration());
+        this.service.paymentsUpdateDates(id, body.firstExpiration(), body.secondExpiration());
     }
 
     /**
      * 03 - Get card monthly payment with its purchases
      * 
      * URL: 
-     *      PUT /cards/{number}/monthlyPayment?year={someYear}&month={someMonth}
+     *      PUT /cards/{id}/monthlyPayment?year={someYear}&month={someMonth}
      * 
      * Params:
      *      - URL: {someYear} the specified year
@@ -114,6 +116,7 @@ public class CardPurchasesController {
      * 
      * Return:
      *      {
+     *          "id": 123,
      *          "cardNumber", "5876-1948-6884-1575",
      *          "year": 2021,
      *          "month": 8,
@@ -144,12 +147,12 @@ public class CardPurchasesController {
      *          ]
      *      }
      */
-    @GetMapping("/cards/{number}/monthlyPayment")
-    ResponseDTO.MonthlyPayment cardsGetMonthtlyPayment(@PathVariable String number, 
+    @GetMapping("/cards/{id}/monthlyPayment")
+    ResponseDTO.MonthlyPayment cardsGetMonthtlyPayment(@PathVariable long id, 
                                                        @RequestParam int year, 
                                                        @RequestParam int month)
     {
-        return this.service.cardsGetMonthtlyPayment(number, year, month);
+        return this.service.cardsGetMonthtlyPayment(id, year, month);
     }
 
     /**
@@ -172,6 +175,7 @@ public class CardPurchasesController {
      * 
      *      [
      *          {
+     *              "id": 2343
      *              "number": "44756745756",
      *              "ccv", "123"
      *              "cardholderNameInCard": "Juan Perez",

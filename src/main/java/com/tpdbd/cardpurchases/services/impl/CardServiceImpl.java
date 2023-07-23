@@ -26,15 +26,15 @@ public class CardServiceImpl implements CardService {
     }    
 
     @Override
-    public List<String> findAllNumbers() {
-        return this.cardRepository.findAllNumbers();
+    public List<Long> findAllIds() {
+        return this.cardRepository.findAllIds();
     }
 
     @Override
-    public Card find(String cardNumber) {
+    public Card find(long id) {
         return this.cardRepository
-            .findByNumber(cardNumber)
-            .orElseThrow(() -> new CardNotFoundException(cardNumber));
+            .findById(id)
+            .orElseThrow(() -> new CardNotFoundException(id));
     }
 
     @Override
@@ -44,7 +44,7 @@ public class CardServiceImpl implements CardService {
 
     @Override
     @Transactional
-    public void delete(String cardNumber) {
-        this.cardRepository.deleteByNumber(cardNumber);
+    public void delete(long id) {
+        this.cardRepository.deleteById(id);
     }
 }

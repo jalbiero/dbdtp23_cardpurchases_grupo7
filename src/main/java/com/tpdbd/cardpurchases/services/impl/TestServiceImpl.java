@@ -41,31 +41,31 @@ public class TestServiceImpl implements TestService {
 
 
     @Override
-    public List<String> getBankCuits() {
-        return this.bankService.findAllCuits();
+    public List<Long> getBankIds() {
+        return this.bankService.findAllIds();
 
     }
 
     @Override
-    public Bank getBank(String cuit) {
-        return this.bankService.find(cuit);
+    public Bank getBank(Long id) {
+        return this.bankService.find(id);
     }
 
     @Override
-    public List<String> getCardNumbes() {
-        return this.cardService.findAllNumbers();
+    public List<Long> getCardIds() {
+        return this.cardService.findAllIds();
     }
 
     @Override
-    public Card getCard(String number) {
-        return this.cardService.find(number);
+    public Card getCard(long id) {
+        return this.cardService.find(id);
     }
 
     @Override
     @Transactional
-    public String addCard(RequestDTO.Card card) {
-        var bank = this.bankService.find(card.bankCuit());
-        var cardHolder = this.cardHolderService.find(card.cardHolderDni());
+    public long addCard(RequestDTO.Card card) {
+        var bank = this.bankService.find(card.bankId());
+        var cardHolder = this.cardHolderService.find(card.cardHolderId());
 
         var newCard = new Card(
             bank,
@@ -75,27 +75,27 @@ public class TestServiceImpl implements TestService {
             card.since(),
             card.expirationDate());
 
-        return this.cardService.save(newCard).getNumber();
+        return this.cardService.save(newCard).getId();
     }
 
     @Override
-    public void deleteCard(String number) {
-        this.cardService.delete(number);
+    public void deleteCard(long id) {
+        this.cardService.delete(id);
     }
 
     @Override
-    public List<String> getCardHolderDnis() {
-        return this.cardHolderService.findAllDnis();
+    public List<Long> getCardHolderIds() {
+        return this.cardHolderService.findAllIds();
     }
 
     @Override
-    public List<String> getPaymentCodes() {
-        return this.paymentService.findAllCodes();
+    public List<Long> getPaymentIds() {
+        return this.paymentService.findAllIds();
     }
 
     @Override
-    public Payment getPayment(String code) {
-        return this.paymentService.find(code);
+    public Payment getPayment(Long id) {
+        return this.paymentService.find(id);
     }
 
     @Override

@@ -38,71 +38,76 @@ public class TestController {
     ///////////////////////
     // Banks
 
-    @GetMapping("/banks/cuits")
-    Map<String, List<String>> getBankCuits() {
-        var result = new LinkedHashMap<String, List<String>>();
-        result.put("cuits", this.service.getBankCuits());
+    @GetMapping("/banks/ids")
+    Map<String, List<Long>> getBankIds() {
+        var result = new LinkedHashMap<String, List<Long>>();
+        result.put("ids", this.service.getBankIds());
         return result;
     }
 
-    @GetMapping("/banks/{cuit}")
-    ResponseDTO.Bank getBank(@PathVariable String cuit) {
-        return ResponseDTO.Bank.fromModel(this.service.getBank(cuit));
+    @GetMapping("/banks/{id}")
+    ResponseDTO.Bank getBank(@PathVariable Long id) {
+        return ResponseDTO.Bank.fromModel(this.service.getBank(id));
     }
 
     ///////////////////////
     // Cards
 
-    @GetMapping("/cards/numbers")
-    Map<String, List<String>> getCardNumbers() {
-        var result = new LinkedHashMap<String, List<String>>();
-        result.put("numbers", this.service.getCardNumbes());
+    @GetMapping("/cards/ids")
+    Map<String, List<Long>> getCardIds() {
+        var result = new LinkedHashMap<String, List<Long>>();
+        result.put("ids", this.service.getCardIds());
         return result;
     }
 
-    @GetMapping("/cards/{number}")
-    ResponseDTO.Card getCard(@PathVariable String number) {
-        return ResponseDTO.Card.fromModel(this.service.getCard(number));
+    @GetMapping("/cards/{id}")
+    ResponseDTO.Card getCard(@PathVariable long id) {
+        return ResponseDTO.Card.fromModel(this.service.getCard(id));
     }
 
     /**
      * Add a new card
-     * @param card
-     * @return The number of the new card
+     * @return The id of the new card:
+     * 
+     *           {
+     *              "id": 123
+     *           }
      */
     @PostMapping("/cards")
-    String addCard(@RequestBody RequestDTO.Card card) {
-        return this.service.addCard(card);
+    Map<String, Long> addCard(@RequestBody RequestDTO.Card card) {
+        var result = new LinkedHashMap<String, Long>();
+        result.put("id", this.service.addCard(card));
+        return result;
     }
 
-    @DeleteMapping("/cards/{number}")
-    void deleteCard(@PathVariable String number) {
-        this.service.deleteCard(number);
+    @DeleteMapping("/cards/{id}")
+    void deleteCard(@PathVariable long id) {
+        this.service.deleteCard(id);
     }
 
     ///////////////////////
     // Card holders
 
-    @GetMapping("/cardHolders/dnis")
-    Map<String, List<String>> getCardHolderDnis() {
-        var result = new LinkedHashMap<String, List<String>>();
-        result.put("dnis", this.service.getCardHolderDnis());
+    @GetMapping("/cardHolders/ids")
+    Map<String, List<Long>> getCardHolderIds() {
+        var result = new LinkedHashMap<String, List<Long>>();
+        result.put("ids", this.service.getCardHolderIds());
         return result;
     }
 
     ///////////////////////
     // Payments
 
-    @GetMapping("/payments/codes")
-    Map<String, List<String>> getPaymentCodes() {
-        var result = new LinkedHashMap<String, List<String>>();
-        result.put("codes", this.service.getPaymentCodes());
+    @GetMapping("/payments/ids")
+    Map<String, List<Long>> getPaymentIds() {
+        var result = new LinkedHashMap<String, List<Long>>();
+        result.put("ids", this.service.getPaymentIds());
         return result;
     }
 
-    @GetMapping("/payments/{code}")
-    ResponseDTO.Payment getPayment(@PathVariable String code) {
-        return ResponseDTO.Payment.fromModel(this.service.getPayment(code));
+    @GetMapping("/payments/{id}")
+    ResponseDTO.Payment getPayment(@PathVariable Long id) {
+        return ResponseDTO.Payment.fromModel(this.service.getPayment(id));
     }
 
     ///////////////////////

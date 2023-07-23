@@ -65,7 +65,7 @@ public class CardPurchasesControllerTests {
         final var DISCOUNT = 0.5f;
         final var PCAP = 5000.f;
 
-        var cuit = getSomeBankCuit();
+        var cuit = getSomeBankId();
 
         // Add a new promotion
         var discount = new RequestDTO.Discount(
@@ -101,21 +101,21 @@ public class CardPurchasesControllerTests {
         final var NEW_DATES = new RequestDTO.PaymentsUpdateDatesBody(
             LocalDate.of(2030, 12, 31), LocalDate.of(2040, 10, 15));
 
-        var code = getSomePaymentCode();
+        var id = getSomePaymentId();
 
         // Update dates
         given()
             .when()
                 .contentType(ContentType.JSON)    
                 .body(NEW_DATES)
-                .put("/payments/{code}/updateDates", code)
+                .put("/payments/{id}/updateDates", id)
             .then()
                 .statusCode(200);
 
         // Check payment
         given()
             .when()
-                .get("/test/payments/{code}", code)
+                .get("/test/payments/{id}", id)
             .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
@@ -127,23 +127,23 @@ public class CardPurchasesControllerTests {
                     Matchers.equalTo(NEW_DATES.secondExpiration().toString()));
     }
 
-    //@Test 
+    @Test 
     void testCardsGetMonthtlyPaymentHappyPath() {
-        // TODO This test is not well designed because the card number, year and month
+        // TODO This test is not well designed because the card id, year and month
         //      are hardcoded (test data is repeatable, but if not, the test will fail.
         //      See TestDataGeneratorService.random for more information about repeatable data)
 
-        final var CARD_NUMBER = "5876-1948-6884-1575";
+        final var CARD_ID = 7l; //"5876-1948-6884-1575";
         final var YEAR = 2021;
         final var MONTH = 8;
 
         given()
             .when()
-                .get("/cards/{number}/monthlyPayment?year={year}&month={month}", CARD_NUMBER, YEAR, MONTH) 
+                .get("/cards/{id}/monthlyPayment?year={year}&month={month}", CARD_ID, YEAR, MONTH) 
             .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
-                .body("cardNumber", Matchers.equalTo(CARD_NUMBER))
+                .body("cardId", Matchers.equalTo((int)CARD_ID))
                 .body("year", Matchers.equalTo(YEAR))
                 .body("month", Matchers.equalTo(MONTH))
                 .body("purchases", Matchers.not(Matchers.emptyArray()));
@@ -151,13 +151,13 @@ public class CardPurchasesControllerTests {
 
     @Test 
     void testCardsGetMonthtlyPaymentNotFound() {
-        final var CARD_NUMBER = "5876-1948-6884-1575";
+        final var CARD_ID = 999_999_999_999l;
         final var UNREAL_YEAR = 1900;
         final var MONTH = 1;
 
         given()
             .when()
-                .get("/cards/{number}/monthlyPayment?year={year}&month={month}", CARD_NUMBER, UNREAL_YEAR, MONTH) 
+                .get("/cards/{id}/monthlyPayment?year={year}&month={month}", CARD_ID, UNREAL_YEAR, MONTH) 
             .then()
                 .statusCode(404);
     }
@@ -172,8 +172,8 @@ public class CardPurchasesControllerTests {
 
         // Create a new card
         var card = new RequestDTO.Card(
-            getSomeBankCuit(), 
-            getSomeCardHolderDni(), 
+            getSomeBankId(), 
+            getSomeCardHolderIds(), 
             CARD_NUMBER,
             this.faker.business().securityCode(),
             BASE_DATE,
@@ -393,32 +393,25 @@ public class CardPurchasesControllerTests {
     ///////////////////
     // Helpers
 
-    public String getSomeBankCuit() {
+    public Long getSomeBankId() {
         return given()
-            .get("/test/banks/cuits")
+            .get("/test/banks/ids")
             .jsonPath()
-            .getObject("cuits[0]", String.class);
+            .getObject("ids[0]", Long.class);
     }
 
-    public String getSomeCardHolderDni() {
+    public long getSomeCardHolderIds() {
         return given()
-            .get("/test/cardHolders/dnis")
+            .get("/test/cardHolders/ids")
             .jsonPath()
-            .getObject("dnis[0]", String.class);
+            .getObject("ids[0]", Long.class);
     }
 
-    public String getSomePaymentCode() {
+    public long getSomePaymentId() {
         return given()
-            .get("/test/payments/codes")
+            .get("/test/payments/ids")
             .jsonPath()
-            .getObject("codes[0]", String.class);
-    }
-
-    public String getSomeCardNumber() {
-        return given()
-            .get("/test/cards/numbers")
-            .jsonPath()
-            .getObject("numbers[0]", String.class);
+            .getObject("ids[0]", Long.class);
     }
 
     static public String getSomeStoreCuit() {

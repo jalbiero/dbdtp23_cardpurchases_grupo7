@@ -19,23 +19,23 @@ public class PaymentServiceImpl implements PaymentService {
     private PaymentRepository paymentRepository;
 
     @Override
-    public Payment find(String code) {
+    public Payment find(Long id) {
         return this.paymentRepository
-            .findByCode(code)
-            .orElseThrow(() -> new PaymentNotFoundException(code));    
+            .findById(id)
+            .orElseThrow(() -> new PaymentNotFoundException(id));    
     }
 
     @Override
-    public List<String> findAllCodes() {
-        return this.paymentRepository.findAllCodes();
+    public List<Long> findAllIds() {
+        return this.paymentRepository.findAllIds();
     }
 
     @Override
-    public Payment findMonthlyPayment(String cardNumber, int year, int month)
+    public Payment findMonthlyPayment(long cardId, int year, int month)
     {
         return this.paymentRepository
-            .findMonthlyPayment(cardNumber, year, month)
-            .orElseThrow(() -> new MonthlyPaymentNotFoundException(cardNumber, year, month));
+            .findMonthlyPayment(cardId, year, month)
+            .orElseThrow(() -> new MonthlyPaymentNotFoundException(cardId, year, month));
     }
 
     @Override

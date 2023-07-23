@@ -60,10 +60,6 @@ Para aislar la funcionalidad pedida de lo que se necesita para probarla se decid
 2. El controlador [TestController](src/main/java/com/tpdbd/cardpurchases/controllers/TestController.java) y su servicio asociado [TestService](src/main/java/com/tpdbd/cardpurchases/services/TestService.java) (_tests_ unitarios asociados en [TestControllerTests](src/test/java/com/tpdbd/cardpurchases/TestControllerTests.java)) implementan funcionalidad necesaria para probar lo pedido en la tarea. En una aplicación completa lo pedido sería sólo una parte del total, el cual se complementaría con lo que está en `TestController/TestService`.
 3. Por cuestiones de tiempo la documentación de los _endpoints_ se hace solamente para el controlador `CardPurchasesController` de una forma sencilla agregándose además [swagger para listar/probar los mismos en _runtime_](#documentación-y-prueba-manual-de-los-endpoints-implementados).
 
-### Entidades
-
-¿Cómo identificar unívocamente las entidades? En aquellas en los que hubiera un campo que permita hacerlo (CUIT, DNI, Number, etc) se optó por usar los mismos (ej: `Bank`, `CardHolder`, `Card`). En los que no, se usa directamente el ID autogenerado (ej: `Purchases`)
-
 ### Pruebas
 
 Para las pruebas (tanto manuales con la aplicación funcionando, como para los _tests_ unitarios) se diseño un servicio ([TestDataGeneratorService](src/main/java/com/tpdbd/cardpurchases/services/TestDataGeneratorService.java)) que se ejecuta al arrancar la aplicación. La funcionalidad del mismo es generar datos de prueba (lo más real posibles) en la base de datos. Inicialmente se evaluó la opción de tener un archivo .sql, pero no iba a escalar ya que:

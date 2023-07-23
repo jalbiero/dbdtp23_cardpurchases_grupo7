@@ -38,74 +38,75 @@ public class TestControllerTests {
     }
 
     @Test
-    public void testGetBanksCuits() {
+    public void testGetBanksIds() {
         given()
             .when()
-                .get("/test/banks/cuits")
+                .get("/test/banks/ids")
             .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
-                .body("cuits", Matchers.hasSize(Matchers.greaterThan((0))));
+                .body("ids", Matchers.hasSize(Matchers.greaterThan((0))));
     }
 
     @Test
     public void testGetBank() {
-        var cuit = getSomeBankCuit();
+        var id = getSomeBankId();
 
         given()
             .when()
-                .get("/test/banks/{cuit}", cuit)
+                .get("/test/banks/{id}", id)
             .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
-                .body("cuit", Matchers.equalTo(cuit));
+                .body("id", Matchers.equalTo((int)id));
     }
 
     @Test
     public void testAddRemoveCard() {
         final var CARD_NUMBER = this.faker.business().creditCardNumber();
 
-        var cuit = getSomeBankCuit();
-        var dni = getSomeCardHolderDni();
+        var bankId = getSomeBankId();
+        var cardHolderId = getSomeCardHolderId();
 
         var card = new RequestDTO.Card(
-            cuit, 
-            dni, 
+            bankId, 
+            cardHolderId, 
             CARD_NUMBER, 
             this.faker.business().securityCode(),
             LocalDate.now(), 
             LocalDate.now().plusDays(10));
 
         // Create a new card
-        given()
-            .when()
-                .contentType(ContentType.JSON)    
-                .body(card)
-                .post("/test/cards")
-            .then()
-                .statusCode(200);
+        var newCardId = 
+            given()
+                .when()
+                    .contentType(ContentType.JSON)    
+                    .body(card)
+                    .post("/test/cards")
+                    .jsonPath()
+                    .getObject("id", Long.class);
         
         // Validate the creation
         given()
             .when()
-                .get("/test/cards/{number}", CARD_NUMBER)
+                .get("/test/cards/{id}", newCardId)
             .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
-                .body("number", Matchers.equalTo(CARD_NUMBER));
+                .body("id", Matchers.equalTo(newCardId.intValue()));
                 // TODO Validate other attributes
 
             
         // Remove the new card
         given()
             .when()
-                .delete("/test/cards/{number}", CARD_NUMBER)
+                .delete("/test/cards/{id}", newCardId)
             .then()
                 .statusCode(200);
 
         given()
             .when()
-                .get("/cards/{number}", CARD_NUMBER)
+                .get("/cards/{id}", newCardId)
             .then()
                 .statusCode(404);                
     }
@@ -125,17 +126,17 @@ public class TestControllerTests {
     ///////////////////
     // Helpers
 
-    static public String getSomeBankCuit() {
+    static public long getSomeBankId() {
         return given()
-            .get("/test/banks/cuits")
+            .get("/test/banks/ids")
             .jsonPath()
-            .getObject("cuits[0]", String.class);
+            .getObject("ids[0]", Long.class);
     }
 
-    static public String getSomeCardHolderDni() {
+    static public long getSomeCardHolderId() {
         return given()
-            .get("/test/cardHolders/dnis")
+            .get("/test/cardHolders/ids")
             .jsonPath()
-            .getObject("dnis[0]", String.class);
+            .getObject("ids[0]", Long.class);
     }
 }

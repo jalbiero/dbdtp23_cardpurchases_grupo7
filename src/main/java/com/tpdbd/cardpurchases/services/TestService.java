@@ -11,18 +11,18 @@ import com.tpdbd.cardpurchases.model.Payment;
  * Provide all extra funcionallity needed for manual or automated testing
  */
 public interface TestService {
-    List<String> getBankCuits();
-    Bank getBank(String cuit);
+    List<Long> getBankIds();
+    Bank getBank(Long id);
 
-    List<String> getCardNumbes();
-    Card getCard(String number);
-    String addCard(RequestDTO.Card card);
-    void deleteCard(String number);
+    List<Long> getCardIds();
+    Card getCard(long id);
+    long addCard(RequestDTO.Card card);
+    void deleteCard(long id);
 
-    List<String> getCardHolderDnis();
+    List<Long> getCardHolderIds();
 
-    List<String> getPaymentCodes();
-    Payment getPayment(String code);
+    List<Long> getPaymentIds();
+    Payment getPayment(Long id);
 
     List<Long> getPurchaseIds();
 
