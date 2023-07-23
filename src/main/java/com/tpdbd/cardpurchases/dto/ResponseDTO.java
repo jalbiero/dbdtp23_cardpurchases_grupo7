@@ -58,7 +58,7 @@ public interface ResponseDTO {
         LocalDate since,
         LocalDate expirationDate,
         long bankId, // In real life part of the card number identifies the bank
-        long userId) // In real life this may not be necessary, the name provides a partial identification
+        long cardHolderId) // In real life this may not be necessary, the name provides a partial identification
     {
         public static Card fromModel(com.tpdbd.cardpurchases.model.Card card) {
             return new Card(
