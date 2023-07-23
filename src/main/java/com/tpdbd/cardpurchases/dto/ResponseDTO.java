@@ -57,8 +57,8 @@ public interface ResponseDTO {
         String cardholderNameInCard,
         LocalDate since,
         LocalDate expirationDate,
-        String bankCuit, // In real life part of the card number identifies the bank
-        String userDni) // In real life this is not necessary, the name provides a partial identification
+        long bankId, // In real life part of the card number identifies the bank
+        long userId) // In real life this may not be necessary, the name provides a partial identification
     {
         public static Card fromModel(com.tpdbd.cardpurchases.model.Card card) {
             return new Card(
@@ -68,8 +68,8 @@ public interface ResponseDTO {
                 card.getCardholderNameInCard(), 
                 card.getSince(),
                 card.getExpirationDate(),
-                card.getBank().getCuit(),
-                card.getCardHolder().getDni());
+                card.getBank().getId(),
+                card.getCardHolder().getId());
         }
     }
 
