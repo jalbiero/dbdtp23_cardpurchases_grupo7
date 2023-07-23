@@ -66,11 +66,11 @@ public class TestControllerTests {
         final var CARD_NUMBER = this.faker.business().creditCardNumber();
 
         var bankId = getSomeBankId();
-        var dni = getSomeCardHolderDni();
+        var cardHolderId = getSomeCardHolderId();
 
         var card = new RequestDTO.Card(
             bankId, 
-            dni, 
+            cardHolderId, 
             CARD_NUMBER, 
             this.faker.business().securityCode(),
             LocalDate.now(), 
@@ -133,10 +133,10 @@ public class TestControllerTests {
             .getObject("ids[0]", Long.class);
     }
 
-    static public String getSomeCardHolderDni() {
+    static public long getSomeCardHolderId() {
         return given()
-            .get("/test/cardHolders/dnis")
+            .get("/test/cardHolders/ids")
             .jsonPath()
-            .getObject("dnis[0]", String.class);
+            .getObject("ids[0]", Long.class);
     }
 }

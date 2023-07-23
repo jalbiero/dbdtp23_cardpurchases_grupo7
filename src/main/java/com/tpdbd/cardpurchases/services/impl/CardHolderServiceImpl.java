@@ -16,15 +16,15 @@ public class CardHolderServiceImpl implements CardHolderService {
     CardHolderRepository cardHolderRepository;
 
     @Override
-    public CardHolder find(String dni) {
+    public CardHolder find(long id) {
         return this.cardHolderRepository
-            .findByDni(dni)
-            .orElseThrow(() -> new CardHolderNotFoundException(dni));
+            .findById(id)
+            .orElseThrow(() -> new CardHolderNotFoundException(id));
     }
 
     @Override
-    public List<String> findAllDnis() {
-        return this.cardHolderRepository.findAllDnis();
+    public List<Long> findAllIds() {
+        return this.cardHolderRepository.findAllIds();
     }
     
 }

@@ -65,7 +65,7 @@ public class TestServiceImpl implements TestService {
     @Transactional
     public long addCard(RequestDTO.Card card) {
         var bank = this.bankService.find(card.bankId());
-        var cardHolder = this.cardHolderService.find(card.cardHolderDni());
+        var cardHolder = this.cardHolderService.find(card.cardHolderId());
 
         var newCard = new Card(
             bank,
@@ -84,8 +84,8 @@ public class TestServiceImpl implements TestService {
     }
 
     @Override
-    public List<String> getCardHolderDnis() {
-        return this.cardHolderService.findAllDnis();
+    public List<Long> getCardHolderIds() {
+        return this.cardHolderService.findAllIds();
     }
 
     @Override

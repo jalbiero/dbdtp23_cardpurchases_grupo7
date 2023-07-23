@@ -173,7 +173,7 @@ public class CardPurchasesControllerTests {
         // Create a new card
         var card = new RequestDTO.Card(
             getSomeBankId(), 
-            getSomeCardHolderDni(), 
+            getSomeCardHolderIds(), 
             CARD_NUMBER,
             this.faker.business().securityCode(),
             BASE_DATE,
@@ -400,11 +400,11 @@ public class CardPurchasesControllerTests {
             .getObject("ids[0]", Long.class);
     }
 
-    public String getSomeCardHolderDni() {
+    public long getSomeCardHolderIds() {
         return given()
-            .get("/test/cardHolders/dnis")
+            .get("/test/cardHolders/ids")
             .jsonPath()
-            .getObject("dnis[0]", String.class);
+            .getObject("ids[0]", Long.class);
     }
 
     public long getSomePaymentId() {

@@ -5,7 +5,7 @@ import java.util.List;
 import com.tpdbd.cardpurchases.model.CardHolder;
 
 public interface CardHolderService {
-    CardHolder find(String dni);
+    CardHolder find(long id);
     
-    List<String> findAllDnis();
+    List<Long> findAllIds();
 }

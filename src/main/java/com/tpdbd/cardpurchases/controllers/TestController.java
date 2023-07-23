@@ -67,7 +67,6 @@ public class TestController {
 
     /**
      * Add a new card
-     * @param card
      * @return The id of the new card:
      * 
      *           {
@@ -89,10 +88,10 @@ public class TestController {
     ///////////////////////
     // Card holders
 
-    @GetMapping("/cardHolders/dnis")
-    Map<String, List<String>> getCardHolderDnis() {
-        var result = new LinkedHashMap<String, List<String>>();
-        result.put("dnis", this.service.getCardHolderDnis());
+    @GetMapping("/cardHolders/ids")
+    Map<String, List<Long>> getCardHolderIds() {
+        var result = new LinkedHashMap<String, List<Long>>();
+        result.put("ids", this.service.getCardHolderIds());
         return result;
     }
 
