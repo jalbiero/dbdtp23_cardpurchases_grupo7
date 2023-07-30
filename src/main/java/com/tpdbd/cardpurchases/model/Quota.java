@@ -11,18 +11,23 @@ public class Quota {
     @GeneratedValue
     private Long id;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
+    @JoinColumn(nullable = false)
     private Purchase purchase;
 
+    @Column(nullable = false)
     private int number;
 
+    @Column(nullable = false)
     private float price;
 
+    @Column(nullable = false)
     private int month;
 
+    @Column(nullable = false)
     private int year;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(nullable = true)
     @Nullable
     private Payment payment;
@@ -96,11 +101,5 @@ public class Quota {
 
     public void setPayment(Payment payment) {
         this.payment = payment;
-    }
-
-    @Override
-    public String toString() {
-        return "Quota [id=" + id + ", purchase=" + purchase + ", number=" + number + ", price=" + price + ", month="
-                + month + ", year=" + year + ", payment=" + payment + "]";
     }
 }

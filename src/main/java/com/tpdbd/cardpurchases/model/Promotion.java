@@ -6,28 +6,36 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.Where;
 
 @Entity
-@Inheritance
+@Inheritance(strategy = InheritanceType.JOINED) // This allows non nullable fields in subclasses
 @Where(clause = "deleted = false") // Note: SQL specific, Mongo version will need another solution 
 public abstract class Promotion {
     @Id
     @GeneratedValue
     private Long id;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
+    @JoinColumn(nullable = false)
     private Bank bank;
 
+    @Column(length = 50, nullable = false)
     private String code; // aka 'paymentVoucher' (in Purchase class)
 
+    @Column(length = 100, nullable = false)
     private String promotionTitle;
 
+    @Column(length = 50, nullable = false)
     private String nameStore;
 
+    @Column(length = 20, nullable = false)
     private String cuitStore;
 
+    @Column(nullable = false)
     private LocalDate validityStartDate;
 
+    @Column(nullable = false)
     private LocalDate validityEndDate;
 
+    @Column(length = 200, nullable = false)
     private String comments;
 
     // Implements a logical delete with the help of @Where annotation (see 
@@ -57,6 +65,10 @@ public abstract class Promotion {
         this.validityEndDate = validityEndDate;
         this.comments = comments;
         this.deleted = false;
+    }
+
+    public Long getId() {
+        return this.id;
     }
 
     public Bank getBank() {
@@ -121,12 +133,5 @@ public abstract class Promotion {
 
     public void setComments(String comments) {
         this.comments = comments;
-    }
-
-    @Override
-    public String toString() {
-        return "Promotion [id=" + id + ", bank=" + bank + ", code=" + code + ", promotionTitle=" + promotionTitle
-                + ", nameStore=" + nameStore + ", cuitStore=" + cuitStore + ", validityStartDate=" + validityStartDate
-                + ", validityEndDate=" + validityEndDate + ", comments=" + comments + "]";
     }
 }

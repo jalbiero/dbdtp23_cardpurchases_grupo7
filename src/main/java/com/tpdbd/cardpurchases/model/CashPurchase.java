@@ -1,11 +1,13 @@
 package com.tpdbd.cardpurchases.model;
 
 import jakarta.annotation.Nullable;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 
 @Entity
 public class CashPurchase extends Purchase {
 
+    @Column(nullable = false)
     private float storeDiscount;
 
     public CashPurchase() {

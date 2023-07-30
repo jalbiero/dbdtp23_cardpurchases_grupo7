@@ -1,31 +1,45 @@
 package com.tpdbd.cardpurchases.model;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import jakarta.persistence.*;
 
-@Entity
+@Entity 
 public class Card {
     @Id
     @GeneratedValue
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
+    @JoinColumn(nullable = false)
     private Bank bank;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne 
+    @JoinColumn(nullable = false)
     private CardHolder cardHolder;
 
-    @Column(unique = true)
+    @Column(unique = true, length = 20, nullable = false)
     private String number;
 
+    @Column(length = 3, nullable = false)
     private String ccv;
 
+    @Column(length = 50, nullable = false)
     private String cardholderNameInCard;
 
+    @Column(nullable = false)
     private LocalDate since;
 
+    @Column(nullable = false)
     private LocalDate expirationDate;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinTable(
+        name="purchase",
+        joinColumns=@JoinColumn(name="card_id"),
+        inverseJoinColumns=@JoinColumn(name="id"))
+    private List<Purchase> purchases;
 
     public Card() {
     }
@@ -108,10 +122,7 @@ public class Card {
         this.expirationDate = expirationDate;
     }
 
-    @Override
-    public String toString() {
-        return "Card [id=" + id + ", bank=" + bank + ", cardHolder=" + cardHolder + ", number=" + number + ", ccv="
-                + ccv + ", cardholderNameInCard=" + cardholderNameInCard + ", since=" + since + ", expirationDate="
-                + expirationDate + "]";
+    public List<Purchase> getPurchases() {
+        return this.purchases;
     }
 }

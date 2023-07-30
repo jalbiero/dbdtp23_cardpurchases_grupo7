@@ -1,13 +1,16 @@
 package com.tpdbd.cardpurchases.model;
 
 import jakarta.annotation.Nullable;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 
 @Entity
 public class CreditPurchase extends Purchase {
 
+    @Column(nullable = true)
     private float interest;
 
+    @Column(nullable = false)
     private int numberOfQuotas;
 
     public CreditPurchase() {
