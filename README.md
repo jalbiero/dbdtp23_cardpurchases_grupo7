@@ -77,6 +77,19 @@ Los _tests_ unitarios se ejecutan con:
 $ mvn test
 ```
 
+### Modelo
+
+En el modelo se tomaron las siguientes decisiones:
+
+- Se anotó cada atributo con propiedades básicas tales como:
+  - Si puede ser nulo o no.
+  - Longitud máxima de caracteres en caso de las cadenas.
+  - Unicidad en los que se requiera (DNI, CUIT, etc)
+- En el caso de colecciones que se mapean a tablas:
+  -  se usó `@JoinTable` (además de por ejemplo `@OneToMany`) para simplificar la generación del modelo en la base. Sin `@JoinTable` se generan tablas extras intermedias que no hacen falta.
+  -  Se usó además el valor por defecto para el _fetch_ (LAZY) y para las operaciones de cascada (desabilitado) ya que no se tuvo necesidad de activar las mismas.
+- En cuanto a la herencia: Hay 2 grupos de clases que las usan, `Purchase` con _CashPurchase_ y _CreditPurchase_, y `Promotion` con _Financing_ y _Discount_. En ambos caso se decidió usar una estrategia de tipo `InheritanceType.JOINED`, la misma permite definir campos como "no nulos" (cosa que la estrategia más óptima, `InheritanceType.SINGLE_TABLE`, no permite). Además en ambas casos las subclases tiene pocas columnas en comparación con la clase base. Creo que es un buen compromiso entre entre consistencia del modelo (ej: asegurar que no se agreguen campos nulos) y optimización.
+
 ### Otros
 
 - En la clase `Quota`, por conveniencia, se cambiaron los tipos de datos de los attributos `month`y `year`, ambos originalmente `String` a `int`
