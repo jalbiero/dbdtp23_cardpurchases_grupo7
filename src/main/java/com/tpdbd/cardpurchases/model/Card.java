@@ -34,7 +34,7 @@ public class Card {
     @Column(nullable = false)
     private LocalDate expirationDate;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany 
     @JoinTable(
         name="purchase",
         joinColumns=@JoinColumn(name="card_id"),

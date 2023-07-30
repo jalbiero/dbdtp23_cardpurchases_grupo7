@@ -29,7 +29,7 @@ public class CardHolder {
     @Column(nullable = false)
     private LocalDate entry;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany
     @JoinTable(
         name="card",
         joinColumns=@JoinColumn(name="card_holder_id"),

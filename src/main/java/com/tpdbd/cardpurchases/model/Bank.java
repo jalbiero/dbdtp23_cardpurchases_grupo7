@@ -23,14 +23,14 @@ public class Bank {
     @Column(length = 20, nullable = false)
     private String telephone;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany 
     @JoinTable(
         name="promotion",
         joinColumns=@JoinColumn(name="bank_id"),
         inverseJoinColumns=@JoinColumn(name="id"))
     private List<Promotion> promotions;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany 
     @JoinTable(
         name="card",
         joinColumns=@JoinColumn(name="bank_id"),

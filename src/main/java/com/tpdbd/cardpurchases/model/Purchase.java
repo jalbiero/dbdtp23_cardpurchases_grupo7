@@ -34,7 +34,7 @@ public abstract class Purchase {
     @Column(nullable = false)
     private float finalAmount;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany 
     @JoinTable(
         name="quota",
         joinColumns=@JoinColumn(name="purchase_id"),

@@ -33,7 +33,7 @@ public class Payment {
     @Column(nullable = false)
     private float totalPrice;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany
     @JoinTable(
         name="quota",
         joinColumns=@JoinColumn(name="payment_id"),
