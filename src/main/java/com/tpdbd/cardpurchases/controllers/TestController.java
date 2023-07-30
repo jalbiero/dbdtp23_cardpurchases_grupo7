@@ -139,7 +139,4 @@ public class TestController {
         result.put("codes", this.service.getPromotionCodes());
         return result;
     }
-
-
-
 }

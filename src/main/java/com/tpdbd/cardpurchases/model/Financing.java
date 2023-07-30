@@ -1,13 +1,17 @@
 package com.tpdbd.cardpurchases.model;
 
 import java.time.LocalDate;
+
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 
 @Entity
 public class Financing extends Promotion {
 
+    @Column(nullable = false)
     private int numberOfQuotas;
 
+    @Column(nullable = true)
     private float interest;
 
     public Financing() {
@@ -46,9 +50,4 @@ public class Financing extends Promotion {
         this.interest = interest;
     }
 
-    @Override
-    public String toString() {
-        return "Financing [numberOfQuotas=" + numberOfQuotas + ", interest=" + interest + "]";
-    }
-   
 }

@@ -118,7 +118,7 @@ public interface ResponseDTO {
             return switch (promotion) {
                 case com.tpdbd.cardpurchases.model.Discount d -> Discount.fromModel(d, numOfPurchases);
                 case com.tpdbd.cardpurchases.model.Financing f -> Financing.fromModel(f, numOfPurchases);
-                default -> throw new IllegalArgumentException("Unknow type of promotion");
+                default -> throw new IllegalArgumentException("Unknown type of promotion");
             };
         }
     }
@@ -197,7 +197,7 @@ public interface ResponseDTO {
             return switch (purchase) {
                 case com.tpdbd.cardpurchases.model.CashPurchase ca -> CashPurchase.fromModel(ca);
                 case com.tpdbd.cardpurchases.model.CreditPurchase cr -> CreditPurchase.fromModel(cr);
-                default -> throw new IllegalArgumentException("Unknow type of purchase");
+                default -> throw new IllegalArgumentException("Unknown type of purchase");
             };
         }
     }

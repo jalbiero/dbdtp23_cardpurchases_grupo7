@@ -1,8 +1,7 @@
 package com.tpdbd.cardpurchases.model;
 
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import jakarta.persistence.*;
 
@@ -12,17 +11,31 @@ public class Bank {
     @GeneratedValue
     private Long id;
 
+    @Column(length = 50, nullable = false)
     private String name;
 
-    @Column(unique = true)
+    @Column(unique = true, length = 20, nullable = false)
     private String cuit;
 
+    @Column(length = 200, nullable = false)
     private String address;
 
+    @Column(length = 20, nullable = false)
     private String telephone;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    private Set<Promotion> promotions;
+    @OneToMany 
+    @JoinTable(
+        name="promotion",
+        joinColumns=@JoinColumn(name="bank_id"),
+        inverseJoinColumns=@JoinColumn(name="id"))
+    private List<Promotion> promotions;
+
+    @OneToMany 
+    @JoinTable(
+        name="card",
+        joinColumns=@JoinColumn(name="bank_id"),
+        inverseJoinColumns=@JoinColumn(name="id"))
+    private List<Card> cards;
 
     public Bank() {
     }
@@ -32,7 +45,7 @@ public class Bank {
         this.cuit = cuit;
         this.address = address;
         this.telephone = telephone;
-        this.promotions = new LinkedHashSet<Promotion>();
+        this.promotions = new ArrayList<Promotion>();
     }
 
     public Long getId() {
@@ -71,21 +84,11 @@ public class Bank {
         this.telephone = telephone;
     }
 
-    public Set<Promotion> getPromotions() {
-        return Collections.unmodifiableSet(this.promotions);
+    public List<Promotion> getPromotions() {
+        return this.promotions;
     }
 
-    public boolean addPromotion(Promotion promotion) {
-        return this.promotions.add(promotion);
-    }
-
-    public boolean removePromotion(Promotion promotion) {
-        return this.promotions.remove(promotion);
-    }
-
-    @Override
-    public String toString() {
-        return "Bank [id=" + id + ", name=" + name + ", cuit=" + cuit + ", address=" + address + ", telephone="
-                + telephone + ", promotions=" + promotions + "]";
+    public List<Card> getCards() {
+        return this.cards;
     }
 }

@@ -1,9 +1,8 @@
 package com.tpdbd.cardpurchases.model;
 
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import jakarta.persistence.*;
 
@@ -13,21 +12,33 @@ public class Payment {
     @GeneratedValue
     private Long id;
 
+    @Column(length = 50, nullable = false)
     private String code;
 
+    @Column(nullable = false)
     private int month;
 
+    @Column(nullable = false)
     private int year;
 
-    // TODO See comments in ResponseDTO.MonthlyPayment about these 3 attribues
+    @Column(nullable = false)
     private LocalDate firstExpiration;
+
+    @Column(nullable = false)
     private LocalDate secondExpiration;
+
+    @Column(nullable = false)
     private float surcharge; 
 
+    @Column(nullable = false)
     private float totalPrice;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    private Set<Quota> quotas;
+    @OneToMany
+    @JoinTable(
+        name="quota",
+        joinColumns=@JoinColumn(name="payment_id"),
+        inverseJoinColumns=@JoinColumn(name="id"))
+    private List<Quota> quotas;
 
     // This allows an easy navigation to the card used in the payment (another
     // complex way it is to use one of the associated quotas in order to reach 
@@ -55,7 +66,7 @@ public class Payment {
         this.secondExpiration = secondExpiration;
         this.surcharge = surcharge;
         this.totalPrice = totalPrice;
-        this.quotas = new LinkedHashSet<Quota>();
+        this.quotas = new ArrayList<Quota>();
         this.card = card;
     }
 
@@ -119,16 +130,8 @@ public class Payment {
         this.totalPrice = totalPrice;
     }
 
-    public Set<Quota> getQuotas() {
-        return Collections.unmodifiableSet(this.quotas);
-    }
-
-    public void addQuota(Quota quota) {
-        this.quotas.add(quota);
-    }
-
-    public void removeQuota(Quota quota) {
-        this.quotas.remove(quota);
+    public List<Quota> getQuotas() {
+        return this.quotas;
     }
 
     public Card getCard() {
@@ -138,12 +141,4 @@ public class Payment {
     public void setCard(Card card) {
         this.card = card;
     }
-
-    @Override
-    public String toString() {
-        return "Payment [id=" + id + ", code=" + code + ", month=" + month + ", year=" + year + ", firstExpiration="
-                + firstExpiration + ", secondExpiration=" + secondExpiration + ", surcharge=" + surcharge
-                + ", totalPrice=" + totalPrice + ", quotas=" + quotas + ", card=" + card + "]";
-    }
-
 }

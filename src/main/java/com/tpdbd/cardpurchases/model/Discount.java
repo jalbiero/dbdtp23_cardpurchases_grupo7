@@ -1,15 +1,20 @@
 package com.tpdbd.cardpurchases.model;
 
 import java.time.LocalDate;
+
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 
 @Entity
 public class Discount extends Promotion {
 
+    @Column(nullable = false)
     private float discountPercentage;
 
+    @Column(nullable = false)
     private float priceCap;
 
+    @Column(nullable = false)
     private boolean onlyCash; 
 
     public Discount() {
@@ -56,11 +61,5 @@ public class Discount extends Promotion {
 
     public void setOnlyCash(boolean onlyCash) {
         this.onlyCash = onlyCash;
-    }
-
-    @Override
-    public String toString() {
-        return "Discount [discountPercentage=" + discountPercentage + ", priceCap=" + priceCap + ", onlyCash="
-                + onlyCash + "]";
     }
 }

@@ -34,14 +34,21 @@ import com.tpdbd.cardpurchases.model.Quota;
 import com.tpdbd.cardpurchases.repositories.BankRepository;
 import com.tpdbd.cardpurchases.repositories.CardHolderRepository;
 import com.tpdbd.cardpurchases.repositories.CardRepository;
+import com.tpdbd.cardpurchases.repositories.PaymentRepository;
+import com.tpdbd.cardpurchases.repositories.PromotionRepository;
 import com.tpdbd.cardpurchases.repositories.PurchaseRepository;
+import com.tpdbd.cardpurchases.repositories.QuotaRepository;
 import com.tpdbd.cardpurchases.services.TestDataGeneratorService;
 import com.tpdbd.cardpurchases.util.SequenceGenerator;
+import com.tpdbd.cardpurchases.util.TransactionalCaller;
 import com.tpdbd.cardpurchases.util.TriFunction;
 
 import jakarta.annotation.Nullable;
-import jakarta.transaction.Transactional;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.PersistenceUnit;
 import net.datafaker.Faker;
+
 
 /**
  * Store entity
@@ -61,13 +68,19 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
     @Autowired private BankRepository bankRepository;
     @Autowired private CardHolderRepository cardHolderRepository;
     @Autowired private CardRepository cardRepository;
+    @Autowired private PaymentRepository paymentRepository;
+    @Autowired private PromotionRepository promotionRepository;
     @Autowired private PurchaseRepository<CashPurchase> cashRepository; 
     @Autowired private PurchaseRepository<CreditPurchase> creditRepository; 
+    @Autowired private QuotaRepository quotaRespository;
+
+    @PersistenceUnit 
+    private EntityManagerFactory entityManagerFactory;
 
     private Random random = new Random(0); // Same seed (0) -> all is "repeatable"
     private Faker faker; 
 
-    private SequenceGenerator cuitGenerator = new SequenceGenerator();
+    private SequenceGenerator cuitGenerator = new SequenceGenerator("cuit");
     private SequenceGenerator promotionCode = new SequenceGenerator("promo");
     private SequenceGenerator paymentCode = new SequenceGenerator("payment");
     private Iterable<Store> stores;
@@ -82,23 +95,43 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
     }
 
     @Override
-    @Transactional
     public void generateData() {
-        this.stores = generateStores();
+        try (var tc = new TransactionalCaller(this.entityManagerFactory.createEntityManager())) {
+            tc.call((EntityManager em) -> {
+                this.stores = generateStores();
 
-        var banks = this.bankRepository.saveAll(generateBanksAndPromotions(this.stores));
-        var cardHolders = this.cardHolderRepository.saveAll(generateCardHolders());
-        var cards = this.cardRepository.saveAll(generateCards(banks, cardHolders));
+                generateBanks();
 
-        var cashPurchases = generateCashPurchases(this.stores, cards);
-        var creditPurchases = generateCreditPurchases(this.stores, cards);
+                var banks = this.bankRepository.findAll();
 
-        generatePaymentsFor(Stream.concat(
-            StreamSupport.stream(cashPurchases.spliterator(), false),
-            StreamSupport.stream(creditPurchases.spliterator(), false)));
+                generatePromotions(banks, this.stores);
+                generateCardHolders();
+    
+                var cardHolders = this.cardHolderRepository.findAll();
+                generateCards(banks, cardHolders);
 
-        this.cashRepository.saveAll(cashPurchases);
-        this.creditRepository.saveAll(creditPurchases);
+                var cards = this.cardRepository.findAll();
+                generateCashPurchases(this.stores, cards, em);
+                generateCreditPurchases(this.stores, cards, em);
+
+                var cashPurchases = this.cashRepository.findAll();
+                generateQuotasTo(cashPurchases);
+
+                var creditPurchases = this.creditRepository.findAll();
+                generateQuotasTo(creditPurchases);
+            });
+
+            // Payments need all previous data saved in the db
+            tc.call((EntityManager em) -> {
+                generatePaymentsFor(Stream.concat(
+                    StreamSupport.stream(this.cashRepository.findAll().spliterator(), false),
+                    StreamSupport.stream(this.creditRepository.findAll().spliterator(), false)), em);
+            });
+            
+        }
+        catch (Exception ex) {
+            System.err.println("Unexpected error: " + ex.getStackTrace().toString()); // TODO Add a proper logging
+        }
     }
 
     @Override
@@ -216,13 +249,7 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
             .generate();
     }
 
-    /**
-     * Generates a random list of Banks (and their Promotions)
-     * @return
-     */
-    private Iterable<Bank> generateBanksAndPromotions(Iterable<Store> stores) {        
-        // For the sake of clearity, it generates Banks first and later 
-        // their promotions for each one of them
+    private Iterable<Bank> generateBanks() {
         List<Bank> banks = this.faker.collection(() -> new Bank(
                 this.faker.company().name(), 
                 this.cuitGenerator.getNextValue(), 
@@ -232,18 +259,28 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
             .len(getIntParam("numOfBanks"))
             .generate();
 
+        return this.bankRepository.saveAll(banks);
+    }
+
+    /**
+     * Generates a random list of Banks (and their Promotions)
+     * @return
+     */
+    private Iterable<Promotion> generatePromotions(Iterable<Bank> banks, Iterable<Store> stores) {        
+        var promotions = new ArrayList<Promotion>();
+
         banks.forEach(bank -> {
             // Asumption: 
             //   - Each Bank will emit both types of promotions (Discount and 
-            //     Financing) for each promoted Store, so at most, maxNumOfPromotionsPerBank * 2.
+            //     Financing) for each promoted Store, so at most, numOfStores * 2.
             //   - All banks use the same generator of promotion codes, so 
             //     promotions across all banks have a unique code.
-            getRandomItemsFrom(stores, this.faker.number().numberBetween(1, getIntParam("maxNumOfPromotionsPerBank")))
+            getRandomItemsFrom(stores, this.faker.number().numberBetween(1, getIntParam("numOfStores")))
                 .forEach(promotedStore -> {
                     var validityStart = getFakeDate();
                     var validityEnd = getFakeDate(validityStart);
 
-                    bank.addPromotion(new Discount(
+                    promotions.add(new Discount(  
                         bank,
                         this.promotionCode.getNextValue(), 
                         this.faker.company().catchPhrase(), 
@@ -265,7 +302,7 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
                         ? 0.f 
                         : this.faker.number().numberBetween(1, getIntParam("maxPromoInterest")) / 100.f;
 
-                    bank.addPromotion(new Financing(
+                    promotions.add(new Financing(
                         bank,
                         this.promotionCode.getNextValue(), 
                         this.faker.company().catchPhrase(), 
@@ -279,7 +316,7 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
                 });
             });
 
-        return banks;
+        return this.promotionRepository.saveAll(promotions);
     }
 
     /**
@@ -287,9 +324,11 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
      * @return
      */
     private Iterable<CardHolder> generateCardHolders() {
-        return this.faker.collection(() -> new CardHolder(
+        Iterable<CardHolder> cardHolders = 
+            this.faker.collection(() -> new CardHolder(
                 this.faker.name().fullName(),
-                this.faker.idNumber().valid(),
+                // faker.idNumber() is not good fot DNI, it generes IDs with hyphens
+                String.valueOf(this.faker.number().numberBetween(1, 99_999_999)),
                 Integer.toString(this.faker.number().positive()), 
                 this.faker.address().fullAddress(), 
                 this.faker.phoneNumber().cellPhone(), 
@@ -297,6 +336,8 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
             )
             .len(getIntParam("numOfCardHolders"))
             .generate();
+
+        return this.cardHolderRepository.saveAll(cardHolders);
     }
 
     /**
@@ -325,7 +366,7 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
                 });
             });
 
-        return cards;
+        return this.cardRepository.saveAll(cards);
     }
 
     /**
@@ -334,11 +375,12 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
      * @param cards
      * @return
      */
-    private Iterable<CashPurchase> generateCashPurchases(Iterable<Store> stores, Iterable<Card> cards) {        
-        return generatePurchases(
+    private Iterable<CashPurchase> generateCashPurchases(Iterable<Store> stores, Iterable<Card> cards, EntityManager entityManager) { 
+        var purchases = generatePurchases(
             getIntParam("maxNumOfCashPurchasesPerCard"),
             stores, 
             cards, 
+            entityManager,
             (store, card, promotions) -> {
                 var promo = promotions.stream()
                     .filter(p -> Discount.class.isInstance(p))
@@ -366,10 +408,10 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
                     finalAmount,
                     storeDiscount);
 
-                generateQuotasTo(purchase, 1, finalAmount);
-
                 return purchase;
             });
+
+        return this.cashRepository.saveAll(purchases);
     }
 
     /**
@@ -379,11 +421,12 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
      * @param cards
      * @return
      */
-    private Iterable<CreditPurchase> generateCreditPurchases(Iterable<Store> stores, Iterable<Card> cards) {
-        return generatePurchases(
+    private  Iterable<CreditPurchase> generateCreditPurchases(Iterable<Store> stores, Iterable<Card> cards, EntityManager entityManager) {
+        var purchases = generatePurchases(
             getIntParam("maxNumOfCreditPurchasesPerCard"), 
             stores, 
             cards, 
+            entityManager,
             (store, card, promotions) -> {
                 // TODO I am not sure about the following way of calculating the 'finalAmount' (1st apply the 
                 //      discount promotion to get 'disAmount', and 2nd apply the financial promotion interest
@@ -447,10 +490,10 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
                     finInterest,
                     finNumOfQuotas);
 
-                generateQuotasTo(purchase, finNumOfQuotas, finalAmount);
-
                 return purchase;
             });
+
+        return this.creditRepository.saveAll(purchases);
     }
 
     /**
@@ -467,6 +510,7 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
         Iterable<T> generatePurchases(int maxNumOfPurchases,
                                       Iterable<Store> stores, 
                                       Iterable<Card> cards, 
+                                      EntityManager entityManager,
                                       TriFunction<Store, Card, List<Promotion>, T> purchaseCreator)     
     {
         var purchases = new ArrayList<T>();
@@ -476,15 +520,16 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
 
         cards.forEach(card -> {
             var numOfPurchases = this.random.nextInt(maxNumOfPurchases) + 1;
+            var bank = entityManager.merge(card.getBank()); // re-attach the bank to the current context
 
             getRandomItemsFrom(stores, numOfPurchases)
                 .forEach(store -> {
-                    var promotions = card.getBank().getPromotions().stream()
-                        .filter(promo -> promo.getCuitStore() == store.cuit())
+                    var promotions = bank.getPromotions().stream()
+                        .filter(promo -> promo.getCuitStore().equals(store.cuit()))
                         .toList();
+                     
 
                     assert promotions.size() <=2; // A bank has at most 2 promotions for each store
-
                     purchases.add(purchaseCreator.apply(store, card, promotions));
                 });
         });
@@ -492,28 +537,45 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
         return purchases;
     }
 
-    private void generateQuotasTo(Purchase purchase, int numOfQuotas, float finalAmount) {
-        if (numOfQuotas == 0) 
-            return;
+    /**
+     * Generates quotas to each purchase in the specified list of them
+     * @param <T>
+     * @param purchases
+     * @return
+     */
+    private <T extends Purchase>
+        Iterable<Quota> generateQuotasTo(Iterable<T> purchases) 
+    { 
+        var quotas = new ArrayList<Quota>();
 
-        var shopDate = getFakeDate(purchase.getCard().getSince());
-        var amountPerQuota = finalAmount / numOfQuotas;
+        purchases.forEach(purchase -> {
+            var numOfQuotas = switch (purchase) {
+                case CreditPurchase d -> d.getNumberOfQuotas();
+                case CashPurchase f -> 1;
+                default -> throw new IllegalArgumentException("Unknown type of Purchase");
+            };
 
-        // Adjust the number of quotas if they exceed the expiration date of the credit card
-        var monthsForExpiration = ChronoUnit.MONTHS.between(purchase.getCard().getExpirationDate(), shopDate);
-        var finalNumOfQuotas = numOfQuotas > monthsForExpiration ? monthsForExpiration : numOfQuotas;
+            var shopDate = getFakeDate(purchase.getCard().getSince());
+            var amountPerQuota = purchase.getFinalAmount() / numOfQuotas;
 
-        for (int i=1; i <= finalNumOfQuotas; i++) {
-            // Each quota is set to the following month of the previous one
-            var paymentDate = shopDate.plusMonths(i);
+            // Adjust the number of quotas if they exceed the expiration date of the credit card
+            var monthsForExpiration = ChronoUnit.MONTHS.between(purchase.getCard().getExpirationDate(), shopDate);
+            var finalNumOfQuotas = numOfQuotas > monthsForExpiration ? monthsForExpiration : numOfQuotas;
 
-            purchase.addQuota(new Quota(
-                purchase,
-                i, 
-                amountPerQuota, 
-                paymentDate.getMonthValue(),
-                paymentDate.getYear()));
-        }
+            for (int i=1; i <= finalNumOfQuotas; i++) {
+                // Each quota is set to the following month of the previous one
+                var paymentDate = shopDate.plusMonths(i);
+
+                quotas.add(new Quota(
+                    purchase,
+                    i,
+                    amountPerQuota, 
+                    paymentDate.getMonthValue(),
+                    paymentDate.getYear()));
+            }
+        });
+
+        return this.quotaRespository.saveAll(quotas);
     }
 
     /**
@@ -521,10 +583,11 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
      * same period of time (one payment for them)
      * @param purchases
      */
-    private void generatePaymentsFor(Stream<Purchase> purchases) {
+    private void generatePaymentsFor(Stream<Purchase> purchases, EntityManager entityManager) {
         var paymentsUntil = getDateParam("generatePaymentsUntil");
 
         purchases
+            .map(purchase -> entityManager.merge(purchase)) // re-attach each purchae to the current context
             .collect(Collectors.groupingBy(Purchase::getCard))
             .values()
             .forEach((purchasesByCard) -> {
@@ -556,12 +619,14 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
                             totalPrice,
                             card);
 
+                        final var savedPayment = this.paymentRepository.save(payment);
+
                         // Set the bi-directional relationship
-                        // TODO Check if this is entirely necessary
                         quotas.forEach(quota -> {
-                            payment.addQuota(quota);
-                            quota.setPayment(payment);
+                            quota.setPayment(savedPayment);
                         });
+
+                        this.quotaRespository.saveAll(quotas);
                     }); 
             });
     }

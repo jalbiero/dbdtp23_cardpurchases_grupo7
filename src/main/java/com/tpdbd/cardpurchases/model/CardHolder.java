@@ -1,6 +1,8 @@
 package com.tpdbd.cardpurchases.model;
 
 import java.time.LocalDate;
+import java.util.List;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -9,19 +11,30 @@ public class CardHolder {
     @GeneratedValue
     private Long id;
 
+    @Column(length = 50, nullable = false)
     private String completeName;
 
-    @Column(unique = true)
+    @Column(unique = true, length = 8, nullable = false)
     private String dni;
 
-    @Column(unique = true)
+    @Column(unique = true, length = 20, nullable = false)
     private String cuil;
 
+    @Column(length = 200, nullable = false)
     private String address;
 
+    @Column(length = 20, nullable = false)
     private String telephone;
 
+    @Column(nullable = false)
     private LocalDate entry;
+
+    @OneToMany
+    @JoinTable(
+        name="card",
+        joinColumns=@JoinColumn(name="card_holder_id"),
+        inverseJoinColumns=@JoinColumn(name="id"))
+    private List<Card> cards;
 
     public CardHolder() {
     }
@@ -94,9 +107,7 @@ public class CardHolder {
         this.entry = entry;
     }
 
-    @Override
-    public String toString() {
-        return "CardHolder [id=" + id + ", completeName=" + completeName + ", dni=" + dni + ", cuil=" + cuil
-                + ", address=" + address + ", telephone=" + telephone + ", entry=" + entry + "]";
+    public List<Card> getCards() {
+        return this.cards;
     }
 }

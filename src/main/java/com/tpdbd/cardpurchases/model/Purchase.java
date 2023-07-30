@@ -1,36 +1,45 @@
 package com.tpdbd.cardpurchases.model;
 
-import java.util.Collections;
-import java.util.LinkedHashSet;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 
 @Entity
-@Inheritance
+@Inheritance(strategy = InheritanceType.JOINED)  // This allows non nullable fields in subclasses
 public abstract class Purchase {
     @Id
     @GeneratedValue
     private Long id;
 
     @ManyToOne
+    @JoinColumn(nullable = false)
     private Card card;
 
     @Column(nullable = true)
     private String paymentVoucher;
 
+    @Column(length = 50, nullable = false)
     private String store;
 
+    @Column(length = 20, nullable = false)
     private String cuitStore;
 
+    @Column(nullable = false)
     private float amount;
 
+    @Column(nullable = false)
     private float finalAmount;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    private Set<Quota> quotas;
+    @OneToMany 
+    @JoinTable(
+        name="quota",
+        joinColumns=@JoinColumn(name="purchase_id"),
+        inverseJoinColumns=@JoinColumn(name="id"))
+    private List<Quota> quotas;
 
     public Purchase() {
     }
@@ -49,7 +58,7 @@ public abstract class Purchase {
         this.cuitStore = cuitStore;
         this.amount = amount;
         this.finalAmount = finalAmount;
-        this.quotas = new LinkedHashSet<Quota>();
+        this.quotas = new ArrayList<Quota>();
     }
 
     public long getId() {
@@ -104,22 +113,15 @@ public abstract class Purchase {
         this.finalAmount = finalAmount;
     }
 
-    public Set<Quota> getQuotas() {
-        return Collections.unmodifiableSet(this.quotas);
+    public List<Quota> getQuotas() {
+        return this.quotas;
     }
 
     public boolean addQuota(Quota quota) {
         return this.quotas.add(quota);
     }
 
-    public boolean removeQuota(Quota quota) {
-        return this.quotas.remove(quota);
-    }
-
-    @Override
-    public String toString() {
-        return "Purchase [id=" + id + ", card=" + card + ", paymentVoucher=" + paymentVoucher + ", store=" + store
-                + ", cuitStore=" + cuitStore + ", amount=" + amount + ", finalAmount=" + finalAmount + ", quotas="
-                + quotas + "]";
-    }
+    // public boolean removeQuota(Quota quota) {
+    //     return this.quotas.remove(quota);
+    //}
 }

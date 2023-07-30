@@ -12,5 +12,7 @@ public interface PromotionService {
  
     List<Promotion> GetAvailablePromotions(String cuitStore, LocalDate from, LocalDate to);
  
-    void deleteByCode(String code);    
+    void deleteByCode(String code);
+    
+    void save(Promotion promotion);
 }

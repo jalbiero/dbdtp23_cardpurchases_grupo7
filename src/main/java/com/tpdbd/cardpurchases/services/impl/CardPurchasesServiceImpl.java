@@ -42,7 +42,10 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
     @Override
     @Transactional
     public void banksAddDiscountPromotion(long id, RequestDTO.Discount discount) {
-        this.bankService.addDiscountPromotion(id, discount);
+        var bank = this.bankService.find(id);
+        var promo = RequestDTO.Discount.toModel(discount, bank);
+
+        this.promotionService.save(promo);
     }
 
     @Override
