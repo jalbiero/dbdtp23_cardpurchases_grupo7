@@ -309,7 +309,7 @@ public interface ResponseDTO {
             
             // TODO: It is not clear how "Payment.surcharge", "Payment.firstExpiration" and
             //       "Payment.secondExpiration" must be used. Is the Payment class a "payment order"
-            //       or a "payment record"? Sometimes seems to the 1st one, sometimes the 2nd one.
+            //       or a "payment record"? Sometimes seems to be the 1st one, sometimes the 2nd one.
             //       Having said that, and for the sake of simplicity, I will ignore the "Payment.surcharge"
             //       using only the "Payment.totalPrice" to represents the amount of money that
             //       a Card holder has payed in the given period (year and month)            
