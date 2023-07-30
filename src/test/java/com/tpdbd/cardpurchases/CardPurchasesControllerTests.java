@@ -22,7 +22,7 @@ import net.datafaker.Faker;
 import static io.restassured.RestAssured.given;
 
 import java.time.LocalDate;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiFunction;
 
@@ -133,9 +133,9 @@ public class CardPurchasesControllerTests {
         //      are hardcoded (test data is repeatable, but if not, the test will fail.
         //      See TestDataGeneratorService.random for more information about repeatable data)
 
-        final var CARD_ID = 7l; //"5876-1948-6884-1575";
-        final var YEAR = 2021;
-        final var MONTH = 8;
+        final var CARD_ID = 76l; 
+        final var YEAR = 2019;
+        final var MONTH = 3;
 
         given()
             .when()
@@ -171,7 +171,7 @@ public class CardPurchasesControllerTests {
         final var CARD_NUMBER = this.faker.business().creditCardNumber();
 
         // Create a new card
-        var card = new RequestDTO.Card(
+        var newCard = new RequestDTO.Card(
             getSomeBankId(), 
             getSomeCardHolderIds(), 
             CARD_NUMBER,
@@ -179,10 +179,12 @@ public class CardPurchasesControllerTests {
             BASE_DATE,
             BASE_DATE.plusDays(DAYS_TO_EXPIRATION)); 
 
-        given()
+        var newCardId = given()
             .contentType(ContentType.JSON)                    
-            .body(card)
-            .post("/test/cards");
+            .body(newCard)
+            .post("/test/cards")
+            .jsonPath()
+            .getObject("id", Long.class);
         
         // Test some expiration paths
 
@@ -211,7 +213,11 @@ public class CardPurchasesControllerTests {
              .body("$", Matchers.hasSize(0));
 
         // Remove the test card
-        given().delete("/test/cards/{number}", CARD_NUMBER);
+        given()
+            .when()
+                .delete("/test/cards/{id}", newCardId)
+            .then()
+                .statusCode(200);
     }
 
     @Test 
@@ -250,7 +256,7 @@ public class CardPurchasesControllerTests {
         //      See TestDataGeneratorService.random for more information about 
         //      repeatable data)
 
-        final var CREDIT_PURCHASE_ID = 45;
+        final var CREDIT_PURCHASE_ID = 901;
      
         given()
             .when()
@@ -432,7 +438,7 @@ public class CardPurchasesControllerTests {
         return given()
             .get("/test/promotions/codes")
             .jsonPath()
-            .getObject("codes", new TypeRef<LinkedList<String>>(){});
+            .getObject("codes", new TypeRef<ArrayList<String>>(){});
     }
 
 }
