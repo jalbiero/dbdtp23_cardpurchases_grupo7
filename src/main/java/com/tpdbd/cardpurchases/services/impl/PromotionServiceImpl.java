@@ -40,4 +40,9 @@ public class PromotionServiceImpl implements PromotionService {
         if (this.promotionRepository.deleteByCode(code) == 0)
             throw new PromotionNotFoundException(code);
     } 
+
+    @Override
+    public void save(Promotion promotion) {
+        this.promotionRepository.save(promotion);
+    }
 }
