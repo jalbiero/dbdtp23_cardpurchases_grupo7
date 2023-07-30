@@ -121,6 +121,7 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
                 generateQuotasTo(creditPurchases);
             });
 
+            // Payments need all previous data saved in the db
             tc.call((EntityManager em) -> {
                 generatePaymentsFor(Stream.concat(
                     StreamSupport.stream(this.cashRepository.findAll().spliterator(), false),
@@ -131,7 +132,6 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
         catch (Exception ex) {
             System.err.println("Unexpected error: " + ex.getStackTrace().toString()); // TODO Add a proper logging
         }
-
     }
 
     @Override
