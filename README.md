@@ -18,7 +18,7 @@ Para simplificar el desarrollo los tests unitarios son de integración es decir 
 
 El desarrollo se hizo bajo Linux (openSUSE 15.4), no se probó en otras plataformas (macOS, Windows), pero debería funcionar sin problemas en ambas.
 
-Nota: En el archivo [pom.xml](pom.xml) se agregó una tarea (ver `Start-up dependant services`) que automáticamente levanta el docker de SQL mediante `docker compose` tanto al ejecutar la aplicación como al ejecutar sus test unitarios. Todo es automático.
+Nota: En el archivo [pom.xml](pom.xml) se agregó una tarea (ver `Start-up dependant services`) que automáticamente levanta el docker de SQL mediante `docker compose` tanto al ejecutar la aplicación como al ejecutar sus tests unitarios. Todo es automático.
 
 ## Instalación y ejecución
 
@@ -44,7 +44,7 @@ $ mvn spring-boot:run
 
 ### Iniciales
 
-- Se usa Java 19 con habilitación de "preview features" para usar funcionalidad nueva de _pattern matching_, específicamente _switch_ para _instanceof_ (ver [ResponseDTO.java](src/main/java/com/tpdbd/cardpurchases/dto/ResponseDTO.java))
+- Se usa Java 19 con habilitación de "preview features" para usar funcionalidad nueva de _pattern matching_, específicamente _switch_ para _instanceof_ (ej: ver [ResponseDTO.java](src/main/java/com/tpdbd/cardpurchases/dto/ResponseDTO.java))
 - Se actualizaron tipos de datos discontinuados tales como:
   - Anotaciones JPA: En los ejemplos prácticos se usa `javax.persistence.*`, en este trabajo se usa su actualzación `jakarta.persistence.*`
   - Fecha: `java.util.Date` a `java.time.LocalDate`
@@ -58,7 +58,7 @@ Para aislar la funcionalidad pedida de lo que se necesita para probarla se decid
 
 1. El controlador [CardPurchasesController](src/main/java/com/tpdbd/cardpurchases/controllers/CardPurchasesController.java) y su servicio asociado [CardPurchasesService](src/main/java/com/tpdbd/cardpurchases/services/CardPurchasesService.java) implementan solamente lo que se pide como tarea (sus _tests_ unitarios asociados están en [CardPurchasesControllerTests](src/test/java/com/tpdbd/cardpurchases/CardPurchasesControllerTests.java).
 2. El controlador [TestController](src/main/java/com/tpdbd/cardpurchases/controllers/TestController.java) y su servicio asociado [TestService](src/main/java/com/tpdbd/cardpurchases/services/TestService.java) (_tests_ unitarios asociados en [TestControllerTests](src/test/java/com/tpdbd/cardpurchases/TestControllerTests.java)) implementan funcionalidad necesaria para probar lo pedido en la tarea. En una aplicación completa lo pedido sería sólo una parte del total, el cual se complementaría con lo que está en `TestController/TestService`.
-3. Por cuestiones de tiempo la documentación de los _endpoints_ se hace solamente para el controlador `CardPurchasesController` de una forma sencilla agregándose además [swagger para listar/probar los mismos en _runtime_](#documentación-y-prueba-manual-de-los-endpoints-implementados).
+3. Por cuestiones de tiempo la documentación de los _endpoints_ se hace solamente para el controlador `CardPurchasesController` de una forma sencilla agregándose además [swagger para listar/probar los mismos en _runtime_](#documentación-y-prueba-manual-de-los-endpoints-implementados) como se comentó anteriormente.
 
 ### Pruebas
 
@@ -67,9 +67,9 @@ Para las pruebas (tanto manuales con la aplicación funcionando, como para los _
    1. Era muy dependiente de la estructura de datos generada por JPA (un cambio en las anotaciones y la estructura difiere)
    2. Iba a ser necesario tener un archivo similar para Mongo.
 
-En conclusión. El código del servicio trabaja con las entidades del modelo por lo cual es independiente de la base de datos subyacente.
+En conclusión: El código del servicio trabaja con las entidades del modelo por lo cual es independiente de la base de datos subyacente.
 
-La generación de datos se controle mediante el [archivo de propiedades de la aplicación](src/main/resources/application.properties). Por simplicidad, sobre todo para ciertos tests, y a menos que esas propiedades sean modificadas, los datos generados en cada corrida de la aplicación, o de los _test_ unitarios, van a ser los mismos.
+La generación de datos se controla mediante el [archivo de propiedades de la aplicación](src/main/resources/application.properties). Por simplicidad, sobre todo para ciertos tests, y a menos que esas propiedades sean modificadas, los datos generados en cada corrida de la aplicación, o de los _test_ unitarios, van a ser siempre los mismos.
 
 Los _tests_ unitarios se ejecutan con:
 
@@ -86,9 +86,9 @@ En el modelo se tomaron las siguientes decisiones:
   - Longitud máxima de caracteres en caso de las cadenas.
   - Unicidad en los que se requiera (DNI, CUIT, etc)
 - En el caso de colecciones que se mapean a tablas:
-  -  se usó `@JoinTable` (además de por ejemplo `@OneToMany`) para simplificar la generación del modelo en la base. Sin `@JoinTable` se generan tablas extras intermedias que no hacen falta.
+  -  se usó `@JoinTable` (además de por ejemplo `@OneToMany`) para simplificar la generación del modelo en la base. Sin `@JoinTable` se generan tablas extras intermedias que no son óptimas desde el punto de vista del rendimiento.
   -  Se usó además el valor por defecto para el _fetch_ (LAZY) y para las operaciones de cascada (desabilitado) ya que no se tuvo necesidad de activar las mismas.
-- En cuanto a la herencia: Hay 2 grupos de clases que las usan, `Purchase` con _CashPurchase_ y _CreditPurchase_, y `Promotion` con _Financing_ y _Discount_. En ambos caso se decidió usar una estrategia de tipo `InheritanceType.JOINED`, la misma permite definir campos como "no nulos" (cosa que la estrategia más óptima, `InheritanceType.SINGLE_TABLE`, no permite). Además en ambas casos las subclases tiene pocas columnas en comparación con la clase base. Creo que es un buen compromiso entre entre consistencia del modelo (ej: asegurar que no se agreguen campos nulos) y optimización.
+- En cuanto a la herencia: Hay 2 grupos de clases que las usan, `Purchase` con _CashPurchase_ y _CreditPurchase_, y `Promotion` con _Financing_ y _Discount_. En ambos caso se decidió usar una estrategia de tipo `InheritanceType.JOINED`, la misma permite definir campos como "no nulos" (cosa que la estrategia más óptima, `InheritanceType.SINGLE_TABLE`, no permite). Además, en ambas casos las subclases tienen pocas columnas en comparación con la clase base. Creo que es un buen compromiso entre consistencia del modelo (ej: asegurar que no se agreguen campos nulos) y optimización de datos y rendimiento.
 
 ### Otros
 
