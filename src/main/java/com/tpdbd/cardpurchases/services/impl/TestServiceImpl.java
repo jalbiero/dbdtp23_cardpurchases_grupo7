@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.tpdbd.cardpurchases.dto.RequestDTO;
 import com.tpdbd.cardpurchases.model.Bank;
@@ -17,7 +18,7 @@ import com.tpdbd.cardpurchases.services.PromotionService;
 import com.tpdbd.cardpurchases.services.PurchaseService;
 import com.tpdbd.cardpurchases.services.TestService;
 
-import jakarta.transaction.Transactional;
+//import jakarta.transaction.Transactional;
 
 @Service
 public class TestServiceImpl implements TestService {

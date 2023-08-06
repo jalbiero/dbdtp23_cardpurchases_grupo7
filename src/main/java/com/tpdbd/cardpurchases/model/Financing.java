@@ -2,16 +2,18 @@ package com.tpdbd.cardpurchases.model;
 
 import java.time.LocalDate;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
+import org.springframework.data.mongodb.core.mapping.Document;
+// import jakarta.persistence.Column;
+// import jakarta.persistence.Entity;
 
-@Entity
+//@Entity
+@Document
 public class Financing extends Promotion {
 
-    @Column(nullable = false)
+    //@Column(nullable = false)
     private int numberOfQuotas;
 
-    @Column(nullable = true)
+    //@Column(nullable = true)
     private float interest;
 
     public Financing() {

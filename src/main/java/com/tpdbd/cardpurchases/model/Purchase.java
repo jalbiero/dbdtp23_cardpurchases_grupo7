@@ -6,39 +6,43 @@ import java.util.List;
 import java.util.Optional;
 
 import jakarta.annotation.Nullable;
-import jakarta.persistence.*;
 
-@Entity
-@Inheritance(strategy = InheritanceType.JOINED)  // This allows non nullable fields in subclasses
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+//import jakarta.persistence.*;
+
+//@Entity
+//@Inheritance(strategy = InheritanceType.JOINED)  // This allows non nullable fields in subclasses
+@Document
 public abstract class Purchase {
     @Id
-    @GeneratedValue
+    // @GeneratedValue
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(nullable = false)
+    // @ManyToOne
+    // @JoinColumn(nullable = false)
     private Card card;
 
-    @Column(nullable = true)
+    //@Column(nullable = true)
     private String paymentVoucher;
 
-    @Column(length = 50, nullable = false)
+    //@Column(length = 50, nullable = false)
     private String store;
 
-    @Column(length = 20, nullable = false)
+    //@Column(length = 20, nullable = false)
     private String cuitStore;
 
-    @Column(nullable = false)
+    //@Column(nullable = false)
     private float amount;
 
-    @Column(nullable = false)
+    //@Column(nullable = false)
     private float finalAmount;
 
-    @OneToMany 
-    @JoinTable(
-        name="quota",
-        joinColumns=@JoinColumn(name="purchase_id"),
-        inverseJoinColumns=@JoinColumn(name="id"))
+    //@OneToMany 
+    // @JoinTable(
+    //     name="quota",
+    //     joinColumns=@JoinColumn(name="purchase_id"),
+    //     inverseJoinColumns=@JoinColumn(name="id"))
     private List<Quota> quotas;
 
     public Purchase() {

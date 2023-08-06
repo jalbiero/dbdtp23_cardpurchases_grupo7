@@ -15,7 +15,7 @@ public interface ResponseDTO {
     ////////////////////////////////////////////////////////
     @JsonInclude(JsonInclude.Include.NON_ABSENT)
     record Bank(
-        long id,
+        String id,
         String name,
         String cuit,
         String address,
@@ -57,7 +57,7 @@ public interface ResponseDTO {
         String cardholderNameInCard,
         LocalDate since,
         LocalDate expirationDate,
-        long bankId, // In real life part of the card number identifies the bank
+        String bankId, // In real life part of the card number identifies the bank
         long cardHolderId) // In real life this may not be necessary, the name provides a partial identification
     {
         public static Card fromModel(com.tpdbd.cardpurchases.model.Card card) {

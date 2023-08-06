@@ -3,37 +3,40 @@ package com.tpdbd.cardpurchases.model;
 import java.time.LocalDate;
 import java.util.List;
 
-import jakarta.persistence.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+//import jakarta.persistence.*;
 
-@Entity
+//@Entity
+@Document
 public class CardHolder {
     @Id
-    @GeneratedValue
+    // @GeneratedValue
     private Long id;
 
-    @Column(length = 50, nullable = false)
+    //@Column(length = 50, nullable = false)
     private String completeName;
 
-    @Column(unique = true, length = 8, nullable = false)
+    //@Column(unique = true, length = 8, nullable = false)
     private String dni;
 
-    @Column(unique = true, length = 20, nullable = false)
+    //@Column(unique = true, length = 20, nullable = false)
     private String cuil;
 
-    @Column(length = 200, nullable = false)
+    //@Column(length = 200, nullable = false)
     private String address;
 
-    @Column(length = 20, nullable = false)
+    //@Column(length = 20, nullable = false)
     private String telephone;
 
-    @Column(nullable = false)
+    //@Column(nullable = false)
     private LocalDate entry;
 
-    @OneToMany
-    @JoinTable(
-        name="card",
-        joinColumns=@JoinColumn(name="card_holder_id"),
-        inverseJoinColumns=@JoinColumn(name="id"))
+    //@OneToMany
+    // @JoinTable(
+    //     name="card",
+    //     joinColumns=@JoinColumn(name="card_holder_id"),
+    //     inverseJoinColumns=@JoinColumn(name="id"))
     private List<Card> cards;
 
     public CardHolder() {
