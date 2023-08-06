@@ -9,6 +9,7 @@ import com.tpdbd.cardpurchases.errors.CardHolderNotFoundException;
 import com.tpdbd.cardpurchases.model.CardHolder;
 import com.tpdbd.cardpurchases.repositories.CardHolderRepository;
 import com.tpdbd.cardpurchases.services.CardHolderService;
+import com.tpdbd.cardpurchases.util.StreamHelpers;
 
 @Service
 public class CardHolderServiceImpl implements CardHolderService {
@@ -23,8 +24,10 @@ public class CardHolderServiceImpl implements CardHolderService {
     }
 
     @Override
-    public List<Long> findAllIds() {
-        return this.cardHolderRepository.findAllIds();
+    public List<String> findAllIds() {
+        return StreamHelpers.toStream(this.cardHolderRepository.findAll())
+            .map(cardHolder -> cardHolder.getId())
+            .toList();
     }
     
 }

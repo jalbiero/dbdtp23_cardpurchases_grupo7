@@ -102,13 +102,13 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
 
                 generateBanks();
 
-            //    var banks = this.bankRepository.findAll();
+                var banks = this.bankRepository.findAll();
 
             //     generatePromotions(banks, this.stores);
-            //     generateCardHolders();
+                generateCardHolders();
     
-            //     var cardHolders = this.cardHolderRepository.findAll();
-            //     generateCards(banks, cardHolders);
+                var cardHolders = this.cardHolderRepository.findAll();
+                generateCards(banks, cardHolders);
 
             //     var cards = this.cardRepository.findAll();
             //     generateCashPurchases(this.stores, cards); //, em);

@@ -85,7 +85,7 @@ public class TestServiceImpl implements TestService {
     }
 
     @Override
-    public List<Long> getCardHolderIds() {
+    public List<String> getCardHolderIds() {
         return this.cardHolderService.findAllIds();
     }
 

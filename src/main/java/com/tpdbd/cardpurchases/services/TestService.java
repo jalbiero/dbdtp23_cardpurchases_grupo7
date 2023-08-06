@@ -19,7 +19,7 @@ public interface TestService {
     String addCard(RequestDTO.Card card);
     void deleteCard(String id);
 
-    List<Long> getCardHolderIds();
+    List<String> getCardHolderIds();
 
     List<Long> getPaymentIds();
     Payment getPayment(Long id);

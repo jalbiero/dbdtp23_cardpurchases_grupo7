@@ -89,8 +89,8 @@ public class TestController {
     // Card holders
 
     @GetMapping("/cardHolders/ids")
-    Map<String, List<Long>> getCardHolderIds() {
-        var result = new LinkedHashMap<String, List<Long>>();
+    Map<String, List<String>> getCardHolderIds() {
+        var result = new LinkedHashMap<String, List<String>>();
         result.put("ids", this.service.getCardHolderIds());
         return result;
     }
