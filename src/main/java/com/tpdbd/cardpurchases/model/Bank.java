@@ -3,38 +3,42 @@ package com.tpdbd.cardpurchases.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.persistence.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-@Entity
+//import jakarta.persistence.*;
+
+//@Entity
+@Document(collection = "banks")
 public class Bank {
     @Id
-    @GeneratedValue
-    private Long id;
+    //@GeneratedValue
+    private String id;
 
-    @Column(length = 50, nullable = false)
+    //@Column(length = 50, nullable = false)
     private String name;
 
-    @Column(unique = true, length = 20, nullable = false)
+    //@Column(unique = true, length = 20, nullable = false)
     private String cuit;
 
-    @Column(length = 200, nullable = false)
+    //@Column(length = 200, nullable = false)
     private String address;
 
-    @Column(length = 20, nullable = false)
+    //@Column(length = 20, nullable = false)
     private String telephone;
 
-    @OneToMany 
-    @JoinTable(
-        name="promotion",
-        joinColumns=@JoinColumn(name="bank_id"),
-        inverseJoinColumns=@JoinColumn(name="id"))
+    //@OneToMany 
+    // @JoinTable(
+    //     name="promotion",
+    //     joinColumns=@JoinColumn(name="bank_id"),
+    //     inverseJoinColumns=@JoinColumn(name="id"))
     private List<Promotion> promotions;
 
-    @OneToMany 
-    @JoinTable(
-        name="card",
-        joinColumns=@JoinColumn(name="bank_id"),
-        inverseJoinColumns=@JoinColumn(name="id"))
+    //@OneToMany 
+    // @JoinTable(
+    //     name="card",
+    //     joinColumns=@JoinColumn(name="bank_id"),
+    //     inverseJoinColumns=@JoinColumn(name="id"))
     private List<Card> cards;
 
     public Bank() {
@@ -48,7 +52,7 @@ public class Bank {
         this.promotions = new ArrayList<Promotion>();
     }
 
-    public Long getId() {
+    public String getId() {
         return this.id;
     }
 

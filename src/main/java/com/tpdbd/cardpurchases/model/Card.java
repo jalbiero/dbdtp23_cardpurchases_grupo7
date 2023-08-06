@@ -3,42 +3,46 @@ package com.tpdbd.cardpurchases.model;
 import java.time.LocalDate;
 import java.util.List;
 
-import jakarta.persistence.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-@Entity 
+//import jakarta.persistence.*;
+
+//@Entity 
+@Document
 public class Card {
     @Id
-    @GeneratedValue
+    // @GeneratedValue
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(nullable = false)
+    // @ManyToOne
+    // @JoinColumn(nullable = false)
     private Bank bank;
 
-    @ManyToOne 
-    @JoinColumn(nullable = false)
+    // @ManyToOne 
+    // @JoinColumn(nullable = false)
     private CardHolder cardHolder;
 
-    @Column(unique = true, length = 20, nullable = false)
+    //@Column(unique = true, length = 20, nullable = false)
     private String number;
 
-    @Column(length = 3, nullable = false)
+    //@Column(length = 3, nullable = false)
     private String ccv;
 
-    @Column(length = 50, nullable = false)
+    //@Column(length = 50, nullable = false)
     private String cardholderNameInCard;
 
-    @Column(nullable = false)
+    //@Column(nullable = false)
     private LocalDate since;
 
-    @Column(nullable = false)
+    //@Column(nullable = false)
     private LocalDate expirationDate;
 
-    @OneToMany 
-    @JoinTable(
-        name="purchase",
-        joinColumns=@JoinColumn(name="card_id"),
-        inverseJoinColumns=@JoinColumn(name="id"))
+    //@OneToMany 
+    // @JoinTable(
+    //     name="purchase",
+    //     joinColumns=@JoinColumn(name="card_id"),
+    //     inverseJoinColumns=@JoinColumn(name="id"))
     private List<Purchase> purchases;
 
     public Card() {

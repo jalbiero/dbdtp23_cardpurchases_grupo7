@@ -1,16 +1,19 @@
 package com.tpdbd.cardpurchases.model;
 
 import jakarta.annotation.Nullable;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
 
-@Entity
+import org.springframework.data.mongodb.core.mapping.Document;
+// import jakarta.persistence.Column;
+// import jakarta.persistence.Entity;
+
+//@Entity
+@Document
 public class CreditPurchase extends Purchase {
 
-    @Column(nullable = true)
+    //@Column(nullable = true)
     private float interest;
 
-    @Column(nullable = false)
+    //@Column(nullable = false)
     private int numberOfQuotas;
 
     public CreditPurchase() {

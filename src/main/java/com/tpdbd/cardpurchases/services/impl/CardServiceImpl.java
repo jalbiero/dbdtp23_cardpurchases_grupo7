@@ -5,13 +5,14 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.tpdbd.cardpurchases.errors.CardNotFoundException;
 import com.tpdbd.cardpurchases.model.Card;
 import com.tpdbd.cardpurchases.repositories.CardRepository;
 import com.tpdbd.cardpurchases.services.CardService;
 
-import jakarta.transaction.Transactional;
+//import jakarta.transaction.Transactional;
 
 @Service
 public class CardServiceImpl implements CardService {

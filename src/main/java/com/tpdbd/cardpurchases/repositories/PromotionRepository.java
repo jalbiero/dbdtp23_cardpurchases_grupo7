@@ -4,14 +4,16 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.mongodb.repository.Query;
+//import org.springframework.data.jpa.repository.Modifying;
+// import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.tpdbd.cardpurchases.model.Promotion;
 
-import jakarta.transaction.Transactional;
+//import jakarta.transaction.Transactional;
 
 public interface PromotionRepository extends CrudRepository<Promotion, Long> {
    @Query("SELECT p.code FROM Promotion p")
@@ -23,7 +25,7 @@ public interface PromotionRepository extends CrudRepository<Promotion, Long> {
 
    // Performs a logical delete
    @Transactional
-   @Modifying
+   //@Modifying
    @Query(
       "UPDATE Promotion p " + 
       "SET p.deleted = true " + 

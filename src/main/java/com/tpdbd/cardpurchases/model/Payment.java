@@ -4,46 +4,49 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.persistence.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+// import jakarta.persistence.*;
 
-@Entity
+//@Entity
+@Document
 public class Payment {
     @Id
-    @GeneratedValue
+    // @GeneratedValue
     private Long id;
 
-    @Column(length = 50, nullable = false)
+    //@Column(length = 50, nullable = false)
     private String code;
 
-    @Column(nullable = false)
+    //@Column(nullable = false)
     private int month;
 
-    @Column(nullable = false)
+    //@Column(nullable = false)
     private int year;
 
-    @Column(nullable = false)
+    //@Column(nullable = false)
     private LocalDate firstExpiration;
 
-    @Column(nullable = false)
+    //@Column(nullable = false)
     private LocalDate secondExpiration;
 
-    @Column(nullable = false)
+    //@Column(nullable = false)
     private float surcharge; 
 
-    @Column(nullable = false)
+    //@Column(nullable = false)
     private float totalPrice;
 
-    @OneToMany
-    @JoinTable(
-        name="quota",
-        joinColumns=@JoinColumn(name="payment_id"),
-        inverseJoinColumns=@JoinColumn(name="id"))
+    //@OneToMany
+    // @JoinTable(
+    //     name="quota",
+    //     joinColumns=@JoinColumn(name="payment_id"),
+    //     inverseJoinColumns=@JoinColumn(name="id"))
     private List<Quota> quotas;
 
     // This allows an easy navigation to the card used in the payment (another
     // complex way it is to use one of the associated quotas in order to reach 
     // the Purchase and then the Card)
-    @ManyToOne
+    //@ManyToOne
     private Card card;
     
     public Payment() {

@@ -3,32 +3,37 @@ package com.tpdbd.cardpurchases.model;
 import java.util.Optional;
 
 import jakarta.annotation.Nullable;
-import jakarta.persistence.*;
 
-@Entity
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+// import jakarta.persistence.*;
+
+//@Entity
+@Document
 public class Quota {
     @Id
-    @GeneratedValue
+    // @GeneratedValue
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(nullable = false)
+    // @ManyToOne
+    // @JoinColumn(nullable = false)
     private Purchase purchase;
 
-    @Column(nullable = false)
+    //@Column(nullable = false)
     private int number;
 
-    @Column(nullable = false)
+    //@Column(nullable = false)
     private float price;
 
-    @Column(nullable = false)
+    //@Column(nullable = false)
     private int month;
 
-    @Column(nullable = false)
+    //@Column(nullable = false)
     private int year;
 
-    @ManyToOne
-    @JoinColumn(nullable = true)
+    // @ManyToOne
+    // @JoinColumn(nullable = true)
     @Nullable
     private Payment payment;
 
