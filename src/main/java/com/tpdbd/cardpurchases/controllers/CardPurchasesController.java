@@ -67,7 +67,7 @@ public class CardPurchasesController {
      *          }
      */
     @PostMapping("/banks/{id}/addDiscountPromotion")
-    void banksAddDiscountPromotion(@PathVariable long id, 
+    void banksAddDiscountPromotion(@PathVariable String id, 
                                    @RequestBody RequestDTO.Discount discount) 
     {
         this.service.banksAddDiscountPromotion(id, discount);

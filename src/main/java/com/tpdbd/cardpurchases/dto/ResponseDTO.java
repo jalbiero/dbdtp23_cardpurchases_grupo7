@@ -51,7 +51,7 @@ public interface ResponseDTO {
 
     ////////////////////////////////////////////////////////
     record Card(
-        long id,
+        String id,
         String number,
         String ccv,
         String cardholderNameInCard,
@@ -295,7 +295,7 @@ public interface ResponseDTO {
 
     ////////////////////////////////////////////////////////
     record MonthlyPayment(
-        long cardId,
+        String cardId,
         String cardNumber,
         int year, 
         int month, 

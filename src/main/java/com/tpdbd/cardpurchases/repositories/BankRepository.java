@@ -8,7 +8,7 @@ import org.springframework.data.repository.CrudRepository;
 
 import com.tpdbd.cardpurchases.model.Bank;
 
-public interface BankRepository extends CrudRepository<Bank, Long> {
-    @Query("SELECT b.id FROM Bank b")
-    List<Long> findAllIds();
+public interface BankRepository extends CrudRepository<Bank, String> {
+    // @Query("SELECT b.id FROM Bank b")
+    // List<Long> findAllIds();
 }

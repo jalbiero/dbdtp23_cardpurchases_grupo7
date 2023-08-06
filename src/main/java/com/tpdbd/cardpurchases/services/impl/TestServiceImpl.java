@@ -42,29 +42,29 @@ public class TestServiceImpl implements TestService {
 
 
     @Override
-    public List<Long> getBankIds() {
+    public List<String> getBankIds() {
         return this.bankService.findAllIds();
 
     }
 
     @Override
-    public Bank getBank(Long id) {
+    public Bank getBank(String id) {
         return this.bankService.find(id);
     }
 
     @Override
-    public List<Long> getCardIds() {
+    public List<String> getCardIds() {
         return this.cardService.findAllIds();
     }
 
     @Override
-    public Card getCard(long id) {
+    public Card getCard(String id) {
         return this.cardService.find(id);
     }
 
     @Override
     @Transactional
-    public long addCard(RequestDTO.Card card) {
+    public String addCard(RequestDTO.Card card) {
         var bank = this.bankService.find(card.bankId());
         var cardHolder = this.cardHolderService.find(card.cardHolderId());
 
@@ -80,7 +80,7 @@ public class TestServiceImpl implements TestService {
     }
 
     @Override
-    public void deleteCard(long id) {
+    public void deleteCard(String id) {
         this.cardService.delete(id);
     }
 

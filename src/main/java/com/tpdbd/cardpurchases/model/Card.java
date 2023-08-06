@@ -13,7 +13,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Card {
     @Id
     // @GeneratedValue
-    private Long id;
+    private String id;
 
     // @ManyToOne
     // @JoinColumn(nullable = false)
@@ -65,7 +65,7 @@ public class Card {
         this.expirationDate = expirationDate;
     }
 
-    public Long getId() {
+    public String getId() {
         return this.id;
     }
 

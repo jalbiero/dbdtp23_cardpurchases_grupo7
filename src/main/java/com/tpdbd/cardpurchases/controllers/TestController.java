@@ -39,14 +39,14 @@ public class TestController {
     // Banks
 
     @GetMapping("/banks/ids")
-    Map<String, List<Long>> getBankIds() {
-        var result = new LinkedHashMap<String, List<Long>>();
+    Map<String, List<String>> getBankIds() {
+        var result = new LinkedHashMap<String, List<String>>();
         result.put("ids", this.service.getBankIds());
         return result;
     }
 
     @GetMapping("/banks/{id}")
-    ResponseDTO.Bank getBank(@PathVariable Long id) {
+    ResponseDTO.Bank getBank(@PathVariable String id) {
         return ResponseDTO.Bank.fromModel(this.service.getBank(id));
     }
 
@@ -54,14 +54,14 @@ public class TestController {
     // Cards
 
     @GetMapping("/cards/ids")
-    Map<String, List<Long>> getCardIds() {
-        var result = new LinkedHashMap<String, List<Long>>();
+    Map<String, List<String>> getCardIds() {
+        var result = new LinkedHashMap<String, List<String>>();
         result.put("ids", this.service.getCardIds());
         return result;
     }
 
     @GetMapping("/cards/{id}")
-    ResponseDTO.Card getCard(@PathVariable long id) {
+    ResponseDTO.Card getCard(@PathVariable String id) {
         return ResponseDTO.Card.fromModel(this.service.getCard(id));
     }
 
@@ -74,14 +74,14 @@ public class TestController {
      *           }
      */
     @PostMapping("/cards")
-    Map<String, Long> addCard(@RequestBody RequestDTO.Card card) {
-        var result = new LinkedHashMap<String, Long>();
+    Map<String, String> addCard(@RequestBody RequestDTO.Card card) {
+        var result = new LinkedHashMap<String, String>();
         result.put("id", this.service.addCard(card));
         return result;
     }
 
     @DeleteMapping("/cards/{id}")
-    void deleteCard(@PathVariable long id) {
+    void deleteCard(@PathVariable String id) {
         this.service.deleteCard(id);
     }
 

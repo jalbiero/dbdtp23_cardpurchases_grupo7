@@ -9,6 +9,7 @@ import com.tpdbd.cardpurchases.errors.BankNotFoundException;
 import com.tpdbd.cardpurchases.model.Bank;
 import com.tpdbd.cardpurchases.repositories.BankRepository;
 import com.tpdbd.cardpurchases.services.BankService;
+import com.tpdbd.cardpurchases.util.StreamHelpers;
 
 @Service
 public class BankServiceImpl implements BankService {
@@ -16,13 +17,14 @@ public class BankServiceImpl implements BankService {
     private BankRepository bankRepository;
 
     @Override
-    public List<Long> findAllIds() {
-        return this.bankRepository.findAllIds();
-        
+    public List<String> findAllIds() {
+        return StreamHelpers.toStream(this.bankRepository.findAll())
+            .map(bank -> bank.getId())
+            .toList();
     }
 
     @Override
-    public Bank find(Long id) {
+    public Bank find(String id) {
         return this.bankRepository
             .findById(id)
             .orElseThrow(() -> new BankNotFoundException(id));

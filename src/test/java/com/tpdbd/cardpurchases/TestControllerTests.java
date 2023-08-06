@@ -58,7 +58,7 @@ public class TestControllerTests {
             .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
-                .body("id", Matchers.equalTo((int)id));
+                .body("id", Matchers.equalTo(id));
     }
 
     @Test
@@ -126,11 +126,11 @@ public class TestControllerTests {
     ///////////////////
     // Helpers
 
-    static public long getSomeBankId() {
+    static public String getSomeBankId() {
         return given()
             .get("/test/banks/ids")
             .jsonPath()
-            .getObject("ids[0]", Long.class);
+            .getObject("ids[0]", String.class);
     }
 
     static public long getSomeCardHolderId() {
