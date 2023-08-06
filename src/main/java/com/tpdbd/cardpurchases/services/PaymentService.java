@@ -6,11 +6,11 @@ import com.tpdbd.cardpurchases.model.Payment;
 import com.tpdbd.cardpurchases.repositories.projections.MostEarnerBank;
 
 public interface PaymentService {
-    Payment find(Long id);
+    Payment find(String id);
 
-    List<Long> findAllIds();
+    List<String> findAllIds();
 
-    Payment findMonthlyPayment(long id, int year, int month);
+    Payment findMonthlyPayment(String cardId, int year, int month);
 
     List<MostEarnerBank> findTheMostEarnerBanks(int count);  
 

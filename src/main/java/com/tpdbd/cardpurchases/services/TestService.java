@@ -21,8 +21,8 @@ public interface TestService {
 
     List<String> getCardHolderIds();
 
-    List<Long> getPaymentIds();
-    Payment getPayment(Long id);
+    List<String> getPaymentIds();
+    Payment getPayment(String id);
 
     List<Long> getPurchaseIds();
 

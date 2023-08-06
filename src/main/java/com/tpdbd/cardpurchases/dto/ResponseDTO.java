@@ -75,7 +75,7 @@ public interface ResponseDTO {
 
     ////////////////////////////////////////////////////////
     record Payment(
-        long id,
+        String id,
         String code,
         int month,
         int year,

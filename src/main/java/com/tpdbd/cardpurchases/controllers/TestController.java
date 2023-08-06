@@ -99,14 +99,14 @@ public class TestController {
     // Payments
 
     @GetMapping("/payments/ids")
-    Map<String, List<Long>> getPaymentIds() {
-        var result = new LinkedHashMap<String, List<Long>>();
+    Map<String, List<String>> getPaymentIds() {
+        var result = new LinkedHashMap<String, List<String>>();
         result.put("ids", this.service.getPaymentIds());
         return result;
     }
 
     @GetMapping("/payments/{id}")
-    ResponseDTO.Payment getPayment(@PathVariable Long id) {
+    ResponseDTO.Payment getPayment(@PathVariable String id) {
         return ResponseDTO.Payment.fromModel(this.service.getPayment(id));
     }
 

@@ -90,12 +90,12 @@ public class TestServiceImpl implements TestService {
     }
 
     @Override
-    public List<Long> getPaymentIds() {
+    public List<String> getPaymentIds() {
         return this.paymentService.findAllIds();
     }
 
     @Override
-    public Payment getPayment(Long id) {
+    public Payment getPayment(String id) {
         return this.paymentService.find(id);
     }
 

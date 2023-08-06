@@ -51,7 +51,7 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
 
     @Override
     @Transactional
-    public void paymentsUpdateDates(long id, LocalDate firstExpiration, LocalDate secondExpiration) {
+    public void paymentsUpdateDates(String id, LocalDate firstExpiration, LocalDate secondExpiration) {
         var payment = this.paymentService.find(id);
      
         payment.setFirstExpiration(firstExpiration);
@@ -61,9 +61,9 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
     }
 
     @Override
-    public ResponseDTO.MonthlyPayment cardsGetMonthtlyPayment(long id, int year, int month) {
+    public ResponseDTO.MonthlyPayment cardsGetMonthtlyPayment(String cardId, int year, int month) {
         return ResponseDTO.MonthlyPayment.fromModel(
-            this.paymentService.findMonthlyPayment(id, year, month));
+            this.paymentService.findMonthlyPayment(cardId, year, month));
     }
   
     @Override
