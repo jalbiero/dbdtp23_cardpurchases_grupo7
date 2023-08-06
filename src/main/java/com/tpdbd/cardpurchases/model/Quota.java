@@ -14,7 +14,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Quota {
     @Id
     // @GeneratedValue
-    private Long id;
+    private String id;
 
     // @ManyToOne
     // @JoinColumn(nullable = false)

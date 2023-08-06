@@ -74,7 +74,7 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
     }
 
     @Override
-    public ResponseDTO.Purchase purchasesGetInfo(long purchaseId) {
+    public ResponseDTO.Purchase purchasesGetInfo(String purchaseId) {
         return ResponseDTO.Purchase.fromModel(
             this.purchaseService.findById(purchaseId));
     }
@@ -85,7 +85,7 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
     }
 
     @Override
-    public ResponseDTO.CreditPurchaseTotalPrice purchasesCreditGetTotalPrice(long purchaseId) {
+    public ResponseDTO.CreditPurchaseTotalPrice purchasesCreditGetTotalPrice(String purchaseId) {
         var purchase = this.purchaseService.findCreditTotalPrice(purchaseId);
         
         return new ResponseDTO.CreditPurchaseTotalPrice(purchaseId, purchase.getFinalAmount());

@@ -203,7 +203,7 @@ public interface ResponseDTO {
     }
 
     record CashPurchase(
-        long id,
+        String id,
         String cardNumber,
         Optional<String> PaymentVoucher,
         String store,
@@ -234,7 +234,7 @@ public interface ResponseDTO {
     }
 
     record CreditPurchase(
-        long id,
+        String id,
         String cardNumber,
         Optional<String> PaymentVoucher,
         String store,
@@ -334,7 +334,7 @@ public interface ResponseDTO {
 
     ////////////////////////////////////////////////////////
     record CreditPurchaseTotalPrice(
-        long id,
+        String id,
         float totalPrice)
     {}
     

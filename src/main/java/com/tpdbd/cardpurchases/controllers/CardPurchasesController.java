@@ -238,7 +238,7 @@ public class CardPurchasesController {
      *      }
      */
     @GetMapping("/purchases/{id}")
-    ResponseDTO.Purchase purchasesGetInfo(@PathVariable Long id) {
+    ResponseDTO.Purchase purchasesGetInfo(@PathVariable String id) {
         return this.service.purchasesGetInfo(id);
     }
 
@@ -283,7 +283,7 @@ public class CardPurchasesController {
      *      - 404 if the specified credit purchase could not be found
      */ 
     @GetMapping("/purchases/{id}/creditTotalPrice")
-    ResponseDTO.CreditPurchaseTotalPrice purchasesCreditGetTotalPrice(@PathVariable Long id) {
+    ResponseDTO.CreditPurchaseTotalPrice purchasesCreditGetTotalPrice(@PathVariable String id) {
         return this.service.purchasesCreditGetTotalPrice(id);
     }
 

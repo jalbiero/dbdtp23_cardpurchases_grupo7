@@ -100,7 +100,7 @@ public class TestServiceImpl implements TestService {
     }
 
     @Override
-    public List<Long> getPurchaseIds() {
+    public List<String> getPurchaseIds() {
         return this.purchaseService.findAllIds();
     }
 

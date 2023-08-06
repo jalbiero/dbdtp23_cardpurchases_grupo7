@@ -14,6 +14,7 @@ import com.tpdbd.cardpurchases.repositories.PurchaseRepository;
 import com.tpdbd.cardpurchases.repositories.projections.MostUsedVoucher;
 import com.tpdbd.cardpurchases.repositories.projections.NumOfPurchasesByCard;
 import com.tpdbd.cardpurchases.services.PurchaseService;
+import com.tpdbd.cardpurchases.util.StreamHelpers;
 
 @Service
 public class PurchaseServiceImpl implements PurchaseService {
@@ -21,19 +22,21 @@ public class PurchaseServiceImpl implements PurchaseService {
     private PurchaseRepository<Purchase> purchaseRepository; 
 
     @Override
-    public List<Long> findAllIds() {
-        return this.purchaseRepository.findAllIds();
+    public List<String> findAllIds() {
+        return StreamHelpers.toStream(this.purchaseRepository.findAll())
+            .map(purchase -> purchase.getId())
+            .toList();
     }
 
     @Override
-    public Purchase findById(long purchaseId) {
+    public Purchase findById(String purchaseId) {
         return this.purchaseRepository
             .findById(purchaseId)
             .orElseThrow(() -> new PurchaseNotFoundException(purchaseId));
     }
 
     @Override
-    public Purchase findCreditTotalPrice(long purchaseId) {
+    public Purchase findCreditTotalPrice(String purchaseId) {
         return this.purchaseRepository 
             .findById(purchaseId)
             .filter(p -> CreditPurchase.class.isInstance(p))

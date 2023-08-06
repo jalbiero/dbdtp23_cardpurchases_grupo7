@@ -17,7 +17,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public abstract class Purchase {
     @Id
     // @GeneratedValue
-    private Long id;
+    private String id;
 
     // @ManyToOne
     // @JoinColumn(nullable = false)
@@ -65,7 +65,7 @@ public abstract class Purchase {
         this.quotas = new ArrayList<Quota>();
     }
 
-    public long getId() {
+    public String getId() {
         return this.id;
     }
 

@@ -25,7 +25,7 @@ public interface CardPurchasesService {
 
     // 5 Obtener la información de una compra, incluyendo el listado de cuotas si
     // esta posee.
-    ResponseDTO.Purchase purchasesGetInfo(long purchaseId);
+    ResponseDTO.Purchase purchasesGetInfo(String purchaseId);
 
     // 6 Eliminar una promoción a traves de su código (tener en cuenta que esta
     // puede haber sido aplicada alguna compra)
@@ -41,7 +41,7 @@ public interface CardPurchasesService {
     // >    - TestDataGeneratorService.generateCreditPurchases
     // > Dicho lo anterior, este servicio es una variante menor de 'purchaseGetInfo' ya
     // > va a fallar si el ID de compra no corresponde a una compra en cuotas.
-    ResponseDTO.CreditPurchaseTotalPrice purchasesCreditGetTotalPrice(long purchaseId);
+    ResponseDTO.CreditPurchaseTotalPrice purchasesCreditGetTotalPrice(String purchaseId);
 
     // 8 Obtener el listado de las promociones disponibles de un local entre dos
     // fechas

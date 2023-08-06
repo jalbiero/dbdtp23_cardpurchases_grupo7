@@ -114,8 +114,8 @@ public class TestController {
     // Purchases
 
     @GetMapping("/purchases/ids")
-    Map<String, List<Long>> getPurchaseIds() {
-        var result = new LinkedHashMap<String, List<Long>>();
+    Map<String, List<String>> getPurchaseIds() {
+        var result = new LinkedHashMap<String, List<String>>();
         result.put("ids", this.service.getPurchaseIds());
         return result;
     }
