@@ -1,13 +1,15 @@
 services:
-  MySQL:
-    image: mysql:8.0
+  MongoDB:
+    image: mongo:6-jammy
     environment:
-      - MYSQL_ROOT_PASSWORD=root
-      - MYSQL_DATABASE=tpfinal22
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=root
     ports:
-      - 4306:3306
+      - 27017:27017
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3306" ]
+      test: ["CMD", "mongosh", "--eval", "'db.runCommand(\"ping\").ok'", "--quiet" ]
       interval: 3s
       timeout: 30s
       retries: 10
+    volumes:
+      - ./mongodb:/data/db
