@@ -5,7 +5,7 @@ import java.util.List;
 import com.tpdbd.cardpurchases.model.Bank;
 
 public interface BankService {
-    Bank find(Long id);
+    Bank find(String id);
     
-    List<Long> findAllIds(); 
+    List<String> findAllIds(); 
 }

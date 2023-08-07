@@ -7,11 +7,11 @@ import com.tpdbd.cardpurchases.repositories.projections.MostUsedVoucher;
 import com.tpdbd.cardpurchases.repositories.projections.NumOfPurchasesByCard;
 
 public interface PurchaseService {
-    List<Long> findAllIds();
+    List<String> findAllIds();
     
-    Purchase findById(long purchaseId);
+    Purchase findById(String purchaseId);
 
-    Purchase findCreditTotalPrice(long purchaseId);
+    Purchase findCreditTotalPrice(String purchaseId);
 
     List<NumOfPurchasesByCard> findTopPurchasers(int count);
 

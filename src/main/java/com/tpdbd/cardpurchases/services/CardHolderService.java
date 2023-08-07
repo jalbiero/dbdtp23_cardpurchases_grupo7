@@ -7,5 +7,5 @@ import com.tpdbd.cardpurchases.model.CardHolder;
 public interface CardHolderService {
     CardHolder find(long id);
     
-    List<Long> findAllIds();
+    List<String> findAllIds();
 }

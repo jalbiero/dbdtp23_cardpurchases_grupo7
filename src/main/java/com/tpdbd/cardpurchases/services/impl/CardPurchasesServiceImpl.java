@@ -42,7 +42,7 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
 
     @Override
     @Transactional
-    public void banksAddDiscountPromotion(long id, RequestDTO.Discount discount) {
+    public void banksAddDiscountPromotion(String id, RequestDTO.Discount discount) {
         var bank = this.bankService.find(id);
         var promo = RequestDTO.Discount.toModel(discount, bank);
 
@@ -51,7 +51,7 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
 
     @Override
     @Transactional
-    public void paymentsUpdateDates(long id, LocalDate firstExpiration, LocalDate secondExpiration) {
+    public void paymentsUpdateDates(String id, LocalDate firstExpiration, LocalDate secondExpiration) {
         var payment = this.paymentService.find(id);
      
         payment.setFirstExpiration(firstExpiration);
@@ -61,9 +61,9 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
     }
 
     @Override
-    public ResponseDTO.MonthlyPayment cardsGetMonthtlyPayment(long id, int year, int month) {
+    public ResponseDTO.MonthlyPayment cardsGetMonthtlyPayment(String cardId, int year, int month) {
         return ResponseDTO.MonthlyPayment.fromModel(
-            this.paymentService.findMonthlyPayment(id, year, month));
+            this.paymentService.findMonthlyPayment(cardId, year, month));
     }
   
     @Override
@@ -74,7 +74,7 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
     }
 
     @Override
-    public ResponseDTO.Purchase purchasesGetInfo(long purchaseId) {
+    public ResponseDTO.Purchase purchasesGetInfo(String purchaseId) {
         return ResponseDTO.Purchase.fromModel(
             this.purchaseService.findById(purchaseId));
     }
@@ -85,7 +85,7 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
     }
 
     @Override
-    public ResponseDTO.CreditPurchaseTotalPrice purchasesCreditGetTotalPrice(long purchaseId) {
+    public ResponseDTO.CreditPurchaseTotalPrice purchasesCreditGetTotalPrice(String purchaseId) {
         var purchase = this.purchaseService.findCreditTotalPrice(purchaseId);
         
         return new ResponseDTO.CreditPurchaseTotalPrice(purchaseId, purchase.getFinalAmount());

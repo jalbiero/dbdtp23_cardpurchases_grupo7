@@ -12,6 +12,7 @@ import com.tpdbd.cardpurchases.model.Payment;
 import com.tpdbd.cardpurchases.repositories.PaymentRepository;
 import com.tpdbd.cardpurchases.repositories.projections.MostEarnerBank;
 import com.tpdbd.cardpurchases.services.PaymentService;
+import com.tpdbd.cardpurchases.util.StreamHelpers;
 
 @Service
 public class PaymentServiceImpl implements PaymentService {
@@ -19,19 +20,21 @@ public class PaymentServiceImpl implements PaymentService {
     private PaymentRepository paymentRepository;
 
     @Override
-    public Payment find(Long id) {
+    public Payment find(String id) {
         return this.paymentRepository
             .findById(id)
             .orElseThrow(() -> new PaymentNotFoundException(id));    
     }
 
     @Override
-    public List<Long> findAllIds() {
-        return this.paymentRepository.findAllIds();
+    public List<String> findAllIds() {
+        return StreamHelpers.toStream(this.paymentRepository.findAll())
+            .map(payment -> payment.getId())
+            .toList();
     }
 
     @Override
-    public Payment findMonthlyPayment(long cardId, int year, int month)
+    public Payment findMonthlyPayment(String cardId, int year, int month)
     {
         return this.paymentRepository
             .findMonthlyPayment(cardId, year, month)

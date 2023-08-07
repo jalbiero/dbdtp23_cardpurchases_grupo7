@@ -67,7 +67,7 @@ public class CardPurchasesController {
      *          }
      */
     @PostMapping("/banks/{id}/addDiscountPromotion")
-    void banksAddDiscountPromotion(@PathVariable long id, 
+    void banksAddDiscountPromotion(@PathVariable String id, 
                                    @RequestBody RequestDTO.Discount discount) 
     {
         this.service.banksAddDiscountPromotion(id, discount);
@@ -91,7 +91,7 @@ public class CardPurchasesController {
      *          }
      */    
     @PutMapping("/payments/{id}/updateDates")
-    void paymentsUpdateDates(@PathVariable long id, 
+    void paymentsUpdateDates(@PathVariable String id, 
                              @RequestBody RequestDTO.PaymentsUpdateDatesBody body) 
     {
         if (body.firstExpiration().isAfter(body.secondExpiration())) {
@@ -116,14 +116,14 @@ public class CardPurchasesController {
      * 
      * Return:
      *      {
-     *          "id": 123,
+     *          "id": "64cfd297ae28e32a53e9705b",
      *          "cardNumber", "5876-1948-6884-1575",
      *          "year": 2021,
      *          "month": 8,
      *          "totalPrice": 72423.0,
      *          "purchases": [
      *             {
-     *                 "id": 2,
+     *                 "id": "64cfd297ee28e32a53e9705a",
      *                 "cardNumber": "5876-1948-6884-1575",
      *                 "PaymentVoucher": null,
      *                 "store": "Florentin S.A.",
@@ -148,7 +148,7 @@ public class CardPurchasesController {
      *      }
      */
     @GetMapping("/cards/{id}/monthlyPayment")
-    ResponseDTO.MonthlyPayment cardsGetMonthtlyPayment(@PathVariable long id, 
+    ResponseDTO.MonthlyPayment cardsGetMonthtlyPayment(@PathVariable String id, 
                                                        @RequestParam int year, 
                                                        @RequestParam int month)
     {
@@ -175,7 +175,7 @@ public class CardPurchasesController {
      * 
      *      [
      *          {
-     *              "id": 2343
+     *              "id": "64cfd297ae28e32a53e9705b",
      *              "number": "44756745756",
      *              "ccv", "123"
      *              "cardholderNameInCard": "Juan Perez",
@@ -213,8 +213,8 @@ public class CardPurchasesController {
      *      The purchase information:
      * 
      *      {
-     *          "id": 12
-     *          "type": "CashPurchase" | "CreditPurchase"
+     *          "id": "64ded297ae28e32a53e9705b",
+     *          "type": "CashPurchase" | "CreditPurchase",
      *          "cardNumber": "1123123123123",
      *          "PaymentVoucher": "voucherCode",
      *          "store": "the name of the store",
@@ -238,7 +238,7 @@ public class CardPurchasesController {
      *      }
      */
     @GetMapping("/purchases/{id}")
-    ResponseDTO.Purchase purchasesGetInfo(@PathVariable Long id) {
+    ResponseDTO.Purchase purchasesGetInfo(@PathVariable String id) {
         return this.service.purchasesGetInfo(id);
     }
 
@@ -276,14 +276,14 @@ public class CardPurchasesController {
      *      - The totalPrice (finalAmount) of the specified credit purchase:
      * 
      *          {
-     *              "id": 10,
+     *              "id": "64cfd297ae28e32a53e9705b",
      *              "totalPrice": 1023.50
      *          }
      * 
      *      - 404 if the specified credit purchase could not be found
      */ 
     @GetMapping("/purchases/{id}/creditTotalPrice")
-    ResponseDTO.CreditPurchaseTotalPrice purchasesCreditGetTotalPrice(@PathVariable Long id) {
+    ResponseDTO.CreditPurchaseTotalPrice purchasesCreditGetTotalPrice(@PathVariable String id) {
         return this.service.purchasesCreditGetTotalPrice(id);
     }
 

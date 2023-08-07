@@ -8,14 +8,14 @@ import com.tpdbd.cardpurchases.dto.ResponseDTO;
 
 public interface CardPurchasesService {
     // 1 Agregar una nueva promoción de tipo descuento a un banco dado
-    void banksAddDiscountPromotion(long id, RequestDTO.Discount discount);
+    void banksAddDiscountPromotion(String id, RequestDTO.Discount discount);
 
     // 2 Editar las fecha de vencimiento de un pago con cierto código.
-    void paymentsUpdateDates(long id, LocalDate firstExpiration, LocalDate secondExpiration);
+    void paymentsUpdateDates(String id, LocalDate firstExpiration, LocalDate secondExpiration);
 
     // 3 Generar el total de pago de un mes dado, informando las compras
     // correspondientes
-    ResponseDTO.MonthlyPayment cardsGetMonthtlyPayment(long id, int year, int month);
+    ResponseDTO.MonthlyPayment cardsGetMonthtlyPayment(String cardId, int year, int month);
   
     // 4 Obtener el listado de tarjetas que vencen en los siguientes 30 días.
     // > Para mayor flexibilidad y facilidad de prueba, se optó por generalizar 
@@ -25,7 +25,7 @@ public interface CardPurchasesService {
 
     // 5 Obtener la información de una compra, incluyendo el listado de cuotas si
     // esta posee.
-    ResponseDTO.Purchase purchasesGetInfo(long purchaseId);
+    ResponseDTO.Purchase purchasesGetInfo(String purchaseId);
 
     // 6 Eliminar una promoción a traves de su código (tener en cuenta que esta
     // puede haber sido aplicada alguna compra)
@@ -41,7 +41,7 @@ public interface CardPurchasesService {
     // >    - TestDataGeneratorService.generateCreditPurchases
     // > Dicho lo anterior, este servicio es una variante menor de 'purchaseGetInfo' ya
     // > va a fallar si el ID de compra no corresponde a una compra en cuotas.
-    ResponseDTO.CreditPurchaseTotalPrice purchasesCreditGetTotalPrice(long purchaseId);
+    ResponseDTO.CreditPurchaseTotalPrice purchasesCreditGetTotalPrice(String purchaseId);
 
     // 8 Obtener el listado de las promociones disponibles de un local entre dos
     // fechas

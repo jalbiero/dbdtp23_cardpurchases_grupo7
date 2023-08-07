@@ -12,7 +12,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class CardHolder {
     @Id
     // @GeneratedValue
-    private Long id;
+    private String id;
 
     //@Column(length = 50, nullable = false)
     private String completeName;
@@ -58,7 +58,7 @@ public class CardHolder {
         this.entry = entry;
     }
 
-    public Long getId() {
+    public String getId() {
         return this.id;
     }
 

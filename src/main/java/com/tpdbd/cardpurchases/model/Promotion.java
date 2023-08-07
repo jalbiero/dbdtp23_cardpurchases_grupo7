@@ -14,7 +14,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public abstract class Promotion {
     @Id
     // @GeneratedValue
-    private Long id;
+    private String id;
 
     // @ManyToOne
     // @JoinColumn(nullable = false)
@@ -70,7 +70,7 @@ public abstract class Promotion {
         this.deleted = false;
     }
 
-    public Long getId() {
+    public String getId() {
         return this.id;
     }
 

@@ -399,11 +399,11 @@ public class CardPurchasesControllerTests {
     ///////////////////
     // Helpers
 
-    public Long getSomeBankId() {
+    public String getSomeBankId() {
         return given()
             .get("/test/banks/ids")
             .jsonPath()
-            .getObject("ids[0]", Long.class);
+            .getObject("ids[0]", String.class);
     }
 
     public long getSomeCardHolderIds() {

@@ -51,14 +51,14 @@ public interface ResponseDTO {
 
     ////////////////////////////////////////////////////////
     record Card(
-        long id,
+        String id,
         String number,
         String ccv,
         String cardholderNameInCard,
         LocalDate since,
         LocalDate expirationDate,
         String bankId, // In real life part of the card number identifies the bank
-        long cardHolderId) // In real life this may not be necessary, the name provides a partial identification
+        String cardHolderId) // In real life this may not be necessary, the name provides a partial identification
     {
         public static Card fromModel(com.tpdbd.cardpurchases.model.Card card) {
             return new Card(
@@ -75,7 +75,7 @@ public interface ResponseDTO {
 
     ////////////////////////////////////////////////////////
     record Payment(
-        long id,
+        String id,
         String code,
         int month,
         int year,
@@ -203,7 +203,7 @@ public interface ResponseDTO {
     }
 
     record CashPurchase(
-        long id,
+        String id,
         String cardNumber,
         Optional<String> PaymentVoucher,
         String store,
@@ -234,7 +234,7 @@ public interface ResponseDTO {
     }
 
     record CreditPurchase(
-        long id,
+        String id,
         String cardNumber,
         Optional<String> PaymentVoucher,
         String store,
@@ -295,7 +295,7 @@ public interface ResponseDTO {
 
     ////////////////////////////////////////////////////////
     record MonthlyPayment(
-        long cardId,
+        String cardId,
         String cardNumber,
         int year, 
         int month, 
@@ -334,7 +334,7 @@ public interface ResponseDTO {
 
     ////////////////////////////////////////////////////////
     record CreditPurchaseTotalPrice(
-        long id,
+        String id,
         float totalPrice)
     {}
     

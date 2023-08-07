@@ -11,6 +11,7 @@ import com.tpdbd.cardpurchases.errors.CardNotFoundException;
 import com.tpdbd.cardpurchases.model.Card;
 import com.tpdbd.cardpurchases.repositories.CardRepository;
 import com.tpdbd.cardpurchases.services.CardService;
+import com.tpdbd.cardpurchases.util.StreamHelpers;
 
 //import jakarta.transaction.Transactional;
 
@@ -27,12 +28,14 @@ public class CardServiceImpl implements CardService {
     }    
 
     @Override
-    public List<Long> findAllIds() {
-        return this.cardRepository.findAllIds();
+    public List<String> findAllIds() {
+        return StreamHelpers.toStream(this.cardRepository.findAll())
+            .map(card -> card.getId())
+            .toList();
     }
 
     @Override
-    public Card find(long id) {
+    public Card find(String id) {
         return this.cardRepository
             .findById(id)
             .orElseThrow(() -> new CardNotFoundException(id));
@@ -45,7 +48,7 @@ public class CardServiceImpl implements CardService {
 
     @Override
     @Transactional
-    public void delete(long id) {
+    public void delete(String id) {
         this.cardRepository.deleteById(id);
     }
 }

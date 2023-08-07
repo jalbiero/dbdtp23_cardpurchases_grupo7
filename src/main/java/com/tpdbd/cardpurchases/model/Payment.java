@@ -13,7 +13,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Payment {
     @Id
     // @GeneratedValue
-    private Long id;
+    private String id;
 
     //@Column(length = 50, nullable = false)
     private String code;
@@ -73,7 +73,7 @@ public class Payment {
         this.card = card;
     }
 
-    public Long getId() {
+    public String getId() {
         return this.id;
     }
     
