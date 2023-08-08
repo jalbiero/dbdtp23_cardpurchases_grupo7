@@ -16,7 +16,6 @@
     <description>Trabajo final de DBD 2022/23</description>
     <properties>
         <java.version>19</java.version>
-
     </properties>
     <dependencies>
         <!-- <dependency>
@@ -24,9 +23,10 @@
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency> -->
 
-        <!--SPRING DATA MONGODB -->
+        <!--SPRING
+        DATA MONGODB -->
         <dependency>
-        <groupId>org.springframework.boot</groupId>
+            <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-mongodb</artifactId>
         </dependency>
 
@@ -90,6 +90,24 @@
         <plugins>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
+                <artifactId>properties-maven-plugin</artifactId>
+                <version>1.0.0</version>
+                <executions>
+                    <execution>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>read-project-properties</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <files>
+                        <file>src/main/resources/application.properties</file>
+                    </files>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.0.0</version>
                 <executions>
@@ -106,6 +124,30 @@
                                 <argument>up</argument>
                                 <argument>-d</argument>
                                 <argument>--wait</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>Drop mongo database at startup</id>
+                        <phase>test-compile</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>docker</executable>
+                            <arguments>
+                                <argument>exec</argument>
+                                <argument>dbdtp23_cardpurchases_grupo7-MongoDB-1</argument>
+                                <argument>mongosh</argument>
+                                <argument>--authenticationDatabase</argument>
+                                <argument>${spring.data.mongodb.authentication-database}</argument>
+                                <argument>--username</argument>
+                                <argument>${spring.data.mongodb.username}</argument>
+                                <argument>--password</argument>
+                                <argument>${spring.data.mongodb.password}</argument>
+                                <argument>${spring.data.mongodb.database}</argument>
+                                <argument>--eval</argument>
+                                <argument>"printjson(db.dropDatabase())"</argument>
                             </arguments>
                         </configuration>
                     </execution>
