@@ -40,13 +40,9 @@ import com.tpdbd.cardpurchases.repositories.PurchaseRepository;
 import com.tpdbd.cardpurchases.repositories.QuotaRepository;
 import com.tpdbd.cardpurchases.services.TestDataGeneratorService;
 import com.tpdbd.cardpurchases.util.SequenceGenerator;
-import com.tpdbd.cardpurchases.util.TransactionalCaller;
 import com.tpdbd.cardpurchases.util.TriFunction;
 
 import jakarta.annotation.Nullable;
-// import jakarta.persistence.EntityManager;
-// import jakarta.persistence.EntityManagerFactory;
-// import jakarta.persistence.PersistenceUnit;
 import net.datafaker.Faker;
 
 
@@ -74,9 +70,6 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
     @Autowired private PurchaseRepository<CreditPurchase> creditRepository; 
     @Autowired private QuotaRepository quotaRespository;
 
-    // @PersistenceUnit 
-    // private EntityManagerFactory entityManagerFactory;
-
     private Random random = new Random(0); // Same seed (0) -> all is "repeatable"
     private Faker faker; 
 
@@ -96,42 +89,23 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
 
     @Override
     public void generateData() {
-        // try (var tc = new TransactionalCaller(this.entityManagerFactory.createEntityManager())) {
-        //     tc.call((EntityManager em) -> {
-                this.stores = generateStores();
+        this.stores = generateStores();
 
-                generateBanks();
+        var banks = generateBanks();
+        generatePromotions(banks, this.stores);
 
-                var banks = this.bankRepository.findAll();
+        var cardHolders = generateCardHolders();
+        var cards = generateCards(banks, cardHolders);
 
-            //     generatePromotions(banks, this.stores);
-                generateCardHolders();
-    
-                var cardHolders = this.cardHolderRepository.findAll();
-                generateCards(banks, cardHolders);
+        var cashPurchases = generateCashPurchases(this.stores, cards); 
+        generateQuotasTo(cashPurchases);
 
-            //     var cards = this.cardRepository.findAll();
-            //     generateCashPurchases(this.stores, cards); //, em);
-            //     generateCreditPurchases(this.stores, cards); //, em);
+        var creditPurchases = generateCreditPurchases(this.stores, cards); 
+        generateQuotasTo(creditPurchases);
 
-            //     var cashPurchases = this.cashRepository.findAll();
-            //     generateQuotasTo(cashPurchases);
-
-            //     var creditPurchases = this.creditRepository.findAll();
-            //     generateQuotasTo(creditPurchases);
-            // //});
-
-            // // Payments need all previous data saved in the db
-            // // tc.call((EntityManager em) -> {
-            //     generatePaymentsFor(Stream.concat(
-            //         StreamSupport.stream(this.cashRepository.findAll().spliterator(), false),
-            //         StreamSupport.stream(this.creditRepository.findAll().spliterator(), false))); //, em);
-            // //});
-            
-        // }
-        // catch (Exception ex) {
-        //     System.err.println("Unexpected error: " + ex.getStackTrace().toString()); // TODO Add a proper logging
-        // }
+        generatePaymentsFor(Stream.concat(
+            StreamSupport.stream(cashPurchases.spliterator(), false),
+            StreamSupport.stream(creditPurchases.spliterator(), false))); 
     }
 
     @Override
@@ -376,14 +350,12 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
      * @return
      */
     private Iterable<CashPurchase> generateCashPurchases(Iterable<Store> stores, 
-                                                         Iterable<Card> cards 
-                                                         /*, EntityManager entityManager*/) 
+                                                         Iterable<Card> cards) 
     { 
         var purchases = generatePurchases(
             getIntParam("maxNumOfCashPurchasesPerCard"),
             stores, 
             cards, 
-            //entityManager,
             (store, card, promotions) -> {
                 var promo = promotions.stream()
                     .filter(p -> Discount.class.isInstance(p))
@@ -425,13 +397,12 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
      * @return
      */
     private  Iterable<CreditPurchase> generateCreditPurchases(Iterable<Store> stores, 
-                                                              Iterable<Card> cards 
-                                                              /*EntityManager entityManager*/) {
+                                                              Iterable<Card> cards) 
+    {
         var purchases = generatePurchases(
             getIntParam("maxNumOfCreditPurchasesPerCard"), 
             stores, 
             cards, 
-            //entityManager,
             (store, card, promotions) -> {
                 // TODO I am not sure about the following way of calculating the 'finalAmount' (1st apply the 
                 //      discount promotion to get 'disAmount', and 2nd apply the financial promotion interest
@@ -515,7 +486,6 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
         Iterable<T> generatePurchases(int maxNumOfPurchases,
                                       Iterable<Store> stores, 
                                       Iterable<Card> cards, 
-                                      //EntityManager entityManager,
                                       TriFunction<Store, Card, List<Promotion>, T> purchaseCreator)     
     {
         var purchases = new ArrayList<T>();
@@ -525,7 +495,6 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
 
         cards.forEach(card -> {
             var numOfPurchases = this.random.nextInt(maxNumOfPurchases) + 1;
-            //var bank = entityManager.merge(card.getBank()); // re-attach the bank to the current context
             var bank = card.getBank();
 
             getRandomItemsFrom(stores, numOfPurchases)
@@ -589,13 +558,11 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
      * same period of time (one payment for them)
      * @param purchases
      */
-    private void generatePaymentsFor(Stream<Purchase> purchases
-                                    /* EntityManager entityManager*/) 
+    private void generatePaymentsFor(Stream<Purchase> purchases) 
     {
         var paymentsUntil = getDateParam("generatePaymentsUntil");
 
         purchases
-            //.map(purchase -> entityManager.merge(purchase)) // re-attach each purchae to the current context
             .collect(Collectors.groupingBy(Purchase::getCard))
             .values()
             .forEach((purchasesByCard) -> {
