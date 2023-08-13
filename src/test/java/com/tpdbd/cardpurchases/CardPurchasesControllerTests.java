@@ -65,7 +65,7 @@ public class CardPurchasesControllerTests {
         final var DISCOUNT = 0.5f;
         final var PCAP = 5000.f;
 
-        var cuit = getSomeBankId();
+        var bankId = getSomeBankId();
 
         // Add a new promotion
         var discount = new RequestDTO.Discount(
@@ -76,14 +76,14 @@ public class CardPurchasesControllerTests {
             .when()
                 .contentType(ContentType.JSON)    
                 .body(discount)
-                .post("/banks/{cuit}/addDiscountPromotion", cuit)
+                .post("/banks/{cuit}/addDiscountPromotion", bankId)
             .then()
                 .statusCode(200);
 
         // Check if the promotion was added to the given bank
         given()
             .when()
-                .get("/test/banks/{cuit}", cuit)
+                .get("/test/banks/{id}", bankId)
             .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
@@ -230,7 +230,7 @@ public class CardPurchasesControllerTests {
             .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
-                .body("id", Matchers.equalTo((int)id))
+                .body("id", Matchers.equalTo(id))
                 .body("quotas", Matchers.hasSize(Matchers.greaterThanOrEqualTo(0)));
     }
 

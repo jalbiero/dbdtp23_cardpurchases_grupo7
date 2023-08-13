@@ -46,7 +46,8 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
         var bank = this.bankService.find(id);
         var promo = RequestDTO.Discount.toModel(discount, bank);
 
-        this.promotionService.save(promo);
+        bank.getPromotions().add(this.promotionService.save(promo));
+        this.bankService.save(bank);
     }
 
     @Override

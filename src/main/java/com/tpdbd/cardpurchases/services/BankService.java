@@ -8,4 +8,6 @@ public interface BankService {
     Bank find(String id);
     
     List<String> findAllIds(); 
+
+    Bank save(Bank bank);
 }
