@@ -17,7 +17,7 @@ public class CardHolderServiceImpl implements CardHolderService {
     CardHolderRepository cardHolderRepository;
 
     @Override
-    public CardHolder find(long id) {
+    public CardHolder find(String id) {
         return this.cardHolderRepository
             .findById(id)
             .orElseThrow(() -> new CardHolderNotFoundException(id));

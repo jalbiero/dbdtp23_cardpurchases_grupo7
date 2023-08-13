@@ -406,18 +406,18 @@ public class CardPurchasesControllerTests {
             .getObject("ids[0]", String.class);
     }
 
-    public long getSomeCardHolderIds() {
+    public String getSomeCardHolderIds() {
         return given()
             .get("/test/cardHolders/ids")
             .jsonPath()
-            .getObject("ids[0]", Long.class);
+            .getObject("ids[0]", String.class);
     }
 
-    public long getSomePaymentId() {
+    public String getSomePaymentId() {
         return given()
             .get("/test/payments/ids")
             .jsonPath()
-            .getObject("ids[0]", Long.class);
+            .getObject("ids[0]", String.class);
     }
 
     static public String getSomeStoreCuit() {
@@ -427,11 +427,11 @@ public class CardPurchasesControllerTests {
             .getObject("cuits[1]", String.class);
     }
 
-    static public long getSomePurchaseId() {
+    static public String getSomePurchaseId() {
         return given()
             .get("/test/purchases/ids")
             .jsonPath()
-            .getObject("ids[0]", Long.class);
+            .getObject("ids[0]", String.class);
     }
 
     static public List<String> getPromotionCodes() {
@@ -440,5 +440,4 @@ public class CardPurchasesControllerTests {
             .jsonPath()
             .getObject("codes", new TypeRef<ArrayList<String>>(){});
     }
-
 }
