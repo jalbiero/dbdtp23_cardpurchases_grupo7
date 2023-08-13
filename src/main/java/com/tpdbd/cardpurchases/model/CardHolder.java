@@ -1,17 +1,16 @@
 package com.tpdbd.cardpurchases.model;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-//import jakarta.persistence.*;
+import org.springframework.data.mongodb.core.mapping.DocumentReference;
 
-//@Entity
 @Document
 public class CardHolder {
     @Id
-    // @GeneratedValue
     private String id;
 
     //@Column(length = 50, nullable = false)
@@ -37,6 +36,8 @@ public class CardHolder {
     //     name="card",
     //     joinColumns=@JoinColumn(name="card_holder_id"),
     //     inverseJoinColumns=@JoinColumn(name="id"))
+    //@DBRef
+    @DocumentReference(lazy = true)
     private List<Card> cards;
 
     public CardHolder() {
@@ -56,6 +57,7 @@ public class CardHolder {
         this.address = address;
         this.telephone = telephone;
         this.entry = entry;
+        this.cards = new ArrayList<Card>();
     }
 
     public String getId() {

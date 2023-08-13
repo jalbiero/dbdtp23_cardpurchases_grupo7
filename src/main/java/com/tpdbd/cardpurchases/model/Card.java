@@ -1,14 +1,13 @@
 package com.tpdbd.cardpurchases.model;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.DocumentReference;
 
-//import jakarta.persistence.*;
-
-//@Entity 
 @Document
 public class Card {
     @Id
@@ -17,10 +16,14 @@ public class Card {
 
     // @ManyToOne
     // @JoinColumn(nullable = false)
+    //@DBRef
+    @DocumentReference //(lazy = true)
     private Bank bank;
 
     // @ManyToOne 
     // @JoinColumn(nullable = false)
+    //@DBRef
+    @DocumentReference //(lazy = true)
     private CardHolder cardHolder;
 
     //@Column(unique = true, length = 20, nullable = false)
@@ -43,6 +46,8 @@ public class Card {
     //     name="purchase",
     //     joinColumns=@JoinColumn(name="card_id"),
     //     inverseJoinColumns=@JoinColumn(name="id"))
+    //@DBRef
+    @DocumentReference(lazy = true)
     private List<Purchase> purchases;
 
     public Card() {
@@ -63,6 +68,7 @@ public class Card {
         this.cardholderNameInCard = cardHolder.getCompleteName();
         this.since = since;
         this.expirationDate = expirationDate;
+        this.purchases = new ArrayList<Purchase>();
     }
 
     public String getId() {

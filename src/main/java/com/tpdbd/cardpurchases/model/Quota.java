@@ -6,10 +6,8 @@ import jakarta.annotation.Nullable;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.DocumentReference;
 
-// import jakarta.persistence.*;
-
-//@Entity
 @Document
 public class Quota {
     @Id
@@ -18,6 +16,7 @@ public class Quota {
 
     // @ManyToOne
     // @JoinColumn(nullable = false)
+    @DocumentReference
     private Purchase purchase;
 
     //@Column(nullable = false)
@@ -35,6 +34,7 @@ public class Quota {
     // @ManyToOne
     // @JoinColumn(nullable = true)
     @Nullable
+    @DocumentReference
     private Payment payment;
 
     public Quota() {

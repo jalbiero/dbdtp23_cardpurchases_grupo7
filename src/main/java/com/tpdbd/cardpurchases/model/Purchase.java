@@ -1,6 +1,5 @@
 package com.tpdbd.cardpurchases.model;
 
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -9,10 +8,8 @@ import jakarta.annotation.Nullable;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-//import jakarta.persistence.*;
+import org.springframework.data.mongodb.core.mapping.DocumentReference;
 
-//@Entity
-//@Inheritance(strategy = InheritanceType.JOINED)  // This allows non nullable fields in subclasses
 @Document
 public abstract class Purchase {
     @Id
@@ -21,6 +18,8 @@ public abstract class Purchase {
 
     // @ManyToOne
     // @JoinColumn(nullable = false)
+    //@DBRef
+    @DocumentReference 
     private Card card;
 
     //@Column(nullable = true)
@@ -43,6 +42,8 @@ public abstract class Purchase {
     //     name="quota",
     //     joinColumns=@JoinColumn(name="purchase_id"),
     //     inverseJoinColumns=@JoinColumn(name="id"))
+    //@DBRef(lazy = true) // TODO the num of quotas is really small, maybe 'false' is better
+    @DocumentReference(lazy = true)
     private List<Quota> quotas;
 
     public Purchase() {

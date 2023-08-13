@@ -5,10 +5,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
-// import jakarta.persistence.*;
+import org.springframework.data.mongodb.core.mapping.DocumentReference;
 
-//@Entity
 @Document
 public class Payment {
     @Id
@@ -41,12 +41,15 @@ public class Payment {
     //     name="quota",
     //     joinColumns=@JoinColumn(name="payment_id"),
     //     inverseJoinColumns=@JoinColumn(name="id"))
+    //@DBRef(lazy = true)
+    @DocumentReference(lazy = true)
     private List<Quota> quotas;
 
     // This allows an easy navigation to the card used in the payment (another
     // complex way it is to use one of the associated quotas in order to reach 
     // the Purchase and then the Card)
     //@ManyToOne
+    @DocumentReference
     private Card card;
     
     public Payment() {
@@ -60,7 +63,8 @@ public class Payment {
         LocalDate secondExpiration,
         float surcharge, 
         float totalPrice, 
-        Card card) 
+        Card card,
+        List<Quota> quotas) 
     {
         this.code = code;
         this.month = month;
@@ -69,8 +73,22 @@ public class Payment {
         this.secondExpiration = secondExpiration;
         this.surcharge = surcharge;
         this.totalPrice = totalPrice;
-        this.quotas = new ArrayList<Quota>();
         this.card = card;
+        this.quotas = quotas;
+    }
+
+    public Payment(
+        String code, 
+        int month, 
+        int year, 
+        LocalDate firstExpiration, 
+        LocalDate secondExpiration,
+        float surcharge, 
+        float totalPrice, 
+        Card card) 
+    {
+        this(code, month, year, firstExpiration, 
+        secondExpiration, surcharge, totalPrice, card, new ArrayList<Quota>());
     }
 
     public String getId() {

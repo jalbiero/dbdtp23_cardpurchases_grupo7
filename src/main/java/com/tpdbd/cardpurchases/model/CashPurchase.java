@@ -3,10 +3,7 @@ package com.tpdbd.cardpurchases.model;
 import jakarta.annotation.Nullable;
 
 import org.springframework.data.mongodb.core.mapping.Document;
-// import jakarta.persistence.Column;
-// import jakarta.persistence.Entity;
 
-//@Entity
 @Document
 public class CashPurchase extends Purchase {
 
