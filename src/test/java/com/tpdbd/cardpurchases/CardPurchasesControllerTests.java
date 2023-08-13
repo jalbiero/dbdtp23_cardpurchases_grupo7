@@ -151,7 +151,7 @@ public class CardPurchasesControllerTests {
 
     @Test 
     void testCardsGetMonthtlyPaymentNotFound() {
-        final var CARD_ID = 999_999_999_999l;
+        final var CARD_ID = "InexistentCardId";
         final var UNREAL_YEAR = 1900;
         final var MONTH = 1;
 
