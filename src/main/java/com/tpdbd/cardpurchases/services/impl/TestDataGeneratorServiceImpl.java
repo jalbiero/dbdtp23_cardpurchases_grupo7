@@ -66,8 +66,8 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
     @Autowired private CardRepository cardRepository;
     @Autowired private PaymentRepository paymentRepository;
     @Autowired private PromotionRepository promotionRepository;
-    @Autowired private PurchaseRepository<CashPurchase> cashRepository; 
-    @Autowired private PurchaseRepository<CreditPurchase> creditRepository; 
+    @Autowired private PurchaseRepository<CashPurchase> cashPurchaseRepository; 
+    @Autowired private PurchaseRepository<CreditPurchase> creditPurchaseRepository; 
     @Autowired private QuotaRepository quotaRespository;
 
     private Random random = new Random(0); // Same seed (0) -> all is "repeatable"
@@ -89,23 +89,39 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
 
     @Override
     public void generateData() {
-        this.stores = generateStores();
+        System.out.println("****** Generating stores");
+        generateStores();
 
-        var banks = generateBanks();
-        generatePromotions(banks, this.stores);
+        System.out.println("****** Generating banks");
+        generateBanks();
 
-        var cardHolders = generateCardHolders();
-        var cards = generateCards(banks, cardHolders);
+        System.out.println("****** Generating promotions");
+        generatePromotions(this.bankRepository.findAll(), this.stores);
 
-        var cashPurchases = generateCashPurchases(this.stores, cards); 
-        generateQuotasTo(cashPurchases);
+        System.out.println("****** Generating card holders");
+        generateCardHolders();
 
-        var creditPurchases = generateCreditPurchases(this.stores, cards); 
-        generateQuotasTo(creditPurchases);
+        System.out.println("****** Generating cards");
+        generateCards(this.bankRepository.findAll(), this.cardHolderRepository.findAll());
 
+        System.out.println("****** Generating cash purchases");
+        generateCashPurchases(this.stores, this.cardRepository.findAll());
+        
+        System.out.println("****** Generating cash quotas");
+        generateQuotasTo(this.cashPurchaseRepository.findAll());
+
+        System.out.println("****** Generating credit purchases");
+        generateCreditPurchases(this.stores, this.cardRepository.findAll());
+
+        System.out.println("****** Generating credit quotas");
+        generateQuotasTo(this.creditPurchaseRepository.findAll());
+
+        System.out.println("****** Generating payments");
         generatePaymentsFor(Stream.concat(
-            StreamSupport.stream(cashPurchases.spliterator(), false),
-            StreamSupport.stream(creditPurchases.spliterator(), false))); 
+            StreamSupport.stream(this.cashPurchaseRepository.findAll().spliterator(), false),
+            StreamSupport.stream(this.creditPurchaseRepository.findAll().spliterator(), false))); 
+
+        System.out.println("****** Done");
     }
 
     @Override
@@ -214,8 +230,8 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
      * Generates a random list of stores where card holders can shop
      * @return
      */
-    private Iterable<Store> generateStores() {        
-        return this.faker.collection(() -> new Store(
+    private void generateStores() {        
+        this.stores = this.faker.collection(() -> new Store(
                 this.faker.company().name(), 
                 this.cuitGenerator.getNextValue())
             )
@@ -223,7 +239,7 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
             .generate();
     }
 
-    private Iterable<Bank> generateBanks() {
+    private void generateBanks() {
         List<Bank> banks = this.faker.collection(() -> new Bank(
                 this.faker.company().name(), 
                 this.cuitGenerator.getNextValue(), 
@@ -233,16 +249,14 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
             .len(getIntParam("numOfBanks"))
             .generate();
 
-        return this.bankRepository.saveAll(banks);
+        this.bankRepository.saveAll(banks);
     }
 
     /**
      * Generates a random list of Banks (and their Promotions)
      * @return
      */
-    private Iterable<Promotion> generatePromotions(Iterable<Bank> banks, Iterable<Store> stores) {        
-        var promotions = new ArrayList<Promotion>();
-
+    private void generatePromotions(Iterable<Bank> banks, Iterable<Store> stores) {        
         banks.forEach(bank -> {
             // Asumption: 
             //   - Each Bank will emit both types of promotions (Discount and 
@@ -254,7 +268,7 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
                     var validityStart = getFakeDate();
                     var validityEnd = getFakeDate(validityStart);
 
-                    promotions.add(new Discount(  
+                    var discPromo = this.promotionRepository.save(new Discount(
                         bank,
                         this.promotionCode.getNextValue(), 
                         this.faker.company().catchPhrase(), 
@@ -276,7 +290,7 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
                         ? 0.f 
                         : this.faker.number().numberBetween(1, getIntParam("maxPromoInterest")) / 100.f;
 
-                    promotions.add(new Financing(
+                    var finPromo = this.promotionRepository.save(new Financing(    
                         bank,
                         this.promotionCode.getNextValue(), 
                         this.faker.company().catchPhrase(), 
@@ -286,18 +300,20 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
                         validityEnd, 
                         faker.theItCrowd().actors(),
                         numOfQuotas, 
-                        interest)); 
+                        interest));
+
+                    bank.getPromotions().add(discPromo);
+                    bank.getPromotions().add(finPromo);
+                    this.bankRepository.save(bank);
                 });
             });
-
-        return this.promotionRepository.saveAll(promotions);
     }
 
     /**
      * Generates a random list of card holders
      * @return
      */
-    private Iterable<CardHolder> generateCardHolders() {
+    private void generateCardHolders() {
         Iterable<CardHolder> cardHolders = 
             this.faker.collection(() -> new CardHolder(
                 this.faker.name().fullName(),
@@ -311,7 +327,7 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
             .len(getIntParam("numOfCardHolders"))
             .generate();
 
-        return this.cardHolderRepository.saveAll(cardHolders);
+        this.cardHolderRepository.saveAll(cardHolders);
     }
 
     /**
@@ -320,16 +336,14 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
      * @param cardHolders
      * @return
      */
-    private Iterable<Card> generateCards(Iterable<Bank> banks, Iterable<CardHolder> cardHolders) {        
-        var cards = new ArrayList<Card>();
-
+    private void generateCards(Iterable<Bank> banks, Iterable<CardHolder> cardHolders) {        
         cardHolders.forEach(cardHolder -> {
-            getRandomItemsFrom(banks, getIntParam("maxNumOfCardsPerUser"))
+            getRandomItemsFrom(banks, this.faker.number().numberBetween(1, getIntParam("maxNumOfCardsPerUser")))
                 .forEach(bank -> {
                     var since = getFakeDate(cardHolder.getEntry());
                     var expiration = this.faker.number().numberBetween(1, getIntParam("maxCardExpirationYears"));
 
-                    cards.add(new Card(
+                    var card = this.cardRepository.save(new Card(
                         bank,
                         cardHolder,
                         this.faker.business().creditCardNumber(),
@@ -337,10 +351,14 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
                         since,
                         since.plusYears(expiration)
                     ));
+
+                    bank.getCards().add(card);
+                    this.bankRepository.save(bank);
+
+                    cardHolder.getCards().add(card);
+                    this.cardHolderRepository.save(cardHolder);
                 });
             });
-
-        return this.cardRepository.saveAll(cards);
     }
 
     /**
@@ -349,10 +367,10 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
      * @param cards
      * @return
      */
-    private Iterable<CashPurchase> generateCashPurchases(Iterable<Store> stores, 
-                                                         Iterable<Card> cards) 
+    private void  generateCashPurchases(Iterable<Store> stores, 
+                                        Iterable<Card> cards) 
     { 
-        var purchases = generatePurchases(
+        generatePurchases(
             getIntParam("maxNumOfCashPurchasesPerCard"),
             stores, 
             cards, 
@@ -374,19 +392,20 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
 
                 var finalAmount = amount * (1 - finalDiscount);
                 
-                var purchase = new CashPurchase(
+                var purchase = this.cashPurchaseRepository.save(new CashPurchase(
                     card, 
                     voucher,
                     store.name(), 
                     store.cuit(), 
                     amount, 
                     finalAmount,
-                    storeDiscount);
+                    storeDiscount));
+
+                card.getPurchases().add(purchase);
+                this.cardRepository.save(card);
 
                 return purchase;
             });
-
-        return this.cashRepository.saveAll(purchases);
     }
 
     /**
@@ -396,10 +415,10 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
      * @param cards
      * @return
      */
-    private  Iterable<CreditPurchase> generateCreditPurchases(Iterable<Store> stores, 
-                                                              Iterable<Card> cards) 
+    private  void generateCreditPurchases(Iterable<Store> stores, 
+                                          Iterable<Card> cards) 
     {
-        var purchases = generatePurchases(
+        generatePurchases(
             getIntParam("maxNumOfCreditPurchasesPerCard"), 
             stores, 
             cards, 
@@ -456,7 +475,7 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
                 ///////////////////////////////////
                 // Purchase part
 
-                var purchase = new CreditPurchase(
+                var purchase = this.creditPurchaseRepository.save(new CreditPurchase(
                     card, 
                     finVoucher,
                     store.name(), 
@@ -464,12 +483,13 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
                     amount, 
                     finalAmount,
                     finInterest,
-                    finNumOfQuotas);
+                    finNumOfQuotas));
+
+                card.getPurchases().add(purchase);
+                this.cardRepository.save(card);
 
                 return purchase;
             });
-
-        return this.creditRepository.saveAll(purchases);
     }
 
     /**
@@ -483,15 +503,13 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
      * @return Iterable<T>
      */
     private <T extends Purchase> 
-        Iterable<T> generatePurchases(int maxNumOfPurchases,
+        void generatePurchases(int maxNumOfPurchases,
                                       Iterable<Store> stores, 
                                       Iterable<Card> cards, 
                                       TriFunction<Store, Card, List<Promotion>, T> purchaseCreator)     
     {
-        var purchases = new ArrayList<T>();
-
         if (maxNumOfPurchases <= 0)
-            return purchases;
+            return;
 
         cards.forEach(card -> {
             var numOfPurchases = this.random.nextInt(maxNumOfPurchases) + 1;
@@ -503,13 +521,10 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
                         .filter(promo -> promo.getCuitStore().equals(store.cuit()))
                         .toList();
                      
-
                     assert promotions.size() <=2; // A bank has at most 2 promotions for each store
-                    purchases.add(purchaseCreator.apply(store, card, promotions));
+                    purchaseCreator.apply(store, card, promotions);
                 });
         });
-
-        return purchases;
     }
 
     /**
@@ -519,14 +534,12 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
      * @return
      */
     private <T extends Purchase>
-        Iterable<Quota> generateQuotasTo(Iterable<T> purchases) 
+        void generateQuotasTo(Iterable<T> purchases) 
     { 
-        var quotas = new ArrayList<Quota>();
-
         purchases.forEach(purchase -> {
             var numOfQuotas = switch (purchase) {
-                case CreditPurchase d -> d.getNumberOfQuotas();
-                case CashPurchase f -> 1;
+                case CashPurchase cashP -> 1;
+                case CreditPurchase creditP -> creditP.getNumberOfQuotas();
                 default -> throw new IllegalArgumentException("Unknown type of Purchase");
             };
 
@@ -535,22 +548,31 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
 
             // Adjust the number of quotas if they exceed the expiration date of the credit card
             var monthsForExpiration = ChronoUnit.MONTHS.between(purchase.getCard().getExpirationDate(), shopDate);
-            var finalNumOfQuotas = numOfQuotas > monthsForExpiration ? monthsForExpiration : numOfQuotas;
+            var finalNumOfQuotas = 
+                numOfQuotas != 1 && numOfQuotas > monthsForExpiration
+                    ? monthsForExpiration 
+                    : numOfQuotas;
 
-            for (int i=1; i <= finalNumOfQuotas; i++) {
+            for (int quotaNumber = 1; quotaNumber <= finalNumOfQuotas; quotaNumber++) {
                 // Each quota is set to the following month of the previous one
-                var paymentDate = shopDate.plusMonths(i);
+                var paymentDate = shopDate.plusMonths(quotaNumber);
 
-                quotas.add(new Quota(
+                var quota = this.quotaRespository.save(new Quota(
                     purchase,
-                    i,
+                    quotaNumber,
                     amountPerQuota, 
                     paymentDate.getMonthValue(),
                     paymentDate.getYear()));
+
+                purchase.getQuotas().add(quota);
+
+                switch (purchase) {
+                    case CashPurchase cashP -> cashPurchaseRepository.save(cashP);
+                    case CreditPurchase creditP -> creditPurchaseRepository.save(creditP);
+                    default -> throw new IllegalArgumentException("Unknown type of Purchase");
+                };
             }
         });
-
-        return this.quotaRespository.saveAll(quotas);
     }
 
     /**
@@ -584,7 +606,7 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
                         // so just use one of them to get the card
                         var card = quotas.get(0).getPurchase().getCard();
 
-                        var payment = new Payment(
+                        final var payment = this.paymentRepository.save(new Payment(
                             this.paymentCode.getNextValue(),
                             period.month(),
                             period.year(),
@@ -592,13 +614,12 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
                             LocalDate.of(period.year(), period.month(), 25),
                             totalPrice * 0.5f, // TODO Surcharfe of 5% is harcoded
                             totalPrice,
-                            card);
-
-                        final var savedPayment = this.paymentRepository.save(payment);
+                            card,
+                            quotas));
 
                         // Set the bi-directional relationship
                         quotas.forEach(quota -> {
-                            quota.setPayment(savedPayment);
+                            quota.setPayment(payment);
                         });
 
                         this.quotaRespository.saveAll(quotas);
