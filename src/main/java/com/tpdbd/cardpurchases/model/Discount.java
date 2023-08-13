@@ -3,10 +3,7 @@ package com.tpdbd.cardpurchases.model;
 import java.time.LocalDate;
 
 import org.springframework.data.mongodb.core.mapping.Document;
-// import jakarta.persistence.Column;
-// import jakarta.persistence.Entity;
 
-//@Entity
 @Document
 public class Discount extends Promotion {
 

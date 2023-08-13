@@ -4,13 +4,11 @@ import java.time.LocalDate;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-// import jakarta.persistence.*;
-// import org.hibernate.annotations.Where;
+import org.springframework.data.mongodb.core.mapping.DocumentReference;
 
-// @Entity
 // @Inheritance(strategy = InheritanceType.JOINED) // This allows non nullable fields in subclasses
 // @Where(clause = "deleted = false") // Note: SQL specific, Mongo version will need another solution 
-@Document
+@Document //(collection = "promotions")
 public abstract class Promotion {
     @Id
     // @GeneratedValue
@@ -18,6 +16,8 @@ public abstract class Promotion {
 
     // @ManyToOne
     // @JoinColumn(nullable = false)
+    //@DBRef
+    @DocumentReference
     private Bank bank;
 
     //@Column(length = 50, nullable = false)

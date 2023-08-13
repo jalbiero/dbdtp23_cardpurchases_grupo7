@@ -5,14 +5,11 @@ import java.util.List;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.DocumentReference;
 
-//import jakarta.persistence.*;
-
-//@Entity
-@Document(collection = "banks")
+@Document //(collection = "banks")
 public class Bank {
     @Id
-    //@GeneratedValue
     private String id;
 
     //@Column(length = 50, nullable = false)
@@ -32,6 +29,8 @@ public class Bank {
     //     name="promotion",
     //     joinColumns=@JoinColumn(name="bank_id"),
     //     inverseJoinColumns=@JoinColumn(name="id"))
+    //@DBRef(lazy = false)
+    @DocumentReference(lazy = true)
     private List<Promotion> promotions;
 
     //@OneToMany 
@@ -39,6 +38,8 @@ public class Bank {
     //     name="card",
     //     joinColumns=@JoinColumn(name="bank_id"),
     //     inverseJoinColumns=@JoinColumn(name="id"))
+    //@DBRef(lazy = true)
+    @DocumentReference(lazy = true)
     private List<Card> cards;
 
     public Bank() {
@@ -50,6 +51,7 @@ public class Bank {
         this.address = address;
         this.telephone = telephone;
         this.promotions = new ArrayList<Promotion>();
+        this.cards = new ArrayList<Card>();
     }
 
     public String getId() {
@@ -90,6 +92,10 @@ public class Bank {
 
     public List<Promotion> getPromotions() {
         return this.promotions;
+    }
+
+    public void setPromotions(List<Promotion> promotions) {
+        this.promotions = promotions;
     }
 
     public List<Card> getCards() {
