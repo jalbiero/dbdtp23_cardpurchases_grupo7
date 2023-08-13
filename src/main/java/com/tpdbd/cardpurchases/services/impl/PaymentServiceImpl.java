@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.tpdbd.cardpurchases.errors.MonthlyPaymentNotFoundException;
 import com.tpdbd.cardpurchases.errors.PaymentNotFoundException;
 import com.tpdbd.cardpurchases.model.Payment;
+import com.tpdbd.cardpurchases.repositories.CardRepository;
 import com.tpdbd.cardpurchases.repositories.PaymentRepository;
 import com.tpdbd.cardpurchases.repositories.projections.MostEarnerBank;
 import com.tpdbd.cardpurchases.services.PaymentService;
@@ -37,7 +38,7 @@ public class PaymentServiceImpl implements PaymentService {
     public Payment findMonthlyPayment(String cardId, int year, int month)
     {
         return this.paymentRepository
-            .findMonthlyPayment(cardId, year, month)
+            .findByCard_IdAndYearAndMonth(cardId, year, month)
             .orElseThrow(() -> new MonthlyPaymentNotFoundException(cardId, year, month));
     }
 

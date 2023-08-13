@@ -133,9 +133,9 @@ public class CardPurchasesControllerTests {
         //      are hardcoded (test data is repeatable, but if not, the test will fail.
         //      See TestDataGeneratorService.random for more information about repeatable data)
 
-        final var CARD_ID = 76l; 
-        final var YEAR = 2019;
-        final var MONTH = 3;
+        final var CARD_ID = "64d95f3855a9b2046b5c8571"; 
+        final var YEAR = 2021;
+        final var MONTH = 8;
 
         given()
             .when()
@@ -143,7 +143,7 @@ public class CardPurchasesControllerTests {
             .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
-                .body("cardId", Matchers.equalTo((int)CARD_ID))
+                .body("cardId", Matchers.equalTo(CARD_ID))
                 .body("year", Matchers.equalTo(YEAR))
                 .body("month", Matchers.equalTo(MONTH))
                 .body("purchases", Matchers.not(Matchers.emptyArray()));
