@@ -84,7 +84,7 @@ public class TestControllerTests {
                     .body(card)
                     .post("/test/cards")
                     .jsonPath()
-                    .getObject("id", Long.class);
+                    .getObject("id", String.class);
         
         // Validate the creation
         given()
@@ -93,7 +93,7 @@ public class TestControllerTests {
             .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
-                .body("id", Matchers.equalTo(newCardId.intValue()));
+                .body("id", Matchers.equalTo(newCardId));
                 // TODO Validate other attributes
 
             
@@ -133,10 +133,10 @@ public class TestControllerTests {
             .getObject("ids[0]", String.class);
     }
 
-    static public long getSomeCardHolderId() {
+    static public String getSomeCardHolderId() {
         return given()
             .get("/test/cardHolders/ids")
             .jsonPath()
-            .getObject("ids[0]", Long.class);
+            .getObject("ids[0]", String.class);
     }
 }

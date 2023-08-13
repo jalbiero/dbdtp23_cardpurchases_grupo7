@@ -1,7 +1,7 @@
 package com.tpdbd.cardpurchases.errors;
 
 public class CardHolderNotFoundException extends NotFoundException {
-    public CardHolderNotFoundException(long id) {
-        super("Card holder not found, id = %d", id);
+    public CardHolderNotFoundException(String id) {
+        super("Card holder not found, id = %s", id);
     }
 }

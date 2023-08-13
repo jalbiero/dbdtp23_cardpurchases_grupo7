@@ -45,7 +45,7 @@ public interface RequestDTO {
     ////////////////////////////////////////////////////////
     record Card(
         String bankId,
-        long cardHolderId,
+        String cardHolderId,
         String number,
         String ccv,
         LocalDate since,
