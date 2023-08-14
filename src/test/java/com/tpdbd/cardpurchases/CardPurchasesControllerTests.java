@@ -184,7 +184,7 @@ public class CardPurchasesControllerTests {
             .body(newCard)
             .post("/test/cards")
             .jsonPath()
-            .getObject("id", Long.class);
+            .getObject("id", String.class);
         
         // Test some expiration paths
 
