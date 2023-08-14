@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import com.tpdbd.cardpurchases.errors.MonthlyPaymentNotFoundException;
 import com.tpdbd.cardpurchases.errors.PaymentNotFoundException;
 import com.tpdbd.cardpurchases.model.Payment;
-import com.tpdbd.cardpurchases.repositories.CardRepository;
 import com.tpdbd.cardpurchases.repositories.PaymentRepository;
 import com.tpdbd.cardpurchases.repositories.projections.MostEarnerBank;
 import com.tpdbd.cardpurchases.services.PaymentService;
