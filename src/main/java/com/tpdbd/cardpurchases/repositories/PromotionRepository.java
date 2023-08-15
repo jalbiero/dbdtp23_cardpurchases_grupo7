@@ -16,7 +16,7 @@ public interface PromotionRepository extends CrudRepository<Promotion, String> {
 
    Iterable<Promotion> findByCuitStoreAndValidityStartDateGreaterThanEqualAndValidityEndDateLessThanEqualAndDeletedFalse(String cuitStore, LocalDate from, LocalDate to);
 
-   @Query("{ 'code': ?0 }")
-   @Update("{ $set:  { 'deleted': true } }")
+   @Query("{ code: ?0 }")
+   @Update("{ $set:  { deleted: true } }")
    Integer deleteByCode(String code);
 }
