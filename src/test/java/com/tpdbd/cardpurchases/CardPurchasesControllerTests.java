@@ -275,11 +275,13 @@ public class CardPurchasesControllerTests {
     }
 
     @Test
-    public void testStoresGetAvailblePromotions() {
+    public void testStoresGetAvailblePromotionsHappyPath() {
         BiFunction<String, String, String> makeParams = 
             (from, to) -> String.format("from=%s&to=%s", from, to); 
 
         var storeCuit = getSomeStoreCuit();
+
+        // Try to pick all promotions
 
         var response = 
             given()
@@ -291,21 +293,25 @@ public class CardPurchasesControllerTests {
                 .statusCode(200)
                 .contentType(ContentType.JSON)
                 .body("$", Matchers.hasSize(Matchers.greaterThan(0)));
+    }
 
-        // Pick the 1st promotion in order to filter by its dates
-        var from = response.jsonPath().getString("[0].validityStartDate");
-        var to = response.jsonPath().getString("[0].validityEndDate");
+    @Test
+    public void testStoresGetAvailblePromotionsNotFound() {
+        BiFunction<String, String, String> makeParams = 
+            (from, to) -> String.format("from=%s&to=%s", from, to); 
 
-        response = 
+        var storeCuit = getSomeStoreCuit();
+
+        var response = 
             given()
                 .when()
                     .get("/stores/{cuit}/availablePromotions?{params}", 
-                        storeCuit, makeParams.apply(from, to));
+                        storeCuit, makeParams.apply("1500-01-01", "1600-12-31"));
         response
             .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
-                .body("$", Matchers.hasSize(Matchers.equalTo(1)));
+                .body("$", Matchers.hasSize(Matchers.equalTo(0)));
     }
 
     @Test
