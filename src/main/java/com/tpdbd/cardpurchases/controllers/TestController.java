@@ -120,6 +120,13 @@ public class TestController {
         return result;
     }
 
+    @GetMapping("/purchases/creditIds")
+    Map<String, List<String>> getPurchaseCreditIds() {
+        var result = new LinkedHashMap<String, List<String>>();
+        result.put("ids", this.service.getPurchaseCreditIds());
+        return result;
+    }
+
     ///////////////////////
     // Stores
 

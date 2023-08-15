@@ -8,6 +8,7 @@ import com.tpdbd.cardpurchases.repositories.projections.NumOfPurchasesByCard;
 
 public interface PurchaseService {
     List<String> findAllIds();
+    List<String> findAllCreditIds();
     
     Purchase findById(String purchaseId);
 

@@ -251,12 +251,7 @@ public class CardPurchasesControllerTests {
 
     @Test
     public void testPurchasesCreditGetTotalPriceHappyPath() {
-        // TODO This test is not well designed because the ID is hardcoded. 
-        //      (test data is repeatable, but if not, the test will fail.
-        //      See TestDataGeneratorService.random for more information about 
-        //      repeatable data)
-
-        final var CREDIT_PURCHASE_ID = 901;
+        final var CREDIT_PURCHASE_ID = getSomeCreditPurchaseId();
      
         given()
             .when()
@@ -264,7 +259,7 @@ public class CardPurchasesControllerTests {
             .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
-                .body("id", Matchers.equalTo((int)CREDIT_PURCHASE_ID))
+                .body("id", Matchers.equalTo(CREDIT_PURCHASE_ID))
                 .body("totalPrice", Matchers.greaterThanOrEqualTo(0.f));
     }
 
@@ -430,6 +425,13 @@ public class CardPurchasesControllerTests {
     static public String getSomePurchaseId() {
         return given()
             .get("/test/purchases/ids")
+            .jsonPath()
+            .getObject("ids[0]", String.class);
+    }
+
+    static public String getSomeCreditPurchaseId() {
+        return given()
+            .get("/test/purchases/creditIds")
             .jsonPath()
             .getObject("ids[0]", String.class);
     }

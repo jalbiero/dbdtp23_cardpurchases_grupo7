@@ -13,8 +13,8 @@ import com.tpdbd.cardpurchases.repositories.projections.MostUsedVoucher;
 import com.tpdbd.cardpurchases.repositories.projections.NumOfPurchasesByCard;
 
 public interface PurchaseRepository<T extends Purchase> extends CrudRepository<T, String> {
-    // @Query("SELECT p.id FROM Purchase p")
-    // List<Long> findAllIds();
+    @Query("{ _class: ?0 }")
+    Iterable<T> findAllByType(String typeName);
 
     @Query(
         "SELECT " + 
