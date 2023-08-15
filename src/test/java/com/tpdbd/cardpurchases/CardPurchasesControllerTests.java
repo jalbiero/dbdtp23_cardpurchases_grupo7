@@ -265,12 +265,7 @@ public class CardPurchasesControllerTests {
 
     @Test
     public void testPurchasesCreditGetTotalPriceNotFound() {
-        // TODO This test is not well designed because the ID is hardcoded. 
-        //      (test data is repeatable, but if not, the test will fail.
-        //      See TestDataGeneratorService.random for more information about 
-        //      repeatable data)
-
-        final var CASH_PURCHASE_ID = 1;
+        final var CASH_PURCHASE_ID = "inexistentCashPurchaseId";
      
         given()
             .when()
