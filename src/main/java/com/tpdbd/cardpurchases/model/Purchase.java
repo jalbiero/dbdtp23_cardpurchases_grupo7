@@ -19,7 +19,7 @@ public abstract class Purchase {
     // @ManyToOne
     // @JoinColumn(nullable = false)
     //@DBRef
-    @DocumentReference 
+    //@DocumentReference 
     private Card card;
 
     //@Column(nullable = true)

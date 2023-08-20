@@ -29,6 +29,13 @@ public class PurchaseServiceImpl implements PurchaseService {
     }
 
     @Override
+    public List<String> findAllCreditIds() {
+        return StreamHelpers.toStream(this.purchaseRepository.findAllByType(CreditPurchase.class.getName()))
+            .map(purchase -> purchase.getId())
+            .toList();
+    }
+
+    @Override
     public Purchase findById(String purchaseId) {
         return this.purchaseRepository
             .findById(purchaseId)

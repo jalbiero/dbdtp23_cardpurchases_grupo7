@@ -10,6 +10,7 @@ import com.tpdbd.cardpurchases.errors.PromotionNotFoundException;
 import com.tpdbd.cardpurchases.model.Promotion;
 import com.tpdbd.cardpurchases.repositories.PromotionRepository;
 import com.tpdbd.cardpurchases.services.PromotionService;
+import com.tpdbd.cardpurchases.util.StreamHelpers;
 
 @Service
 public class PromotionServiceImpl implements PromotionService {
@@ -18,21 +19,23 @@ public class PromotionServiceImpl implements PromotionService {
 
     @Override
     public List<String> findAllCodes() {
-        return this.promotionRepository.findAllCodes();
+        return StreamHelpers.toStream(this.promotionRepository.findByDeletedFalse())
+            .map(promo -> promo.getCode())
+            .toList();
     }
  
     @Override
     public Promotion findByCode(String code) {
         return this.promotionRepository
-            .findByCode(code)
+            .findByCodeAndDeletedFalse(code)
             .orElseThrow(() -> new PromotionNotFoundException(code));
     }
  
     @Override
     public List<Promotion> GetAvailablePromotions(String cuitStore, LocalDate from, LocalDate to) {
-        return this.promotionRepository
-            .findByCuitStoreAndValidityStartDateGreaterThanEqualAndValidityEndDateLessThanEqual(
-                cuitStore, from, to);
+        return StreamHelpers.toStream(this.promotionRepository
+            .findByCuitStoreAndValidityStartDateGreaterThanEqualAndValidityEndDateLessThanEqualAndDeletedFalse(
+                cuitStore, from, to)).toList();
     }
  
     @Override
@@ -42,7 +45,7 @@ public class PromotionServiceImpl implements PromotionService {
     } 
 
     @Override
-    public void save(Promotion promotion) {
-        this.promotionRepository.save(promotion);
+    public Promotion save(Promotion promotion) {
+        return this.promotionRepository.save(promotion);
     }
 }

@@ -29,4 +29,9 @@ public class BankServiceImpl implements BankService {
             .findById(id)
             .orElseThrow(() -> new BankNotFoundException(id));
     }
+
+    @Override
+    public Bank save(Bank bank) {
+        return this.bankRepository.save(bank);
+    }
 }

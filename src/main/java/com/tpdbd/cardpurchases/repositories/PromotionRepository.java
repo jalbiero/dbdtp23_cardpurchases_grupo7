@@ -1,35 +1,22 @@
 package com.tpdbd.cardpurchases.repositories;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
 
-import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
-//import org.springframework.data.jpa.repository.Modifying;
-// import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.mongodb.repository.Update;
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.query.Param;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.tpdbd.cardpurchases.model.Promotion;
 
-//import jakarta.transaction.Transactional;
+public interface PromotionRepository extends CrudRepository<Promotion, String> {
+   Iterable<Promotion> findByDeletedFalse(); // findAll, but ignoring deleted records
 
-public interface PromotionRepository extends MongoRepository<Promotion, Long> {
-   @Query("SELECT p.code FROM Promotion p")
-   List<String> findAllCodes();
+   Optional<Promotion> findByCodeAndDeletedFalse(String code);
 
-   Optional<Promotion> findByCode(String code);
+   Iterable<Promotion> findByCuitStoreAndValidityStartDateGreaterThanEqualAndValidityEndDateLessThanEqualAndDeletedFalse(String cuitStore, LocalDate from, LocalDate to);
 
-   List<Promotion> findByCuitStoreAndValidityStartDateGreaterThanEqualAndValidityEndDateLessThanEqual(String cuitStore, LocalDate from, LocalDate to);
-
-   // Performs a logical delete
-   @Transactional
-   //@Modifying
-   @Query(
-      "UPDATE Promotion p " + 
-      "SET p.deleted = true " + 
-      "WHERE p.code = :code")
-   Integer deleteByCode(@Param("code") String code);
+   @Query("{ code: ?0 }")
+   @Update("{ $set:  { deleted: true } }")
+   Integer deleteByCode(String code);
 }

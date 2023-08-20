@@ -14,5 +14,5 @@ public interface PromotionService {
  
     void deleteByCode(String code);
     
-    void save(Promotion promotion);
+    Promotion save(Promotion promotion);
 }

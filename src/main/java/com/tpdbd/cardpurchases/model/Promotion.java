@@ -7,7 +7,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.DocumentReference;
 
 // @Inheritance(strategy = InheritanceType.JOINED) // This allows non nullable fields in subclasses
-// @Where(clause = "deleted = false") // Note: SQL specific, Mongo version will need another solution 
 @Document //(collection = "promotions")
 public abstract class Promotion {
     @Id

@@ -46,7 +46,8 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
         var bank = this.bankService.find(id);
         var promo = RequestDTO.Discount.toModel(discount, bank);
 
-        this.promotionService.save(promo);
+        bank.getPromotions().add(this.promotionService.save(promo));
+        this.bankService.save(bank);
     }
 
     @Override
@@ -146,7 +147,6 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
     }
 
     @Override
-    @Transactional
     public ResponseDTO.Bank banksGetTheOneWithMostPaymentValues() {
         // For debugging purposes: Set a greater value and uncomment the 
         // logging code a few lines below
@@ -159,14 +159,15 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
             throw new NotFoundException("No banks with payments from their cards");
 
         // TODO Add a propper logger instead of the console output
-        // mostEarnerBanks.forEach(earnerBank -> {
+        // mostEarnerBanks.forEach(bankInfo -> {
         //     System.out.println(
-        //         "Bank: " + earnerBank.getBank().getName() + 
-        //         ", total payment value: " + earnerBank.getTotalPaymentValue());
+        //         "Bank: " + bankInfo.getBankId() + 
+        //         ", total payment value: " + bankInfo.getTotalPaymentValue());
         // });
 
-        var mostEarnerBank = mostEarnerBanks.get(0);
-
-        return ResponseDTO.Bank.fromModel(mostEarnerBank.getBank(), mostEarnerBank.getTotalPaymentValue());
+        var mostEarnerBankInfo = mostEarnerBanks.get(0);
+        var bank = this.bankService.find(mostEarnerBankInfo.getBankId());
+       
+        return ResponseDTO.Bank.fromModel(bank, mostEarnerBankInfo.getTotalPaymentValue());
     }
 }

@@ -37,7 +37,7 @@ public class PaymentServiceImpl implements PaymentService {
     public Payment findMonthlyPayment(String cardId, int year, int month)
     {
         return this.paymentRepository
-            .findMonthlyPayment(cardId, year, month)
+            .findByCard_IdAndYearAndMonth(cardId, year, month)
             .orElseThrow(() -> new MonthlyPaymentNotFoundException(cardId, year, month));
     }
 
