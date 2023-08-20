@@ -1,6 +1,5 @@
 package com.tpdbd.cardpurchases.repositories;
 
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.mongodb.repository.Aggregation;
@@ -22,13 +21,11 @@ public interface PurchaseRepository<T extends Purchase> extends CrudRepository<T
     })
     Slice<NumOfPurchasesByCard> findTopPurchaserCards(Pageable pageable);  
 
-    @Query(
-        "SELECT " + 
-        "   COUNT(p) AS numOfPurchases, " + 
-        "   p.paymentVoucher AS code " + 
-        "FROM Purchase p " + 
-        "WHERE p.paymentVoucher IS NOT NULL " +
-        "GROUP BY p.paymentVoucher " +
-        "ORDER BY numOfPurchases DESC")
-    Page<MostUsedVoucher> findTheMostUsedVouchers(Pageable pageable);  
+    @Aggregation({ 
+        "{ $match: { 'paymentVoucher': { $ne: null } } } ",
+        "{ $group: { _id : '$paymentVoucher', paymentVoucher: { '$first': '$paymentVoucher' }, numOfPurchases: { $sum: 1 } } }",
+        "{ $sort : { numOfPurchases : -1 } }",
+        "{ $project: { _id: 0, 'code': $paymentVoucher, numOfPurchases: 1 } }"        
+    })
+    Slice<MostUsedVoucher> findTheMostUsedVouchers(Pageable pageable);  
 }
