@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.DocumentReference;
 
@@ -16,6 +17,7 @@ public class Bank {
     private String name;
 
     //@Column(unique = true, length = 20, nullable = false)
+    @Indexed(unique = true)
     private String cuit;
 
     //@Column(length = 200, nullable = false)
