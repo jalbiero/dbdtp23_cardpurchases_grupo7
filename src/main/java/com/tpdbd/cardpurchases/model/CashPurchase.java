@@ -7,7 +7,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document
 public class CashPurchase extends Purchase {
 
-    //@Column(nullable = false)
     private float storeDiscount;
 
     public CashPurchase() {

@@ -6,42 +6,30 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.DocumentReference;
 
-// @Inheritance(strategy = InheritanceType.JOINED) // This allows non nullable fields in subclasses
-@Document //(collection = "promotions")
+@Document
 public abstract class Promotion {
     @Id
-    // @GeneratedValue
     private String id;
 
-    // @ManyToOne
-    // @JoinColumn(nullable = false)
-    //@DBRef
     @DocumentReference
     private Bank bank;
 
-    //@Column(length = 50, nullable = false)
     private String code; // aka 'paymentVoucher' (in Purchase class)
 
-    //@Column(length = 100, nullable = false)
     private String promotionTitle;
 
-    //@Column(length = 50, nullable = false)
     private String nameStore;
 
-    //@Column(length = 20, nullable = false)
     private String cuitStore;
 
-    //@Column(nullable = false)
     private LocalDate validityStartDate;
 
-    //@Column(nullable = false)
     private LocalDate validityEndDate;
 
-    //@Column(length = 200, nullable = false)
     private String comments;
 
-    // Implements a logical delete with the help of @Where annotation (see 
-    // PromotionRepository.deleteByCode for more information about its usage
+    // Implements a logical delete with the help of the repository (see
+    // PromotionRepository.deleteByCode for more information about its usage)
     @SuppressWarnings("unused")
     private Boolean deleted; 
 

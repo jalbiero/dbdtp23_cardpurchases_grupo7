@@ -14,32 +14,20 @@ public class CardHolder {
     @Id
     private String id;
 
-    //@Column(length = 50, nullable = false)
     private String completeName;
 
-    //@Column(unique = true, length = 8, nullable = false)
     @Indexed(unique = true)
     private String dni;
 
-    //@Column(unique = true, length = 20, nullable = false)
     @Indexed(unique = true)
     private String cuil;
 
-    //@Column(length = 200, nullable = false)
     private String address;
 
-    //@Column(length = 20, nullable = false)
     private String telephone;
 
-    //@Column(nullable = false)
     private LocalDate entry;
 
-    //@OneToMany
-    // @JoinTable(
-    //     name="card",
-    //     joinColumns=@JoinColumn(name="card_holder_id"),
-    //     inverseJoinColumns=@JoinColumn(name="id"))
-    //@DBRef
     @DocumentReference(lazy = true)
     private List<Card> cards;
 

@@ -7,13 +7,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document
 public class Discount extends Promotion {
 
-    //@Column(nullable = false)
     private float discountPercentage;
 
-    //@Column(nullable = false)
     private float priceCap;
 
-    //@Column(nullable = false)
     private boolean onlyCash; 
 
     public Discount() {

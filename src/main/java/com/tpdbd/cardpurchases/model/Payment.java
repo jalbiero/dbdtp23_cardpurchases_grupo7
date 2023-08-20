@@ -5,51 +5,35 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.DocumentReference;
 
 @Document
 public class Payment {
     @Id
-    // @GeneratedValue
     private String id;
 
-    //@Column(length = 50, nullable = false)
     private String code;
 
-    //@Column(nullable = false)
     private int month;
 
-    //@Column(nullable = false)
     private int year;
 
-    //@Column(nullable = false)
     private LocalDate firstExpiration;
 
-    //@Column(nullable = false)
     private LocalDate secondExpiration;
 
-    //@Column(nullable = false)
     private float surcharge; 
 
-    //@Column(nullable = false)
     private float totalPrice;
 
-    //@OneToMany
-    // @JoinTable(
-    //     name="quota",
-    //     joinColumns=@JoinColumn(name="payment_id"),
-    //     inverseJoinColumns=@JoinColumn(name="id"))
-    //@DBRef(lazy = true)
     @DocumentReference(lazy = true)
     private List<Quota> quotas;
 
-    // This allows an easy navigation to the card used in the payment (another
-    // complex way it is to use one of the associated quotas in order to reach 
-    // the Purchase and then the Card)
-    //@ManyToOne
-    //@DocumentReference
+    // - This allows an easy navigation to the card used in the payment (another
+    //   complex way it is to use one of the associated quotas in order to reach 
+    //   the Purchase and then the Card)
+    // - Embedded to simplify queries (see PaymentRepository)
     private Card card;
     
     public Payment() {

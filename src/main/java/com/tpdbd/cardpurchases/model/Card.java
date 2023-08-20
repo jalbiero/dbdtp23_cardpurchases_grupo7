@@ -12,43 +12,25 @@ import org.springframework.data.mongodb.core.mapping.DocumentReference;
 @Document
 public class Card {
     @Id
-    // @GeneratedValue
     private String id;
 
-    // @ManyToOne
-    // @JoinColumn(nullable = false)
-    //@DBRef
     @DocumentReference //(lazy = true)
     private Bank bank;
 
-    // @ManyToOne 
-    // @JoinColumn(nullable = false)
-    //@DBRef
     @DocumentReference //(lazy = true)
     private CardHolder cardHolder;
 
-    //@Column(unique = true, length = 20, nullable = false)
     @Indexed(unique = true)
     private String number;
 
-    //@Column(length = 3, nullable = false)
     private String ccv;
 
-    //@Column(length = 50, nullable = false)
     private String cardholderNameInCard;
 
-    //@Column(nullable = false)
     private LocalDate since;
 
-    //@Column(nullable = false)
     private LocalDate expirationDate;
 
-    //@OneToMany 
-    // @JoinTable(
-    //     name="purchase",
-    //     joinColumns=@JoinColumn(name="card_id"),
-    //     inverseJoinColumns=@JoinColumn(name="id"))
-    //@DBRef
     @DocumentReference(lazy = true)
     private List<Purchase> purchases;
 

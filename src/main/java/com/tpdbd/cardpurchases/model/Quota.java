@@ -11,28 +11,19 @@ import org.springframework.data.mongodb.core.mapping.DocumentReference;
 @Document
 public class Quota {
     @Id
-    // @GeneratedValue
     private String id;
 
-    // @ManyToOne
-    // @JoinColumn(nullable = false)
-    //@DocumentReference
+    // Embedded to simplify queries (see QuotaRepository)
     private Purchase purchase;
 
-    //@Column(nullable = false)
     private int number;
 
-    //@Column(nullable = false)
     private float price;
 
-    //@Column(nullable = false)
     private int month;
 
-    //@Column(nullable = false)
     private int year;
 
-    // @ManyToOne
-    // @JoinColumn(nullable = true)
     @Nullable
     @DocumentReference
     private Payment payment;

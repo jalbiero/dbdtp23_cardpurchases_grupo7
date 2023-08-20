@@ -8,39 +8,23 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.DocumentReference;
 
-@Document //(collection = "banks")
+@Document 
 public class Bank {
     @Id
     private String id;
 
-    //@Column(length = 50, nullable = false)
     private String name;
 
-    //@Column(unique = true, length = 20, nullable = false)
     @Indexed(unique = true)
     private String cuit;
 
-    //@Column(length = 200, nullable = false)
     private String address;
 
-    //@Column(length = 20, nullable = false)
     private String telephone;
 
-    //@OneToMany 
-    // @JoinTable(
-    //     name="promotion",
-    //     joinColumns=@JoinColumn(name="bank_id"),
-    //     inverseJoinColumns=@JoinColumn(name="id"))
-    //@DBRef(lazy = false)
     @DocumentReference(lazy = true)
     private List<Promotion> promotions;
 
-    //@OneToMany 
-    // @JoinTable(
-    //     name="card",
-    //     joinColumns=@JoinColumn(name="bank_id"),
-    //     inverseJoinColumns=@JoinColumn(name="id"))
-    //@DBRef(lazy = true)
     @DocumentReference(lazy = true)
     private List<Card> cards;
 
