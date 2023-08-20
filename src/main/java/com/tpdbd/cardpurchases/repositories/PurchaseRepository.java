@@ -1,11 +1,10 @@
 package com.tpdbd.cardpurchases.repositories;
 
-import java.util.List;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.data.mongodb.repository.Query;
-//import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
 import com.tpdbd.cardpurchases.model.Purchase;
@@ -16,15 +15,13 @@ public interface PurchaseRepository<T extends Purchase> extends CrudRepository<T
     @Query("{ _class: ?0 }")
     Iterable<T> findAllByType(String typeName);
 
-    @Query(
-        "SELECT " + 
-        "   COUNT(p) AS numOfPurchases, " + 
-        "   p.card AS card " + 
-        "FROM Purchase p " + 
-        "GROUP BY p.card " +
-        "ORDER BY numOfPurchases DESC")
-    Page<NumOfPurchasesByCard> findTopPurchaserCards(Pageable pageable);  
-    
+    @Aggregation({ 
+        "{ $group: { _id : '$card._id', card: { '$first': '$card' }, numOfPurchases: { $sum: 1 } } }",
+        "{ $sort : { numOfPurchases : -1 } }",
+        "{ $project: { _id: 0 } }"
+    })
+    Slice<NumOfPurchasesByCard> findTopPurchaserCards(Pageable pageable);  
+
     @Query(
         "SELECT " + 
         "   COUNT(p) AS numOfPurchases, " + 
