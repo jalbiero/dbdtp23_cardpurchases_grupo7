@@ -49,7 +49,7 @@ public class Payment {
     // complex way it is to use one of the associated quotas in order to reach 
     // the Purchase and then the Card)
     //@ManyToOne
-    @DocumentReference
+    //@DocumentReference
     private Card card;
     
     public Payment() {
