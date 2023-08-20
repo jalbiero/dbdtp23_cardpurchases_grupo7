@@ -127,10 +127,11 @@ public class CardPurchasesControllerTests {
                     Matchers.equalTo(NEW_DATES.secondExpiration().toString()));
     }
 
-    @Test 
+    //@Test 
     void testCardsGetMonthtlyPaymentHappyPath() {
-        // TODO This test is not well designed because the card id, year and month
-        //      are hardcoded (test data is repeatable, but if not, the test will fail.
+        // TODO This test is not well designed (that's why is disabled) because the card id, year and month
+        //      are hardcoded (test data is repeatable, but if not, the test will fail, especially
+        //      with MongoDb where IDs are randomly generated every time).
         //      See TestDataGeneratorService.random for more information about repeatable data)
 
         final var CARD_ID = "64d95f3855a9b2046b5c8571"; 
