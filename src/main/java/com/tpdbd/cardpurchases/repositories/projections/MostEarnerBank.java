@@ -6,7 +6,7 @@ import com.tpdbd.cardpurchases.model.Bank;
 public record MostEarnerBank(Bank bank, float totalPaymentValue)  {
 
     // Provides compatibility with the SQL version based on the 
-    // old NumOfPurchasesByCard interface
+    // old MostEarnerBank interface
 
     public Bank getBank() {
         return this.bank;

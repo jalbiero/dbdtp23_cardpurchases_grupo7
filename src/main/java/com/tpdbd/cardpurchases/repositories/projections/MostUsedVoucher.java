@@ -4,7 +4,7 @@ package com.tpdbd.cardpurchases.repositories.projections;
 public record MostUsedVoucher(String code, int numOfPurchases) {
 
     // Provides compatibility with the SQL version based on the 
-    // old NumOfPurchasesByCard interface
+    // old MostUsedVoucher interface
 
     public String getCode() {
         return this.code;

@@ -16,10 +16,22 @@ public class QuotaServiceImpl implements QuotaService {
 
     @Override
     public Store getTheBestSellerStore(int year, int month) {
-        var bestSellers = this.quotaRepository.findTheBestSellerStores(year, month, PageRequest.of(0, 1));
+        // For debugging purposes: Set a greater value and uncomment the 
+        // logging code a few lines below
+        final var NUM_OF_STORES = 1; 
+
+        var bestSellers = this.quotaRepository.findTheBestSellerStores(year, month, PageRequest.of(0, NUM_OF_STORES));
 
         if (bestSellers.isEmpty())
             throw new BestSellerStoreNotFoundException(year, month);
+
+        // TODO Add a propper logger instead of the console output
+        // bestSellers.forEach(store -> {
+        //     System.out.println(
+        //         "Store: " + store.getStore() +
+        //         ", cuit: " + store.cuitStore() + 
+        //         ", monthly profit: $" + store.getMonthlyProfit());
+        // });
 
         return bestSellers.getContent().get(0);
     }

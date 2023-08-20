@@ -16,7 +16,7 @@ public class Quota {
 
     // @ManyToOne
     // @JoinColumn(nullable = false)
-    @DocumentReference
+    //@DocumentReference
     private Purchase purchase;
 
     //@Column(nullable = false)
