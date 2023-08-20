@@ -89,39 +89,39 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
 
     @Override
     public void generateData() {
-        System.out.println("****** Generating stores");
+        System.out.println(">> Generating stores");
         generateStores();
 
-        System.out.println("****** Generating banks");
+        System.out.println(">> Generating banks");
         generateBanks();
 
-        System.out.println("****** Generating promotions");
+        System.out.println(">> Generating promotions");
         generatePromotions(this.bankRepository.findAll(), this.stores);
 
-        System.out.println("****** Generating card holders");
+        System.out.println(">> Generating card holders");
         generateCardHolders();
 
-        System.out.println("****** Generating cards");
+        System.out.println(">> Generating cards");
         generateCards(this.bankRepository.findAll(), this.cardHolderRepository.findAll());
 
-        System.out.println("****** Generating cash purchases");
+        System.out.println(">> Generating cash purchases");
         generateCashPurchases(this.stores, this.cardRepository.findAll());
         
-        System.out.println("****** Generating cash quotas");
+        System.out.println(">> Generating cash quotas");
         generateQuotasTo(this.cashPurchaseRepository.findAll());
 
-        System.out.println("****** Generating credit purchases");
+        System.out.println(">> Generating credit purchases");
         generateCreditPurchases(this.stores, this.cardRepository.findAll());
 
-        System.out.println("****** Generating credit quotas");
+        System.out.println(">> Generating credit quotas");
         generateQuotasTo(this.creditPurchaseRepository.findAll());
 
-        System.out.println("****** Generating payments");
+        System.out.println(">> Generating payments");
         generatePaymentsFor(Stream.concat(
             StreamSupport.stream(this.cashPurchaseRepository.findAll().spliterator(), false),
             StreamSupport.stream(this.creditPurchaseRepository.findAll().spliterator(), false))); 
 
-        System.out.println("****** Done");
+        System.out.println(">> Done");
     }
 
     @Override
