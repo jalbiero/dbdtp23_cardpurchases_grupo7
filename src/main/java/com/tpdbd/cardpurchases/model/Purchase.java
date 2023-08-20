@@ -13,36 +13,21 @@ import org.springframework.data.mongodb.core.mapping.DocumentReference;
 @Document
 public abstract class Purchase {
     @Id
-    // @GeneratedValue
     private String id;
 
-    // @ManyToOne
-    // @JoinColumn(nullable = false)
-    //@DBRef
-    //@DocumentReference 
+    // Embedded to simplify queries (see PurchaseRepository)
     private Card card;
 
-    //@Column(nullable = true)
     private String paymentVoucher;
 
-    //@Column(length = 50, nullable = false)
     private String store;
 
-    //@Column(length = 20, nullable = false)
     private String cuitStore;
 
-    //@Column(nullable = false)
     private float amount;
 
-    //@Column(nullable = false)
     private float finalAmount;
 
-    //@OneToMany 
-    // @JoinTable(
-    //     name="quota",
-    //     joinColumns=@JoinColumn(name="purchase_id"),
-    //     inverseJoinColumns=@JoinColumn(name="id"))
-    //@DBRef(lazy = true) // TODO the num of quotas is really small, maybe 'false' is better
     @DocumentReference(lazy = true)
     private List<Quota> quotas;
 

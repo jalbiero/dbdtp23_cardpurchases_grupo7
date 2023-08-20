@@ -7,10 +7,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document
 public class CreditPurchase extends Purchase {
 
-    //@Column(nullable = true)
     private float interest;
 
-    //@Column(nullable = false)
     private int numberOfQuotas;
 
     public CreditPurchase() {
