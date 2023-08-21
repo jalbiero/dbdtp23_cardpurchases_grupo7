@@ -18,7 +18,10 @@ Para simplificar el desarrollo los tests unitarios son de integración es decir 
 
 El desarrollo se hizo bajo Linux (openSUSE 15.4), no se probó en otras plataformas (macOS, Windows), pero debería funcionar sin problemas en ambas.
 
-Nota: En el archivo [pom.xml](pom.xml) se agregó una tarea (ver `Start-up dependant services`) que automáticamente levanta el docker de Mongo mediante `docker compose` tanto al ejecutar la aplicación como al ejecutar sus tests unitarios. Todo es automático.
+Nota: En el archivo [pom.xml](pom.xml) se agregaron 2 tareas:
+
+1. `Start-up dependant services`: Automáticamente levanta el docker de Mongo mediante `docker compose` tanto al ejecutar la aplicación como al ejecutar sus tests unitarios.
+2. `Drop mongo database at startup`: Limpia la base de Mongo, tanto al arrancar la aplicación como al ejecutar los tests unitarios.
 
 ## Instalación y ejecución
 
