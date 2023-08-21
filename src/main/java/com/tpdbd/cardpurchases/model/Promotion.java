@@ -3,6 +3,7 @@ package com.tpdbd.cardpurchases.model;
 import java.time.LocalDate;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.DocumentReference;
 
@@ -14,6 +15,7 @@ public abstract class Promotion {
     @DocumentReference
     private Bank bank;
 
+    @Indexed(unique = true)
     private String code; // aka 'paymentVoucher' (in Purchase class)
 
     private String promotionTitle;
