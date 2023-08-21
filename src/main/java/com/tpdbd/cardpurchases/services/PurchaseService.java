@@ -12,7 +12,7 @@ public interface PurchaseService {
     
     Purchase findById(String purchaseId);
 
-    Purchase findCreditTotalPrice(String purchaseId);
+    Purchase findCreditById(String purchaseId);
 
     List<NumOfPurchasesByCard> findTopPurchasers(int count);
 

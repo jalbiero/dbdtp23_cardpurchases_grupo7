@@ -2,9 +2,11 @@ package com.tpdbd.cardpurchases.model;
 
 import jakarta.annotation.Nullable;
 
+import org.springframework.data.annotation.TypeAlias;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document
+@Document(collection = "purchase")
+@TypeAlias("CashPurchase") // Simplifies name for queries (see CashPurchaseRepository)
 public class CashPurchase extends Purchase {
 
     private float storeDiscount;

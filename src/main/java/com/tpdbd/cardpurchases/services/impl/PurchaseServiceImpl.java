@@ -8,8 +8,8 @@ import org.springframework.stereotype.Service;
 
 import com.tpdbd.cardpurchases.errors.CreditPurchaseNotFoundException;
 import com.tpdbd.cardpurchases.errors.PurchaseNotFoundException;
-import com.tpdbd.cardpurchases.model.CreditPurchase;
 import com.tpdbd.cardpurchases.model.Purchase;
+import com.tpdbd.cardpurchases.repositories.CreditPurchaseRepository;
 import com.tpdbd.cardpurchases.repositories.PurchaseRepository;
 import com.tpdbd.cardpurchases.repositories.projections.MostUsedVoucher;
 import com.tpdbd.cardpurchases.repositories.projections.NumOfPurchasesByCard;
@@ -19,7 +19,10 @@ import com.tpdbd.cardpurchases.util.StreamHelpers;
 @Service
 public class PurchaseServiceImpl implements PurchaseService {
     @Autowired
-    private PurchaseRepository<Purchase> purchaseRepository; 
+    private PurchaseRepository<Purchase> purchaseRepository; // For general use regarding the purchase type
+
+    @Autowired
+    private CreditPurchaseRepository creditPurchaseRepository; 
 
     @Override
     public List<String> findAllIds() {
@@ -30,7 +33,7 @@ public class PurchaseServiceImpl implements PurchaseService {
 
     @Override
     public List<String> findAllCreditIds() {
-        return StreamHelpers.toStream(this.purchaseRepository.findAllByType(CreditPurchase.class.getName()))
+        return StreamHelpers.toStream(this.creditPurchaseRepository.findAll())
             .map(purchase -> purchase.getId())
             .toList();
     }
@@ -43,13 +46,11 @@ public class PurchaseServiceImpl implements PurchaseService {
     }
 
     @Override
-    public Purchase findCreditTotalPrice(String purchaseId) {
-        return this.purchaseRepository 
+    public Purchase findCreditById(String purchaseId) {
+        return this.creditPurchaseRepository
             .findById(purchaseId)
-            .filter(p -> CreditPurchase.class.isInstance(p))
-            .map(p -> CreditPurchase.class.cast(p))
             .orElseThrow(() -> new CreditPurchaseNotFoundException(purchaseId));    
-    }
+}
 
     @Override
     public List<NumOfPurchasesByCard> findTopPurchasers(int count) {

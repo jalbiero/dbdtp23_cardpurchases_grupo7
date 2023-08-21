@@ -34,9 +34,10 @@ import com.tpdbd.cardpurchases.model.Quota;
 import com.tpdbd.cardpurchases.repositories.BankRepository;
 import com.tpdbd.cardpurchases.repositories.CardHolderRepository;
 import com.tpdbd.cardpurchases.repositories.CardRepository;
+import com.tpdbd.cardpurchases.repositories.CashPurchaseRepository;
+import com.tpdbd.cardpurchases.repositories.CreditPurchaseRepository;
 import com.tpdbd.cardpurchases.repositories.PaymentRepository;
 import com.tpdbd.cardpurchases.repositories.PromotionRepository;
-import com.tpdbd.cardpurchases.repositories.PurchaseRepository;
 import com.tpdbd.cardpurchases.repositories.QuotaRepository;
 import com.tpdbd.cardpurchases.services.TestDataGeneratorService;
 import com.tpdbd.cardpurchases.util.SequenceGenerator;
@@ -66,8 +67,8 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
     @Autowired private CardRepository cardRepository;
     @Autowired private PaymentRepository paymentRepository;
     @Autowired private PromotionRepository promotionRepository;
-    @Autowired private PurchaseRepository<CashPurchase> cashPurchaseRepository; 
-    @Autowired private PurchaseRepository<CreditPurchase> creditPurchaseRepository; 
+    @Autowired private CashPurchaseRepository cashPurchaseRepository; 
+    @Autowired private CreditPurchaseRepository creditPurchaseRepository; 
     @Autowired private QuotaRepository quotaRespository;
 
     private Random random = new Random(0); // Same seed (0) -> all is "repeatable"
