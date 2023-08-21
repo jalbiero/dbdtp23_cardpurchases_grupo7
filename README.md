@@ -6,7 +6,7 @@ Trabajo final de Diseño de Bases de Datos 2022/23 - **GRUPO 7** (versión Mongo
 
 Esta es una aplicación que expone funcionalidad mediante una API REST, la misma puede ser accedida mediante algún cliente de prueba tal como [Postman](https://www.postman.com/), [JMeter](https://jmeter.apache.org/) o la misma interfaz gráfica expuesta por la aplicación, lo cual se recomienda (ver la sección de [documentación y prueba](#documentación-y-prueba-manual-de-los-endpoints-implementados) para más detalles). La base de datos usada es Mongo 1.6.0
 
-Para simplificar el desarrollo los tests unitarios son de integración es decir que la aplicación se prueba desde la API REST misma (podría hacerse desde los servicios, pero para evitar cierta duplicación en las pruebas, se prueba directamente desde la capa más externa)
+Para simplificar el desarrollo, los tests unitarios son de integración es decir que la aplicación se prueba desde la API REST misma (podría hacerse desde los servicios, pero para evitar cierta duplicación en las pruebas, se prueba directamente desde la capa más externa)
 
 ## Requerimientos
 
@@ -64,10 +64,11 @@ Para aislar la funcionalidad pedida de lo que se necesita para probarla se decid
 
 ### Pruebas
 
-Para las pruebas (tanto manuales con la aplicación funcionando, como para los _tests_ unitarios) se diseño un servicio ([TestDataGeneratorService](src/main/java/com/tpdbd/cardpurchases/services/TestDataGeneratorService.java)) que se ejecuta al arrancar la aplicación. La funcionalidad del mismo es generar datos de prueba (lo más real posibles) en la base de datos. Inicialmente se evaluó la opción de tener un archivo .sql, pero no iba a escalar ya que:
+Para las pruebas (tanto manuales con la aplicación funcionando, como para los _tests_ unitarios) se diseño un servicio ([TestDataGeneratorService](src/main/java/com/tpdbd/cardpurchases/services/TestDataGeneratorService.java)) que se ejecuta al arrancar la aplicación. La funcionalidad del mismo es generar datos de prueba (lo más real posibles) en la base de datos. Inicialmente se evaluó la opción de tener un archivo datos (ej: .sql), pero no iba a escalar ya que:
    
-   1. Era muy dependiente de la estructura de datos generada por JPA (un cambio en las anotaciones y la estructura difiere)
+   1. Era muy dependiente de la estructura de datos generada por JPA/Mongo (un cambio en las anotaciones y la estructura difiere)
    2. Iba a ser necesario tener un archivo similar para Mongo.
+   3. Los datos no son triviales, hay muchas relaciones entre ellos, como para plasmarlos en un archivo "plano" a ser insertado en la base.
 
 En conclusión: El código del servicio trabaja con las entidades del modelo por lo cual es independiente de la base de datos subyacente.
 
@@ -83,7 +84,7 @@ $ mvn test
 
 En el modelo se tomaron las siguientes decisiones:
 
-- Se optó por no renombrar cada clase documento para mantener la paridad con la versión SQL. Ej: 
+- Se optó por no renombrar cada clase documento (*) (a un valor en plural) para mantener la paridad con la versión SQL. Ej: 
 
   ```java
   @Document // << esto genera un documento llamado "bank"
@@ -101,22 +102,11 @@ En el modelo se tomaron las siguientes decisiones:
   }
   ```
 
-- Al ser Mongo una base de datos NoSQL, las cuales se caracterizan en general por falta de esquema, no se restringió la cantidad de caracteres en los campos de tipo cadena. Además, si se quisiera, la restricción tendría que hacerse sobre la capa de Java, no a nivel base de datos como en el caso de SQL. Es decir que habría que controlar que cada _setter_ de las clases del modelo validen las dimensiones de lo que reciben. Este tipo de restricciones va en contra de la filosofía de una base NoSQL (hablando en general por supuesto).
-- Los campos que debían ser únicos se indexaron mediante `@Indexed(unique = true)`
-- Con respecto a la herencia se dejó que Spring Boot para Mongo maneje la misma por defecto, es decir que se marcó tanto las clases bases como las derivadas con su respectivas anotaciones `@Document`. Esto genera una única colección con el nombre de la clase base agregando además un campo `_class` donde se anota de que tipo de clase derivada es el documento almacenando. Ejemplo para el caso de las promociones: Habrá una coleccción `promotion` donde el documento almacenado tendrá algo como lo siguiente para distinguir entre los tipos:
+  (*) Sólo en los casos en que se usa herencia hubo que especificar el nombre de la colección para evitar usar una diferente a la de la clase base.
 
-  ```json
-  [
-    {
-      "foo": "foo value",
-      "_class": "com.tpdbd.cardpurchases.model.Discount"
-    },
-    {
-      "bar": "bar value",
-      "_class": "com.tpdbd.cardpurchases.model.Financing"
-    }
-  ]
-  ```
+- Al ser Mongo una base de datos NoSQL, las cuales se caracterizan en general por falta de esquema, no se restringió la cantidad de caracteres en los campos de tipo cadena. Además, si se quisiera, la restricción tendría que hacerse sobre la capa de Java, no a nivel base de datos como en el caso de SQL ya que en Mongo no lo soporta (hasta donde yo sé). Es decir que habría que controlar que cada _setter_ de las clases del modelo validen las dimensiones de lo que reciben. Este tipo de restricciones va en contra de la filosofía de una base NoSQL (hablando en general por supuesto).
+- Los campos que debían ser únicos se indexaron mediante `@Indexed(unique = true)`
+- Con respecto a la herencia se implementó mediante una única colección de documentos en donde cada documento tiene un atributo que especifica de que subtipo es. Para más información sobre la técnica implementada ver [acá](https://www.mongodb.com/developer/languages/java/java-single-collection-springpart2/). Lamentablemente los repositorios de Spring para Mongo implementan una solución parcial para el tema de la herencia ya que hay que subclasificar el repositorio base y agregar el pertinente filtro sbore el atributo para traer los documentos del tipo requerido (ver `PurchaseRepository`, `CashRepository` y `CreditRepository` para más detalles).
 - Para los casos de relaciones 1-n, se optó por usar la anotación `@DocumentReference(lazy = true)`. Ej:
 
   ```java
@@ -126,11 +116,13 @@ En el modelo se tomaron las siguientes decisiones:
       private List<Card> cards;
   }
   ```
+
 - Para relaciones 1-1 se optó, dependiendo del caso, por relacionar 2 documentos (con carga por defecto, es decir `lazy = false`) o por embeber uno en el otro. Este último caso es notorio para simplificar consultas complejas de agregación (ver `PurchaseRepository` o `QuotaRepository`). Para las mismas se evaluó que el documento incrustado sea sencillo y que la posibilidad de ser modificado sea poco probable. En casos que esto no fuera así se usó directamente una referencia a otro documento y se fue a la base en una segunda instancia a buscar el mismo (ver `PaymentRepository` donde en vez de entregar el documento de un banco (como se hacía con la versión SQL) se entrega sólo su ID. Con dicho ID, el servicio `CardPurchasesService.banksGetTheOneWithMostPaymentValues` va a la base a traer los datos del banco en cuestión). 
+- Se implementa de manera un poco más manual el borrado lógico de promociones. En la versión SQL había una anotación (`@Where`) que a cada query le inyectaba el filtro para quitar los registros marcadas con `deleted = true`. En Mongo esa anotación no existe por lo que tuve que agregar dicho filtro a cada método presente en el repositorio de promociones.
 
-### Lecciones aprendidas y errores detectados
+### Errores detectados (y lecciones aprendidas)
 
-A medida que fui modificando la versión SQL para transformarla en Mongo me fui dando cuenta de algunas cosas. Las mismas las anoté en un documento aparte [Errores detectados al migrar a Mongo.md](doc/Errores%20detectados%20al%20migrar%20a%20Mongo.md)
+A medida que fui modificando la versión SQL para transformarla en Mongo me fui dando cuenta de algunos problemas. Los mismos los anoté en un documento aparte [Errores detectados al migrar a Mongo.md](doc/Errores%20detectados%20al%20migrar%20a%20Mongo.md)
 
 ### Otros
 
