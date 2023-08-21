@@ -2,9 +2,11 @@ package com.tpdbd.cardpurchases.model;
 
 import java.time.LocalDate;
 
+import org.springframework.data.annotation.TypeAlias;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document
+@Document(collection = "promotion")
+@TypeAlias("Discount")
 public class Discount extends Promotion {
 
     private float discountPercentage;

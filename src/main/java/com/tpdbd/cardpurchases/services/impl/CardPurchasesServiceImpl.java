@@ -18,8 +18,6 @@ import com.tpdbd.cardpurchases.services.PromotionService;
 import com.tpdbd.cardpurchases.services.PurchaseService;
 import com.tpdbd.cardpurchases.services.QuotaService;
 
-//import jakarta.transaction.Transactional;
-
 @Service
 public class CardPurchasesServiceImpl implements CardPurchasesService {
     @Autowired
@@ -87,7 +85,7 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
 
     @Override
     public ResponseDTO.CreditPurchaseTotalPrice purchasesCreditGetTotalPrice(String purchaseId) {
-        var purchase = this.purchaseService.findCreditTotalPrice(purchaseId);
+        var purchase = this.purchaseService.findCreditById(purchaseId);
         
         return new ResponseDTO.CreditPurchaseTotalPrice(purchaseId, purchase.getFinalAmount());
     }
