@@ -252,15 +252,15 @@ public class CardPurchasesControllerTests {
 
     @Test
     public void testPurchasesCreditGetTotalPriceHappyPath() {
-        final var CREDIT_PURCHASE_ID = getSomeCreditPurchaseId();
+        final var id = getSomeCreditPurchaseId();
      
         given()
             .when()
-                .get("/purchases/{id}/creditTotalPrice", CREDIT_PURCHASE_ID)
+                .get("/purchases/{id}/creditTotalPrice", id)
             .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
-                .body("id", Matchers.equalTo(CREDIT_PURCHASE_ID))
+                .body("id", Matchers.equalTo(id))
                 .body("totalPrice", Matchers.greaterThanOrEqualTo(0.f));
     }
 
