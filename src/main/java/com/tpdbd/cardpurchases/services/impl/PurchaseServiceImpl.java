@@ -14,15 +14,28 @@ import com.tpdbd.cardpurchases.repositories.PurchaseRepository;
 import com.tpdbd.cardpurchases.repositories.projections.MostUsedVoucher;
 import com.tpdbd.cardpurchases.repositories.projections.NumOfPurchasesByCard;
 import com.tpdbd.cardpurchases.services.PurchaseService;
+import com.tpdbd.cardpurchases.util.StreamHelpers;
 
 @Service
 public class PurchaseServiceImpl implements PurchaseService {
     @Autowired
     private PurchaseRepository<Purchase> purchaseRepository; 
 
+    @Autowired
+    private PurchaseRepository<CreditPurchase> creditPurchaseRepository; 
+
     @Override
     public List<Long> findAllIds() {
-        return this.purchaseRepository.findAllIds();
+        return StreamHelpers.toStream(this.purchaseRepository.findAll())
+            .map(purchase -> purchase.getId())
+            .toList();
+    }
+
+    @Override
+    public List<Long> findAllCreditIds() {
+        return StreamHelpers.toStream(this.creditPurchaseRepository.findAll())
+            .map(purchase -> purchase.getId())
+            .toList();
     }
 
     @Override

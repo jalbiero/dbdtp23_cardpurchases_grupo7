@@ -46,6 +46,7 @@ public class Bank {
         this.address = address;
         this.telephone = telephone;
         this.promotions = new ArrayList<Promotion>();
+        this.cards =  new ArrayList<Card>();
     }
 
     public Long getId() {

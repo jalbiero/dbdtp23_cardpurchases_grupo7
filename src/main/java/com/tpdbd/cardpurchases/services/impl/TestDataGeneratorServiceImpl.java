@@ -350,7 +350,7 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
         var cards = new ArrayList<Card>();
 
         cardHolders.forEach(cardHolder -> {
-            getRandomItemsFrom(banks, getIntParam("maxNumOfCardsPerUser"))
+            getRandomItemsFrom(banks, this.faker.number().numberBetween(1, getIntParam("maxNumOfCardsPerUser")))
                 .forEach(bank -> {
                     var since = getFakeDate(cardHolder.getEntry());
                     var expiration = this.faker.number().numberBetween(1, getIntParam("maxCardExpirationYears"));

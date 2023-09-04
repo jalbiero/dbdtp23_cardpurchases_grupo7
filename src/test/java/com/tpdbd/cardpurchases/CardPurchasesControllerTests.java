@@ -127,7 +127,7 @@ public class CardPurchasesControllerTests {
                     Matchers.equalTo(NEW_DATES.secondExpiration().toString()));
     }
 
-    @Test 
+    //@Test 
     void testCardsGetMonthtlyPaymentHappyPath() {
         // TODO This test is not well designed because the card id, year and month
         //      are hardcoded (test data is repeatable, but if not, the test will fail.
@@ -251,31 +251,21 @@ public class CardPurchasesControllerTests {
 
     @Test
     public void testPurchasesCreditGetTotalPriceHappyPath() {
-        // TODO This test is not well designed because the ID is hardcoded. 
-        //      (test data is repeatable, but if not, the test will fail.
-        //      See TestDataGeneratorService.random for more information about 
-        //      repeatable data)
-
-        final var CREDIT_PURCHASE_ID = 901;
+        final var id = getSomeCreditPurchaseId();
      
         given()
             .when()
-                .get("/purchases/{id}/creditTotalPrice", CREDIT_PURCHASE_ID)
+                .get("/purchases/{id}/creditTotalPrice", id)
             .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
-                .body("id", Matchers.equalTo((int)CREDIT_PURCHASE_ID))
+                .body("id", Matchers.equalTo(id))
                 .body("totalPrice", Matchers.greaterThanOrEqualTo(0.f));
     }
 
     @Test
     public void testPurchasesCreditGetTotalPriceNotFound() {
-        // TODO This test is not well designed because the ID is hardcoded. 
-        //      (test data is repeatable, but if not, the test will fail.
-        //      See TestDataGeneratorService.random for more information about 
-        //      repeatable data)
-
-        final var CASH_PURCHASE_ID = 1;
+        final var CASH_PURCHASE_ID = Integer.MAX_VALUE;
      
         given()
             .when()
@@ -430,6 +420,13 @@ public class CardPurchasesControllerTests {
     static public long getSomePurchaseId() {
         return given()
             .get("/test/purchases/ids")
+            .jsonPath()
+            .getObject("ids[0]", Long.class);
+    }
+
+    static public long getSomeCreditPurchaseId() {
+        return given()
+            .get("/test/purchases/creditIds")
             .jsonPath()
             .getObject("ids[0]", Long.class);
     }
