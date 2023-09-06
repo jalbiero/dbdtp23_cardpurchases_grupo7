@@ -61,14 +61,6 @@ public class TestController {
         return ResponseDTO.Card.fromModel(this.service.getCard(id));
     }
 
-    /**
-     * Add a new card
-     * @return The id of the new card:
-     * 
-     *           {
-     *              "id": 123
-     *           }
-     */
     @PostMapping("/cards")
     ResponseDTO.Id addCard(@RequestBody RequestDTO.Card card) {
         return new ResponseDTO.Id(this.service.addCard(card));
