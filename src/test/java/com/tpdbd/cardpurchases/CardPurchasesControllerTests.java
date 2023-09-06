@@ -259,7 +259,7 @@ public class CardPurchasesControllerTests {
             .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
-                .body("id", Matchers.equalTo(id))
+                .body("id", Matchers.equalTo((int)id))
                 .body("totalPrice", Matchers.greaterThanOrEqualTo(0.f));
     }
 

@@ -9,7 +9,7 @@ import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 
 @Entity
-@Inheritance(strategy = InheritanceType.JOINED)  // This allows non nullable fields in subclasses
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)  
 public abstract class Purchase {
     @Id
     @GeneratedValue
