@@ -1,9 +1,5 @@
 package com.tpdbd.cardpurchases.controllers;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,10 +35,8 @@ public class TestController {
     // Banks
 
     @GetMapping("/banks/ids")
-    Map<String, List<Long>> getBankIds() {
-        var result = new LinkedHashMap<String, List<Long>>();
-        result.put("ids", this.service.getBankIds());
-        return result;
+    ResponseDTO.Ids getBankIds() {
+        return new ResponseDTO.Ids(this.service.getBankIds());
     }
 
     @GetMapping("/banks/{id}")
@@ -54,10 +48,8 @@ public class TestController {
     // Cards
 
     @GetMapping("/cards/ids")
-    Map<String, List<Long>> getCardIds() {
-        var result = new LinkedHashMap<String, List<Long>>();
-        result.put("ids", this.service.getCardIds());
-        return result;
+    ResponseDTO.Ids getCardIds() {
+        return new ResponseDTO.Ids(this.service.getCardIds());
     }
 
     @GetMapping("/cards/{id}")
@@ -65,19 +57,9 @@ public class TestController {
         return ResponseDTO.Card.fromModel(this.service.getCard(id));
     }
 
-    /**
-     * Add a new card
-     * @return The id of the new card:
-     * 
-     *           {
-     *              "id": 123
-     *           }
-     */
     @PostMapping("/cards")
-    Map<String, Long> addCard(@RequestBody RequestDTO.Card card) {
-        var result = new LinkedHashMap<String, Long>();
-        result.put("id", this.service.addCard(card));
-        return result;
+    ResponseDTO.Id addCard(@RequestBody RequestDTO.Card card) {
+        return new ResponseDTO.Id(this.service.addCard(card));
     }
 
     @DeleteMapping("/cards/{id}")
@@ -89,20 +71,16 @@ public class TestController {
     // Card holders
 
     @GetMapping("/cardHolders/ids")
-    Map<String, List<Long>> getCardHolderIds() {
-        var result = new LinkedHashMap<String, List<Long>>();
-        result.put("ids", this.service.getCardHolderIds());
-        return result;
+    ResponseDTO.Ids getCardHolderIds() {
+        return new ResponseDTO.Ids(this.service.getCardHolderIds());
     }
 
     ///////////////////////
     // Payments
 
     @GetMapping("/payments/ids")
-    Map<String, List<Long>> getPaymentIds() {
-        var result = new LinkedHashMap<String, List<Long>>();
-        result.put("ids", this.service.getPaymentIds());
-        return result;
+    ResponseDTO.Ids getPaymentIds() {
+        return new ResponseDTO.Ids(this.service.getPaymentIds());
     }
 
     @GetMapping("/payments/{id}")
@@ -114,29 +92,28 @@ public class TestController {
     // Purchases
 
     @GetMapping("/purchases/ids")
-    Map<String, List<Long>> getPurchaseIds() {
-        var result = new LinkedHashMap<String, List<Long>>();
-        result.put("ids", this.service.getPurchaseIds());
-        return result;
+    ResponseDTO.Ids getPurchaseIds() {
+        return new ResponseDTO.Ids(this.service.getPurchaseIds());
+    }
+
+    @GetMapping("/purchases/creditIds")
+    ResponseDTO.Ids getPurchaseCreditIds() {
+        return new ResponseDTO.Ids(this.service.getPurchaseCreditIds());
     }
 
     ///////////////////////
     // Stores
 
     @GetMapping("/stores/cuits")
-    Map<String, List<String>> getStoreCuits() {
-        var result = new LinkedHashMap<String, List<String>>();
-        result.put("cuits", this.tdgService.getStoreCuits());
-        return result;
+    ResponseDTO.Cuits getStoreCuits() {
+        return new ResponseDTO.Cuits(this.tdgService.getStoreCuits());
     }
 
     ///////////////////////
     // Promotions
 
     @GetMapping("/promotions/codes")
-    Map<String, List<String>> getPromotionCodes() {
-        var result = new LinkedHashMap<String, List<String>>();
-        result.put("codes", this.service.getPromotionCodes());
-        return result;
+    ResponseDTO.PromoCodes getPromotionCodes() {
+        return new ResponseDTO.PromoCodes(this.service.getPromotionCodes());
     }
 }

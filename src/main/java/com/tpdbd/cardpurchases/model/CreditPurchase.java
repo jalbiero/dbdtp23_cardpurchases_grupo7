@@ -7,10 +7,10 @@ import jakarta.persistence.Entity;
 @Entity
 public class CreditPurchase extends Purchase {
 
-    @Column(nullable = true)
+    @Column(nullable = true) // Due to @Inheritance(strategy = InheritanceType.SINGLE_TABLE)  
     private float interest;
 
-    @Column(nullable = false)
+    @Column(nullable = true) // Due to @Inheritance(strategy = InheritanceType.SINGLE_TABLE)  
     private int numberOfQuotas;
 
     public CreditPurchase() {

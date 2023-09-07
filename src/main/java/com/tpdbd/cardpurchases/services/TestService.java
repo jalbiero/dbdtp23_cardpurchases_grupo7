@@ -25,6 +25,7 @@ public interface TestService {
     Payment getPayment(Long id);
 
     List<Long> getPurchaseIds();
+    List<Long> getPurchaseCreditIds();
 
     List<String> getPromotionCodes();
 }

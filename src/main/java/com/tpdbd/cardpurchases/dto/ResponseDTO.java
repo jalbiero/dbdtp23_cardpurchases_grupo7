@@ -337,5 +337,24 @@ public interface ResponseDTO {
         long id,
         float totalPrice)
     {}
-    
+
+    ////////////////////////////////////////////////////////
+    record Id(
+        long id)
+    {}
+
+    ////////////////////////////////////////////////////////
+    record Ids(
+        List<Long> ids)
+    {}
+
+    ////////////////////////////////////////////////////////
+    record Cuits(
+        List<String> cuits)
+    {}
+
+    ////////////////////////////////////////////////////////
+    record PromoCodes(
+        List<String> codes)
+    {}
 }

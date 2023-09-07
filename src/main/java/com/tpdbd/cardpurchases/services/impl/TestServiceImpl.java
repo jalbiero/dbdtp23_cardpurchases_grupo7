@@ -104,6 +104,11 @@ public class TestServiceImpl implements TestService {
     }
 
     @Override
+    public List<Long> getPurchaseCreditIds() {
+        return this.purchaseService.findAllCreditIds();
+    }
+
+    @Override
     public List<String> getPromotionCodes() {
         return this.promotionService.findAllCodes();
     }

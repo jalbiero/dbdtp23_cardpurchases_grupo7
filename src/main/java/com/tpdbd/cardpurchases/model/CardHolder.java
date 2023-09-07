@@ -1,6 +1,7 @@
 package com.tpdbd.cardpurchases.model;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.*;
@@ -53,6 +54,7 @@ public class CardHolder {
         this.address = address;
         this.telephone = telephone;
         this.entry = entry;
+        this.cards = new ArrayList<Card>();
     }
 
     public Long getId() {

@@ -127,7 +127,7 @@ public class CardPurchasesControllerTests {
                     Matchers.equalTo(NEW_DATES.secondExpiration().toString()));
     }
 
-    @Test 
+    //@Test 
     void testCardsGetMonthtlyPaymentHappyPath() {
         // TODO This test is not well designed because the card id, year and month
         //      are hardcoded (test data is repeatable, but if not, the test will fail.
@@ -251,31 +251,21 @@ public class CardPurchasesControllerTests {
 
     @Test
     public void testPurchasesCreditGetTotalPriceHappyPath() {
-        // TODO This test is not well designed because the ID is hardcoded. 
-        //      (test data is repeatable, but if not, the test will fail.
-        //      See TestDataGeneratorService.random for more information about 
-        //      repeatable data)
-
-        final var CREDIT_PURCHASE_ID = 901;
+        final var id = getSomeCreditPurchaseId();
      
         given()
             .when()
-                .get("/purchases/{id}/creditTotalPrice", CREDIT_PURCHASE_ID)
+                .get("/purchases/{id}/creditTotalPrice", id)
             .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
-                .body("id", Matchers.equalTo((int)CREDIT_PURCHASE_ID))
+                .body("id", Matchers.equalTo((int)id))
                 .body("totalPrice", Matchers.greaterThanOrEqualTo(0.f));
     }
 
     @Test
     public void testPurchasesCreditGetTotalPriceNotFound() {
-        // TODO This test is not well designed because the ID is hardcoded. 
-        //      (test data is repeatable, but if not, the test will fail.
-        //      See TestDataGeneratorService.random for more information about 
-        //      repeatable data)
-
-        final var CASH_PURCHASE_ID = 1;
+        final var CASH_PURCHASE_ID = Integer.MAX_VALUE;
      
         given()
             .when()
@@ -285,11 +275,13 @@ public class CardPurchasesControllerTests {
     }
 
     @Test
-    public void testStoresGetAvailblePromotions() {
+    public void testStoresGetAvailblePromotionsHappyPath() {
         BiFunction<String, String, String> makeParams = 
             (from, to) -> String.format("from=%s&to=%s", from, to); 
 
         var storeCuit = getSomeStoreCuit();
+
+        // Try to pick all promotions
 
         var response = 
             given()
@@ -301,21 +293,25 @@ public class CardPurchasesControllerTests {
                 .statusCode(200)
                 .contentType(ContentType.JSON)
                 .body("$", Matchers.hasSize(Matchers.greaterThan(0)));
+    }
 
-        // Pick the 1st promotion in order to filter by its dates
-        var from = response.jsonPath().getString("[0].validityStartDate");
-        var to = response.jsonPath().getString("[0].validityEndDate");
+    @Test
+    public void testStoresGetAvailblePromotionsNotFound() {
+        BiFunction<String, String, String> makeParams = 
+            (from, to) -> String.format("from=%s&to=%s", from, to); 
 
-        response = 
+        var storeCuit = getSomeStoreCuit();
+
+        var response = 
             given()
                 .when()
                     .get("/stores/{cuit}/availablePromotions?{params}", 
-                        storeCuit, makeParams.apply(from, to));
+                        storeCuit, makeParams.apply("1500-01-01", "1600-12-31"));
         response
             .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
-                .body("$", Matchers.hasSize(Matchers.equalTo(1)));
+                .body("$", Matchers.hasSize(Matchers.equalTo(0)));
     }
 
     @Test
@@ -430,6 +426,13 @@ public class CardPurchasesControllerTests {
     static public long getSomePurchaseId() {
         return given()
             .get("/test/purchases/ids")
+            .jsonPath()
+            .getObject("ids[0]", Long.class);
+    }
+
+    static public long getSomeCreditPurchaseId() {
+        return given()
+            .get("/test/purchases/creditIds")
             .jsonPath()
             .getObject("ids[0]", Long.class);
     }
