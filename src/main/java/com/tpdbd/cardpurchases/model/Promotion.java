@@ -17,8 +17,8 @@ public abstract class Promotion {
     @JoinColumn(nullable = false)
     private Bank bank;
 
-    @Column(length = 50, nullable = false)
-    private String code; // aka 'paymentVoucher' (in Purchase class)
+    @Column(unique = true, length = 50, nullable = false)
+    private String code;
 
     @Column(length = 100, nullable = false)
     private String promotionTitle;

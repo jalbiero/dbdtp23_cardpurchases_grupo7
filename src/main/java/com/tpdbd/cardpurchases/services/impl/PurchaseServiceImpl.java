@@ -10,6 +10,7 @@ import com.tpdbd.cardpurchases.errors.CreditPurchaseNotFoundException;
 import com.tpdbd.cardpurchases.errors.PurchaseNotFoundException;
 import com.tpdbd.cardpurchases.model.CreditPurchase;
 import com.tpdbd.cardpurchases.model.Purchase;
+import com.tpdbd.cardpurchases.repositories.CreditPurchaseRepository;
 import com.tpdbd.cardpurchases.repositories.PurchaseRepository;
 import com.tpdbd.cardpurchases.repositories.projections.MostUsedVoucher;
 import com.tpdbd.cardpurchases.repositories.projections.NumOfPurchasesByCard;
@@ -22,7 +23,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     private PurchaseRepository<Purchase> purchaseRepository; 
 
     @Autowired
-    private PurchaseRepository<CreditPurchase> creditPurchaseRepository; 
+    private CreditPurchaseRepository creditPurchaseRepository;
 
     @Override
     public List<Long> findAllIds() {
