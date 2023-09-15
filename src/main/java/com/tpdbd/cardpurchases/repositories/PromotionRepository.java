@@ -11,7 +11,6 @@ import org.springframework.data.repository.query.Param;
 
 import com.tpdbd.cardpurchases.model.Promotion;
 
-import jakarta.transaction.Transactional;
 
 public interface PromotionRepository extends CrudRepository<Promotion, Long> {
    @Query("SELECT p.code FROM Promotion p")
@@ -22,7 +21,6 @@ public interface PromotionRepository extends CrudRepository<Promotion, Long> {
    List<Promotion> findByCuitStoreAndValidityStartDateGreaterThanEqualAndValidityEndDateLessThanEqual(String cuitStore, LocalDate from, LocalDate to);
 
    // Performs a logical delete
-   @Transactional
    @Modifying
    @Query(
       "UPDATE Promotion p " + 

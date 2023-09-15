@@ -3,6 +3,7 @@ package com.tpdbd.cardpurchases.services.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.tpdbd.cardpurchases.repositories.projections.Store;
 import com.tpdbd.cardpurchases.errors.BestSellerStoreNotFoundException;
@@ -15,6 +16,7 @@ public class QuotaServiceImpl implements QuotaService {
     private QuotaRepository quotaRepository;
 
     @Override
+    @Transactional(readOnly = true)
     public Store getTheBestSellerStore(int year, int month) {
         var bestSellers = this.quotaRepository.findTheBestSellerStores(year, month, PageRequest.of(0, 1));
 
