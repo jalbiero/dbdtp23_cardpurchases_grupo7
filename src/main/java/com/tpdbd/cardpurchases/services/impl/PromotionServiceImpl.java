@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.tpdbd.cardpurchases.errors.PromotionNotFoundException;
 import com.tpdbd.cardpurchases.model.Promotion;
@@ -17,11 +18,13 @@ public class PromotionServiceImpl implements PromotionService {
     private PromotionRepository promotionRepository;
 
     @Override
+    @Transactional(readOnly = true)
     public List<String> findAllCodes() {
         return this.promotionRepository.findAllCodes();
     }
  
     @Override
+    @Transactional(readOnly = true)
     public Promotion findByCode(String code) {
         return this.promotionRepository
             .findByCode(code)
@@ -29,6 +32,7 @@ public class PromotionServiceImpl implements PromotionService {
     }
  
     @Override
+    @Transactional(readOnly = true)
     public List<Promotion> GetAvailablePromotions(String cuitStore, LocalDate from, LocalDate to) {
         return this.promotionRepository
             .findByCuitStoreAndValidityStartDateGreaterThanEqualAndValidityEndDateLessThanEqual(
@@ -36,12 +40,14 @@ public class PromotionServiceImpl implements PromotionService {
     }
  
     @Override
+    @Transactional
     public void deleteByCode(String code) {
         if (this.promotionRepository.deleteByCode(code) == 0)
             throw new PromotionNotFoundException(code);
     } 
 
     @Override
+    @Transactional
     public void save(Promotion promotion) {
         this.promotionRepository.save(promotion);
     }
