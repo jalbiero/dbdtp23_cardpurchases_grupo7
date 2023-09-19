@@ -8,13 +8,13 @@ import jakarta.persistence.Entity;
 @Entity
 public class Discount extends Promotion {
 
-    @Column(nullable = false)
+    @Column(nullable = true) // 'true' due to @Inheritance(strategy = InheritanceType.SINGLE_TABLE)  
     private float discountPercentage;
 
-    @Column(nullable = false)
+    @Column(nullable = true) // 'true' due to @Inheritance(strategy = InheritanceType.SINGLE_TABLE)  
     private float priceCap;
 
-    @Column(nullable = false)
+    @Column(nullable = true) // 'true' due to @Inheritance(strategy = InheritanceType.SINGLE_TABLE)  
     private boolean onlyCash; 
 
     public Discount() {

@@ -8,10 +8,10 @@ import jakarta.persistence.Entity;
 @Entity
 public class Financing extends Promotion {
 
-    @Column(nullable = false)
+    @Column(nullable = true) // 'true' due to @Inheritance(strategy = InheritanceType.SINGLE_TABLE)  
     private int numberOfQuotas;
 
-    @Column(nullable = true)
+    @Column(nullable = true) // 'true' due to @Inheritance(strategy = InheritanceType.SINGLE_TABLE)  
     private float interest;
 
     public Financing() {

@@ -7,7 +7,7 @@ import jakarta.persistence.Entity;
 @Entity
 public class CashPurchase extends Purchase {
 
-    @Column(nullable = true) // Due to @Inheritance(strategy = InheritanceType.SINGLE_TABLE)  
+    @Column(nullable = true) // 'true' due to @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
     private float storeDiscount;
 
     public CashPurchase() {
