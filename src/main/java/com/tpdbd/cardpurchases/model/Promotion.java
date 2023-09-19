@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.Where;
 
 @Entity
-@Inheritance(strategy = InheritanceType.JOINED) // This allows non nullable fields in subclasses
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @Where(clause = "deleted = false") // Note: SQL specific, Mongo version will need another solution 
 public abstract class Promotion {
     @Id
