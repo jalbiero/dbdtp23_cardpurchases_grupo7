@@ -23,19 +23,23 @@ public class Bank {
     @Column(length = 20, nullable = false)
     private String telephone;
 
-    @OneToMany 
+    @OneToMany
     @JoinTable(
         name="promotion",
         joinColumns=@JoinColumn(name="bank_id"),
         inverseJoinColumns=@JoinColumn(name="id"))
     private List<Promotion> promotions;
 
-    @OneToMany 
+    @OneToMany
     @JoinTable(
         name="card",
         joinColumns=@JoinColumn(name="bank_id"),
         inverseJoinColumns=@JoinColumn(name="id"))
     private List<Card> cards;
+
+    @ManyToMany
+    @JoinColumn(name = "id")
+    private List<CardHolder> cardHolders;
 
     public Bank() {
     }
@@ -47,6 +51,7 @@ public class Bank {
         this.telephone = telephone;
         this.promotions = new ArrayList<Promotion>();
         this.cards =  new ArrayList<Card>();
+        this.cardHolders = new ArrayList<CardHolder>();
     }
 
     public Long getId() {
@@ -91,5 +96,13 @@ public class Bank {
 
     public List<Card> getCards() {
         return this.cards;
+    }
+
+    public List<CardHolder> getCardHolders() {
+        return this.cardHolders;
+    }
+
+    public void setCardHolders(List<CardHolder> cardHolders) {
+        this.cardHolders = cardHolders;
     }
 }
