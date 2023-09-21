@@ -34,7 +34,7 @@ import java.util.function.BiFunction;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class CardPurchasesControllerTests {
     private final static String BASE_URI = "http://localhost";
-    
+
     private Faker faker = new Faker();
 
     @LocalServerPort
@@ -69,12 +69,12 @@ public class CardPurchasesControllerTests {
 
         // Add a new promotion
         var discount = new RequestDTO.Discount(
-            CODE, TITLE, NAME, CUIT, LocalDate.now(), LocalDate.now().plusMonths(3), 
+            CODE, TITLE, NAME, CUIT, LocalDate.now(), LocalDate.now().plusMonths(3),
             COMMENT, DISCOUNT, PCAP, true);
 
         given()
             .when()
-                .contentType(ContentType.JSON)    
+                .contentType(ContentType.JSON)
                 .body(discount)
                 .post("/banks/{cuit}/addDiscountPromotion", cuit)
             .then()
@@ -106,7 +106,7 @@ public class CardPurchasesControllerTests {
         // Update dates
         given()
             .when()
-                .contentType(ContentType.JSON)    
+                .contentType(ContentType.JSON)
                 .body(NEW_DATES)
                 .put("/payments/{id}/updateDates", id)
             .then()
@@ -120,26 +120,26 @@ public class CardPurchasesControllerTests {
                 .statusCode(200)
                 .contentType(ContentType.JSON)
                 .body(
-                    "firstExpiration", 
+                    "firstExpiration",
                     Matchers.equalTo(NEW_DATES.firstExpiration().toString()))
                 .body(
-                    "secondExpiration", 
+                    "secondExpiration",
                     Matchers.equalTo(NEW_DATES.secondExpiration().toString()));
     }
 
-    //@Test 
+    //@Test
     void testCardsGetMonthtlyPaymentHappyPath() {
         // TODO This test is not well designed because the card id, year and month
         //      are hardcoded (test data is repeatable, but if not, the test will fail.
         //      See TestDataGeneratorService.random for more information about repeatable data)
 
-        final var CARD_ID = 76l; 
+        final var CARD_ID = 76l;
         final var YEAR = 2019;
         final var MONTH = 3;
 
         given()
             .when()
-                .get("/cards/{id}/monthlyPayment?year={year}&month={month}", CARD_ID, YEAR, MONTH) 
+                .get("/cards/{id}/monthlyPayment?year={year}&month={month}", CARD_ID, YEAR, MONTH)
             .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
@@ -149,7 +149,7 @@ public class CardPurchasesControllerTests {
                 .body("purchases", Matchers.not(Matchers.emptyArray()));
     }
 
-    @Test 
+    @Test
     void testCardsGetMonthtlyPaymentNotFound() {
         final var CARD_ID = 999_999_999_999l;
         final var UNREAL_YEAR = 1900;
@@ -157,7 +157,7 @@ public class CardPurchasesControllerTests {
 
         given()
             .when()
-                .get("/cards/{id}/monthlyPayment?year={year}&month={month}", CARD_ID, UNREAL_YEAR, MONTH) 
+                .get("/cards/{id}/monthlyPayment?year={year}&month={month}", CARD_ID, UNREAL_YEAR, MONTH)
             .then()
                 .statusCode(404);
     }
@@ -166,43 +166,43 @@ public class CardPurchasesControllerTests {
     public void testCardsGetSoonToExpire() {
         // Some unique date (the database already has data from TestDataGeneratorService)
         // in order to get just the card that it is being created/tested
-        final var BASE_DATE = LocalDate.of(3000, 11, 1); 
+        final var BASE_DATE = LocalDate.of(3000, 11, 1);
         final var DAYS_TO_EXPIRATION = 31;
         final var CARD_NUMBER = this.faker.business().creditCardNumber();
 
         // Create a new card
         var newCard = new RequestDTO.Card(
-            getSomeBankId(), 
-            getSomeCardHolderIds(), 
+            getSomeBankId(),
+            getSomeCardHolderIds(),
             CARD_NUMBER,
             this.faker.business().securityCode(),
             BASE_DATE,
-            BASE_DATE.plusDays(DAYS_TO_EXPIRATION)); 
+            BASE_DATE.plusDays(DAYS_TO_EXPIRATION));
 
         var newCardId = given()
-            .contentType(ContentType.JSON)                    
+            .contentType(ContentType.JSON)
             .body(newCard)
             .post("/test/cards")
             .jsonPath()
             .getObject("id", Long.class);
-        
+
         // Test some expiration paths
 
-        BiFunction<LocalDate, Integer, ValidatableResponse> getSoonToExpire = 
+        BiFunction<LocalDate, Integer, ValidatableResponse> getSoonToExpire =
             (baseDate, daysFromBaseDate) -> {
                 return given()
                     .when()
-                        .get("/cards/soonToExpire?baseDate={1}&daysFromBaseDate={2}", 
+                        .get("/cards/soonToExpire?baseDate={1}&daysFromBaseDate={2}",
                             baseDate.toString(), daysFromBaseDate)
                     .then()
                         .statusCode(200)
                         .contentType(ContentType.JSON);
-            };    
+            };
 
         // No card in the next 30 days starting from BASE_DATE
         getSoonToExpire.apply(BASE_DATE, 30)
             .body("$", Matchers.hasSize(0));
-            
+
         // One card in the next 30 days
         getSoonToExpire.apply(BASE_DATE.plusDays(5), 30)
             .body("$", Matchers.hasSize(1))
@@ -220,10 +220,10 @@ public class CardPurchasesControllerTests {
                 .statusCode(200);
     }
 
-    @Test 
+    @Test
     public void testPurchasesGetInfo() {
         var id = getSomePurchaseId();
-     
+
         given()
             .when()
                 .get("/purchases/{id}", id)
@@ -234,7 +234,7 @@ public class CardPurchasesControllerTests {
                 .body("quotas", Matchers.hasSize(Matchers.greaterThanOrEqualTo(0)));
     }
 
-    @Test 
+    @Test
     public void testPromotionsDelete() {
         var promoCodes = getPromotionCodes();
         var codeToBeDeleted = promoCodes.get(0);
@@ -252,7 +252,7 @@ public class CardPurchasesControllerTests {
     @Test
     public void testPurchasesCreditGetTotalPriceHappyPath() {
         final var id = getSomeCreditPurchaseId();
-     
+
         given()
             .when()
                 .get("/purchases/{id}/creditTotalPrice", id)
@@ -266,7 +266,7 @@ public class CardPurchasesControllerTests {
     @Test
     public void testPurchasesCreditGetTotalPriceNotFound() {
         final var CASH_PURCHASE_ID = Integer.MAX_VALUE;
-     
+
         given()
             .when()
                 .get("/purchases/{id}/creditTotalPrice", CASH_PURCHASE_ID)
@@ -276,17 +276,17 @@ public class CardPurchasesControllerTests {
 
     @Test
     public void testStoresGetAvailblePromotionsHappyPath() {
-        BiFunction<String, String, String> makeParams = 
-            (from, to) -> String.format("from=%s&to=%s", from, to); 
+        BiFunction<String, String, String> makeParams =
+            (from, to) -> String.format("from=%s&to=%s", from, to);
 
         var storeCuit = getSomeStoreCuit();
 
         // Try to pick all promotions
 
-        var response = 
+        var response =
             given()
                 .when()
-                    .get("/stores/{cuit}/availablePromotions?{params}", 
+                    .get("/stores/{cuit}/availablePromotions?{params}",
                         storeCuit, makeParams.apply("1900-01-01", "3000-12-31"));
         response
             .then()
@@ -297,15 +297,15 @@ public class CardPurchasesControllerTests {
 
     @Test
     public void testStoresGetAvailblePromotionsNotFound() {
-        BiFunction<String, String, String> makeParams = 
-            (from, to) -> String.format("from=%s&to=%s", from, to); 
+        BiFunction<String, String, String> makeParams =
+            (from, to) -> String.format("from=%s&to=%s", from, to);
 
         var storeCuit = getSomeStoreCuit();
 
-        var response = 
+        var response =
             given()
                 .when()
-                    .get("/stores/{cuit}/availablePromotions?{params}", 
+                    .get("/stores/{cuit}/availablePromotions?{params}",
                         storeCuit, makeParams.apply("1500-01-01", "1600-12-31"));
         response
             .then()
@@ -326,7 +326,7 @@ public class CardPurchasesControllerTests {
                 .contentType(ContentType.JSON)
                 .body("$", Matchers.hasSize(Matchers.greaterThanOrEqualTo(0)))
                 .body("$", Matchers.hasSize(Matchers.lessThanOrEqualTo(10)));
-                
+
         // Validate the data, incluiding the array order (sorted by numOfPurchases in descending order)
         var purchasers = response.jsonPath().getList("$", ResponseDTO.PurchaserCardHolder.class);
 
@@ -334,7 +334,7 @@ public class CardPurchasesControllerTests {
         for (var item: purchasers) {
             assertThat(item.cardHolderName(), Matchers.not(Matchers.emptyString()));
             assertThat(item.numOfPurchases(), Matchers.lessThanOrEqualTo(lastNumOfPurchases));
-            assertThat(item.cardNumber(), Matchers.not(Matchers.emptyString())); 
+            assertThat(item.cardNumber(), Matchers.not(Matchers.emptyString()));
             lastNumOfPurchases = item.numOfPurchases();
         }
     }
@@ -353,7 +353,7 @@ public class CardPurchasesControllerTests {
 
     @Test
     public void testStoresGetBestSellerHappyPath() {
-        // TODO This test is not well designed because the year and month are 
+        // TODO This test is not well designed because the year and month are
         //       hardcoded (test data is repeatable, but if not, the test will fail.
         //       See TestDataGeneratorService.random for more information about repeatable data)
 
@@ -377,7 +377,7 @@ public class CardPurchasesControllerTests {
             .then()
                 .statusCode(404);
     }
-    
+
     @Test
     public void testBanksGetTheOneWithMostPaymentValues() {
         given()
