@@ -20,8 +20,10 @@ public class TransactionalCaller implements AutoCloseable {
             this.entityManager.getTransaction().begin();
             runnable.run();
             this.entityManager.getTransaction().commit();
-        } 
+        }
         catch (Exception ex) {
+            System.err.println("TransactionalCaller: Run error = " + ex);
+            ex.printStackTrace();
             this.entityManager.getTransaction().rollback();
         }
     }
@@ -31,8 +33,10 @@ public class TransactionalCaller implements AutoCloseable {
             this.entityManager.getTransaction().begin();
             consumer.accept(this.entityManager);
             this.entityManager.getTransaction().commit();
-        } 
+        }
         catch (Exception ex) {
+            System.err.println("TransactionalCaller: Accept error = " + ex);
+            ex.printStackTrace();
             this.entityManager.getTransaction().rollback();
         }
     }
