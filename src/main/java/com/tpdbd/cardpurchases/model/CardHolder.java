@@ -38,7 +38,10 @@ public class CardHolder {
     private List<Card> cards;
 
     @ManyToMany
-    @JoinColumn(name = "id")
+    @JoinTable(
+        name="banks_card_holders",
+        joinColumns=@JoinColumn( name="card_holder_id"),
+        inverseJoinColumns=@JoinColumn(name="bank_id"))
     private List<Bank> banks;
 
     public CardHolder() {

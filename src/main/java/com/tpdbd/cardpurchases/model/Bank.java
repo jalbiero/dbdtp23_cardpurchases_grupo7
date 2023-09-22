@@ -37,8 +37,7 @@ public class Bank {
         inverseJoinColumns=@JoinColumn(name="id"))
     private List<Card> cards;
 
-    @ManyToMany
-    @JoinColumn(name = "id")
+    @ManyToMany(mappedBy = "banks")
     private List<CardHolder> cardHolders;
 
     public Bank() {
