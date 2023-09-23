@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.tpdbd.cardpurchases.dto.RequestDTO;
 import com.tpdbd.cardpurchases.dto.ResponseDTO;
+import com.tpdbd.cardpurchases.errors.BadRequestException;
 import com.tpdbd.cardpurchases.errors.NotFoundException;
 import com.tpdbd.cardpurchases.services.BankService;
 import com.tpdbd.cardpurchases.services.CardPurchasesService;
@@ -51,8 +52,15 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
     @Override
     @Transactional
     public void paymentsUpdateDates(String id, LocalDate firstExpiration, LocalDate secondExpiration) {
+        if (firstExpiration.isAfter(secondExpiration)) {
+            throw new BadRequestException(
+                "Second expiration date (%s) must be grater than the first one (%s)",
+                secondExpiration,
+                firstExpiration);
+        }
+
         var payment = this.paymentService.find(id);
-     
+
         payment.setFirstExpiration(firstExpiration);
         payment.setSecondExpiration(secondExpiration);
 
@@ -64,7 +72,7 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
         return ResponseDTO.MonthlyPayment.fromModel(
             this.paymentService.findMonthlyPayment(cardId, year, month));
     }
-  
+
     @Override
     public List<ResponseDTO.Card> cardsGetSoonToExpire(LocalDate baseDate, Integer daysFromBaseDate) {
         return this.cardService.findSoonToExpire(baseDate, daysFromBaseDate).stream()
@@ -80,13 +88,13 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
 
     @Override
     public void promotionsDelete(String code) {
-        this.promotionService.deleteByCode(code); 
+        this.promotionService.deleteByCode(code);
     }
 
     @Override
     public ResponseDTO.CreditPurchaseTotalPrice purchasesCreditGetTotalPrice(String purchaseId) {
         var purchase = this.purchaseService.findCreditById(purchaseId);
-        
+
         return new ResponseDTO.CreditPurchaseTotalPrice(purchaseId, purchase.getFinalAmount());
     }
 
@@ -96,7 +104,7 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
 
         return promotions.stream()
             .map(ResponseDTO.Promotion::fromModel)
-            .toList();            
+            .toList();
     }
 
     @Override
@@ -112,9 +120,9 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
     @Override
     @Transactional
     public ResponseDTO.Promotion promotionsGetTheMostUsed() {
-        // For debugging purposes: Set a greater value and uncomment the 
+        // For debugging purposes: Set a greater value and uncomment the
         // logging code a few lines below
-        final var NUM_OF_VOUCHERS = 1; 
+        final var NUM_OF_VOUCHERS = 1;
 
         var mostUsedVouchers = this.purchaseService.findTheMostUsedVouchers(NUM_OF_VOUCHERS);
 
@@ -124,7 +132,7 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
         // TODO Add a propper logger instead of the console output
         // mostUsedVouchers.forEach(voucher -> {
         //     System.out.println(
-        //         "Voucher: " + voucher.getCode() + 
+        //         "Voucher: " + voucher.getCode() +
         //         ", # of purchases: " + voucher.getNumOfPurchases());
         // });
 
@@ -139,16 +147,16 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
         var bestSellerStore = this.quotaService.getTheBestSellerStore(year, month);
 
         return new ResponseDTO.Store(
-            bestSellerStore.getStore(), 
-            bestSellerStore.getCuitStore(), 
+            bestSellerStore.getStore(),
+            bestSellerStore.getCuitStore(),
             bestSellerStore.getMonthlyProfit());
     }
 
     @Override
     public ResponseDTO.Bank banksGetTheOneWithMostPaymentValues() {
-        // For debugging purposes: Set a greater value and uncomment the 
+        // For debugging purposes: Set a greater value and uncomment the
         // logging code a few lines below
-        final var NUM_OF_BANKS = 1; 
+        final var NUM_OF_BANKS = 1;
 
         var mostEarnerBanks = this.paymentService.findTheMostEarnerBanks(NUM_OF_BANKS);
 
@@ -159,13 +167,13 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
         // TODO Add a propper logger instead of the console output
         // mostEarnerBanks.forEach(bankInfo -> {
         //     System.out.println(
-        //         "Bank: " + bankInfo.getBankId() + 
+        //         "Bank: " + bankInfo.getBankId() +
         //         ", total payment value: " + bankInfo.getTotalPaymentValue());
         // });
 
         var mostEarnerBankInfo = mostEarnerBanks.get(0);
         var bank = this.bankService.find(mostEarnerBankInfo.getBankId());
-       
+
         return ResponseDTO.Bank.fromModel(bank, mostEarnerBankInfo.getTotalPaymentValue());
     }
 }
