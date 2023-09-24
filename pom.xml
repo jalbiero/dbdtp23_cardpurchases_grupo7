@@ -149,6 +149,14 @@
                                 <argument>--eval</argument>
                                 <argument>"printjson(db.dropDatabase())"</argument>
                             </arguments>
+                            <successCodes>
+                                <successCode>0</successCode>
+
+                                <!-- Ignore error(s)
+                                     TODO add any extra error needed
+                                -->
+                                <successCode>1</successCode>
+                              </successCodes>
                         </configuration>
                     </execution>
                 </executions>
