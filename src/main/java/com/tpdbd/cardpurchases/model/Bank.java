@@ -8,7 +8,7 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.DocumentReference;
 
-@Document 
+@Document
 public class Bank {
     @Id
     private String id;
@@ -28,6 +28,9 @@ public class Bank {
     @DocumentReference(lazy = true)
     private List<Card> cards;
 
+    @DocumentReference(lazy = true)
+    private List<CardHolder> cardHolders;
+
     public Bank() {
     }
 
@@ -38,6 +41,7 @@ public class Bank {
         this.telephone = telephone;
         this.promotions = new ArrayList<Promotion>();
         this.cards = new ArrayList<Card>();
+        this.cardHolders = new ArrayList<CardHolder>();
     }
 
     public String getId() {
@@ -86,5 +90,13 @@ public class Bank {
 
     public List<Card> getCards() {
         return this.cards;
+    }
+
+    public List<CardHolder> getCardHolders() {
+        return this.cardHolders;
+    }
+
+    public void setCardHolders(List<CardHolder> cardHolders) {
+        this.cardHolders = cardHolders;
     }
 }
