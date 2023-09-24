@@ -67,12 +67,12 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
     @Autowired private CardRepository cardRepository;
     @Autowired private PaymentRepository paymentRepository;
     @Autowired private PromotionRepository promotionRepository;
-    @Autowired private CashPurchaseRepository cashPurchaseRepository; 
-    @Autowired private CreditPurchaseRepository creditPurchaseRepository; 
+    @Autowired private CashPurchaseRepository cashPurchaseRepository;
+    @Autowired private CreditPurchaseRepository creditPurchaseRepository;
     @Autowired private QuotaRepository quotaRespository;
 
     private Random random = new Random(0); // Same seed (0) -> all is "repeatable"
-    private Faker faker; 
+    private Faker faker;
 
     private SequenceGenerator cuitGenerator = new SequenceGenerator("cuit");
     private SequenceGenerator promotionCode = new SequenceGenerator("promo");
@@ -84,7 +84,7 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
             .setLanguage("es")
             .setRegion("AR")
             .build();
-        
+
         this.faker = new Faker(locale, this.random);
     }
 
@@ -107,7 +107,7 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
 
         System.out.println(">> Generating cash purchases");
         generateCashPurchases(this.stores, this.cardRepository.findAll());
-        
+
         System.out.println(">> Generating cash quotas");
         generateQuotasTo(this.cashPurchaseRepository.findAll());
 
@@ -120,7 +120,7 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
         System.out.println(">> Generating payments");
         generatePaymentsFor(Stream.concat(
             StreamSupport.stream(this.cashPurchaseRepository.findAll().spliterator(), false),
-            StreamSupport.stream(this.creditPurchaseRepository.findAll().spliterator(), false))); 
+            StreamSupport.stream(this.creditPurchaseRepository.findAll().spliterator(), false)));
 
         System.out.println(">> Done");
     }
@@ -157,7 +157,7 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
         catch (DateTimeParseException e) {
             // TODO Add a proper logger instead of this console output
             System.err.println((
-                String.format("Invalid syntax for parameter = %s, value = %s, error = %s", 
+                String.format("Invalid syntax for parameter = %s, value = %s, error = %s",
                     name, getStrParam(name), e)));
 
             return LocalDate.now();
@@ -165,7 +165,7 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
     }
 
     /**
-     * Get a fake date based on limits given by property file. This 
+     * Get a fake date based on limits given by property file. This
      * function is a wrapper over Faker.date().between(...) because the
      * library still uses the old Date class :-(
      * @param minDate Use this date instead of the one from configuration
@@ -177,10 +177,10 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
             Date.from(value.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
         var fromDate = localDate2Date.apply(minDate != null ? minDate : getDateParam("minDate"));
-        var toDate = localDate2Date.apply(maxDate != null ? maxDate : getDateParam("maxDate")); 
+        var toDate = localDate2Date.apply(maxDate != null ? maxDate : getDateParam("maxDate"));
 
         return LocalDate.ofInstant(
-            this.faker.date().between(fromDate, toDate).toInstant(), 
+            this.faker.date().between(fromDate, toDate).toInstant(),
             ZoneId.systemDefault());
     }
 
@@ -193,8 +193,8 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
     }
 
     /**
-     * Gets random items from an iterable. It is a very simple implementation especially 
-     * suitable for 'numOfItems' to be much smaller than data.size() (otherwise this 
+     * Gets random items from an iterable. It is a very simple implementation especially
+     * suitable for 'numOfItems' to be much smaller than data.size() (otherwise this
      * function will be very slow, see internal TODO).
      * @param <T>
      * @param data
@@ -208,7 +208,7 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
 
         var uniqueIndexes = new TreeSet<Integer>();
         var result = new ArrayList<T>();
-        
+
         if (randomAccessData.size() < numOfItems)
             return data;
 
@@ -231,9 +231,9 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
      * Generates a random list of stores where card holders can shop
      * @return
      */
-    private void generateStores() {        
+    private void generateStores() {
         this.stores = this.faker.collection(() -> new Store(
-                this.faker.company().name(), 
+                this.faker.company().name(),
                 this.cuitGenerator.getNextValue())
             )
             .len(getIntParam("numOfStores"))
@@ -242,9 +242,9 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
 
     private void generateBanks() {
         List<Bank> banks = this.faker.collection(() -> new Bank(
-                this.faker.company().name(), 
-                this.cuitGenerator.getNextValue(), 
-                this.faker.address().fullAddress(), 
+                this.faker.company().name(),
+                this.cuitGenerator.getNextValue(),
+                this.faker.address().fullAddress(),
                 this.faker.phoneNumber().phoneNumber())
             )
             .len(getIntParam("numOfBanks"))
@@ -257,12 +257,12 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
      * Generates a random list of Banks (and their Promotions)
      * @return
      */
-    private void generatePromotions(Iterable<Bank> banks, Iterable<Store> stores) {        
+    private void generatePromotions(Iterable<Bank> banks, Iterable<Store> stores) {
         banks.forEach(bank -> {
-            // Asumption: 
-            //   - Each Bank will emit both types of promotions (Discount and 
+            // Asumption:
+            //   - Each Bank will emit both types of promotions (Discount and
             //     Financing) for each promoted Store, so at most, numOfStores * 2.
-            //   - All banks use the same generator of promotion codes, so 
+            //   - All banks use the same generator of promotion codes, so
             //     promotions across all banks have a unique code.
             getRandomItemsFrom(stores, this.faker.number().numberBetween(1, getIntParam("numOfStores")))
                 .forEach(promotedStore -> {
@@ -271,36 +271,36 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
 
                     var discPromo = this.promotionRepository.save(new Discount(
                         bank,
-                        this.promotionCode.getNextValue(), 
-                        this.faker.company().catchPhrase(), 
-                        promotedStore.name(), 
-                        promotedStore.cuit(), 
+                        this.promotionCode.getNextValue(),
+                        this.faker.company().catchPhrase(),
+                        promotedStore.name(),
+                        promotedStore.cuit(),
                         validityStart,
-                        validityEnd, 
+                        validityEnd,
                         faker.theItCrowd().characters(),
-                        faker.number().numberBetween(1, getIntParam("maxDiscount")) / 100.f, 
-                        faker.number().numberBetween(getIntParam("minCapPrice"), getIntParam("maxCapPrice")), 
+                        faker.number().numberBetween(1, getIntParam("maxDiscount")) / 100.f,
+                        faker.number().numberBetween(getIntParam("minCapPrice"), getIntParam("maxCapPrice")),
                         faker.bool().bool()));
 
                     validityStart = getFakeDate();
                     validityEnd = getFakeDate(validityStart);
-    
+
                     var numOfQuotas = this.faker.number().numberBetween(1, getIntParam("maxPromoNumOfQuotas"));
-                    
-                    var interest = numOfQuotas == 1 
-                        ? 0.f 
+
+                    var interest = numOfQuotas == 1
+                        ? 0.f
                         : this.faker.number().numberBetween(1, getIntParam("maxPromoInterest")) / 100.f;
 
-                    var finPromo = this.promotionRepository.save(new Financing(    
+                    var finPromo = this.promotionRepository.save(new Financing(
                         bank,
-                        this.promotionCode.getNextValue(), 
-                        this.faker.company().catchPhrase(), 
-                        promotedStore.name(), 
-                        promotedStore.cuit(), 
+                        this.promotionCode.getNextValue(),
+                        this.faker.company().catchPhrase(),
+                        promotedStore.name(),
+                        promotedStore.cuit(),
                         validityStart,
-                        validityEnd, 
+                        validityEnd,
                         faker.theItCrowd().actors(),
-                        numOfQuotas, 
+                        numOfQuotas,
                         interest));
 
                     bank.getPromotions().add(discPromo);
@@ -315,14 +315,14 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
      * @return
      */
     private void generateCardHolders() {
-        Iterable<CardHolder> cardHolders = 
+        Iterable<CardHolder> cardHolders =
             this.faker.collection(() -> new CardHolder(
                 this.faker.name().fullName(),
                 // faker.idNumber() is not good fot DNI, it generes IDs with hyphens
                 String.valueOf(this.faker.number().numberBetween(1, 99_999_999)),
-                Integer.toString(this.faker.number().positive()), 
-                this.faker.address().fullAddress(), 
-                this.faker.phoneNumber().cellPhone(), 
+                Integer.toString(this.faker.number().positive()),
+                this.faker.address().fullAddress(),
+                this.faker.phoneNumber().cellPhone(),
                 getFakeDate())
             )
             .len(getIntParam("numOfCardHolders"))
@@ -337,10 +337,12 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
      * @param cardHolders
      * @return
      */
-    private void generateCards(Iterable<Bank> banks, Iterable<CardHolder> cardHolders) {        
+    private void generateCards(Iterable<Bank> banks, Iterable<CardHolder> cardHolders) {
         cardHolders.forEach(cardHolder -> {
             getRandomItemsFrom(banks, this.faker.number().numberBetween(1, getIntParam("maxNumOfCardsPerUser")))
                 .forEach(bank -> {
+                    //var cardHolderBanks = new ArrayList<Bank>();
+
                     var since = getFakeDate(cardHolder.getEntry());
                     var expiration = this.faker.number().numberBetween(1, getIntParam("maxCardExpirationYears"));
 
@@ -354,9 +356,11 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
                     ));
 
                     bank.getCards().add(card);
+                    bank.getCardHolders().add(cardHolder);
                     this.bankRepository.save(bank);
 
                     cardHolder.getCards().add(card);
+                    cardHolder.getBanks().add(bank);
                     this.cardHolderRepository.save(cardHolder);
                 });
             });
@@ -368,13 +372,13 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
      * @param cards
      * @return
      */
-    private void  generateCashPurchases(Iterable<Store> stores, 
-                                        Iterable<Card> cards) 
-    { 
+    private void  generateCashPurchases(Iterable<Store> stores,
+                                        Iterable<Card> cards)
+    {
         generatePurchases(
             getIntParam("maxNumOfCashPurchasesPerCard"),
-            stores, 
-            cards, 
+            stores,
+            cards,
             (store, card, promotions) -> {
                 var promo = promotions.stream()
                     .filter(p -> Discount.class.isInstance(p))
@@ -382,7 +386,7 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
                     .findAny();
 
                 var voucher = promo.map(Discount::getCode).orElse(null);
-                var priceCap = promo.map(Discount::getPriceCap).orElse(0.f);                       
+                var priceCap = promo.map(Discount::getPriceCap).orElse(0.f);
                 var promoDiscount = promo.map(Discount::getDiscountPercentage).orElse(0.f);
                 var storeDiscount = faker.number().numberBetween(1, getIntParam("maxDiscount")) / 100.f;
 
@@ -392,13 +396,13 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
                 assert finalDiscount < 1; // TODO Add a proper error management
 
                 var finalAmount = amount * (1 - finalDiscount);
-                
+
                 var purchase = this.cashPurchaseRepository.save(new CashPurchase(
-                    card, 
+                    card,
                     voucher,
-                    store.name(), 
-                    store.cuit(), 
-                    amount, 
+                    store.name(),
+                    store.cuit(),
+                    amount,
                     finalAmount,
                     storeDiscount));
 
@@ -411,26 +415,26 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
 
     /**
      * Generates some credit purchases for each card in some random stores
-     * 
+     *
      * @param stores
      * @param cards
      * @return
      */
-    private  void generateCreditPurchases(Iterable<Store> stores, 
-                                          Iterable<Card> cards) 
+    private  void generateCreditPurchases(Iterable<Store> stores,
+                                          Iterable<Card> cards)
     {
         generatePurchases(
-            getIntParam("maxNumOfCreditPurchasesPerCard"), 
-            stores, 
-            cards, 
+            getIntParam("maxNumOfCreditPurchasesPerCard"),
+            stores,
+            cards,
             (store, card, promotions) -> {
-                // TODO I am not sure about the following way of calculating the 'finalAmount' (1st apply the 
+                // TODO I am not sure about the following way of calculating the 'finalAmount' (1st apply the
                 //      discount promotion to get 'disAmount', and 2nd apply the financial promotion interest
                 //      rate on the 'disAmount' in order to calculte the 'finalAmount')
                 //
                 //      Note: The following paragraph from 'TP-Final-202223.pdf' is confusing to me:
                 //
-                //       "En caso de existir más de una posible descuento para una misma compra, estos 
+                //       "En caso de existir más de una posible descuento para una misma compra, estos
                 //        pueden acumularse, exceptuando el caso donde existen diferentes opciones en cuotas,
                 //        solo una aplicable, y cuando el descuento especi que que es solo al contado"
 
@@ -443,9 +447,9 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
                     .filter(p -> Discount.class.isInstance(p))
                     .map(p -> Discount.class.cast(p))
                     .filter(p -> !p.isOnlyCash())
-                    .findAny();  
+                    .findAny();
 
-                var disPriceCap = discountPromo.map(Discount::getPriceCap).orElse(0.f);  
+                var disPriceCap = discountPromo.map(Discount::getPriceCap).orElse(0.f);
                 var disPromoDiscount = discountPromo.map(Discount::getDiscountPercentage).orElse(0.f);
                 var disFinalPromoDiscount = amount <= disPriceCap ? disPromoDiscount : 0.f;
 
@@ -462,26 +466,26 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
                 @Nullable var finVoucher = financialPromo
                     .map(Financing::getCode)
                     .orElse(null); // No promotion
-                
+
                 var finInterest = financialPromo
                     .map(Financing::getInterest)
                     .orElse(this.faker.number().numberBetween(1, getIntParam("maxNoPromoInterest")) / 100.f);
-                
+
                 var finNumOfQuotas = financialPromo
                     .map(Financing::getNumberOfQuotas)
                     .orElse(this.faker.number().numberBetween(1, getIntParam("maxNoPromoNumOfQuotas")));
 
-                var finalAmount = disAmount * (1 + finInterest); 
+                var finalAmount = disAmount * (1 + finInterest);
 
                 ///////////////////////////////////
                 // Purchase part
 
                 var purchase = this.creditPurchaseRepository.save(new CreditPurchase(
-                    card, 
+                    card,
                     finVoucher,
-                    store.name(), 
-                    store.cuit(), 
-                    amount, 
+                    store.name(),
+                    store.cuit(),
+                    amount,
                     finalAmount,
                     finInterest,
                     finNumOfQuotas));
@@ -495,7 +499,7 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
 
     /**
      * Defines the purchase template algorithm, it can generates cash or credit purchases
-     * 
+     *
      * @param <T>
      * @param <U>
      * @param stores
@@ -503,11 +507,11 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
      * @param paymentCreator
      * @return Iterable<T>
      */
-    private <T extends Purchase> 
+    private <T extends Purchase>
         void generatePurchases(int maxNumOfPurchases,
-                                      Iterable<Store> stores, 
-                                      Iterable<Card> cards, 
-                                      TriFunction<Store, Card, List<Promotion>, T> purchaseCreator)     
+                                      Iterable<Store> stores,
+                                      Iterable<Card> cards,
+                                      TriFunction<Store, Card, List<Promotion>, T> purchaseCreator)
     {
         if (maxNumOfPurchases <= 0)
             return;
@@ -521,7 +525,7 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
                     var promotions = bank.getPromotions().stream()
                         .filter(promo -> promo.getCuitStore().equals(store.cuit()))
                         .toList();
-                     
+
                     assert promotions.size() <=2; // A bank has at most 2 promotions for each store
                     purchaseCreator.apply(store, card, promotions);
                 });
@@ -535,10 +539,10 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
      * @return
      */
     private <T extends Purchase>
-        void generateQuotasTo(Iterable<T> purchases) 
-    { 
+        void generateQuotasTo(Iterable<T> purchases)
+    {
         purchases.forEach(purchase -> {
-            var numOfQuotas = switch (purchase) {
+            int numOfQuotas = switch (purchase) {
                 case CashPurchase cashP -> 1;
                 case CreditPurchase creditP -> creditP.getNumberOfQuotas();
                 default -> throw new IllegalArgumentException("Unknown type of Purchase");
@@ -548,10 +552,10 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
             var amountPerQuota = purchase.getFinalAmount() / numOfQuotas;
 
             // Adjust the number of quotas if they exceed the expiration date of the credit card
-            var monthsForExpiration = ChronoUnit.MONTHS.between(purchase.getCard().getExpirationDate(), shopDate);
-            var finalNumOfQuotas = 
+            int monthsForExpiration = (int)ChronoUnit.MONTHS.between(purchase.getCard().getExpirationDate(), shopDate);
+            int finalNumOfQuotas =
                 numOfQuotas != 1 && numOfQuotas > monthsForExpiration
-                    ? monthsForExpiration 
+                    ? monthsForExpiration
                     : numOfQuotas;
 
             for (int quotaNumber = 1; quotaNumber <= finalNumOfQuotas; quotaNumber++) {
@@ -561,7 +565,7 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
                 var quota = this.quotaRespository.save(new Quota(
                     purchase,
                     quotaNumber,
-                    amountPerQuota, 
+                    amountPerQuota,
                     paymentDate.getMonthValue(),
                     paymentDate.getYear()));
 
@@ -577,11 +581,11 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
     }
 
     /**
-     * Generates monthly payments for all purchases, grouping quotas of the same card for the 
+     * Generates monthly payments for all purchases, grouping quotas of the same card for the
      * same period of time (one payment for them)
      * @param purchases
      */
-    private void generatePaymentsFor(Stream<Purchase> purchases) 
+    private void generatePaymentsFor(Stream<Purchase> purchases)
     {
         var paymentsUntil = getDateParam("generatePaymentsUntil");
 
@@ -592,11 +596,11 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
                 purchasesByCard.stream()
                     .flatMap(purchase -> purchase.getQuotas().stream())
                     .filter(quota -> {
-                        // Quota doesn't have the day, just use the first one    
+                        // Quota doesn't have the day, just use the first one
                         var quotaDate = LocalDate.of(quota.getYear(), quota.getMonth(), 1);
                         return quotaDate.isBefore(paymentsUntil);
                     })
-                    .collect(Collectors.groupingBy(quota -> 
+                    .collect(Collectors.groupingBy(quota ->
                         new PaymentPeriod(quota.getMonth(), quota.getYear())))
                     .forEach((period, quotas) -> {
                         var totalPrice = quotas.stream()
@@ -624,7 +628,7 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
                         });
 
                         this.quotaRespository.saveAll(quotas);
-                    }); 
+                    });
             });
     }
 }
