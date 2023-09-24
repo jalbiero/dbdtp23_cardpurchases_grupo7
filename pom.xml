@@ -137,7 +137,7 @@
                             <executable>docker</executable>
                             <arguments>
                                 <argument>exec</argument>
-                                <argument>dbdtp23_cardpurchases_grupo7-MongoDB-1</argument>
+                                <argument>tp-final-mongo</argument>
                                 <argument>mongosh</argument>
                                 <argument>--authenticationDatabase</argument>
                                 <argument>${spring.data.mongodb.authentication-database}</argument>
@@ -149,14 +149,6 @@
                                 <argument>--eval</argument>
                                 <argument>"printjson(db.dropDatabase())"</argument>
                             </arguments>
-                            <successCodes>
-                                <successCode>0</successCode>
-
-                                <!-- Ignore error(s)
-                                     TODO add any extra error needed
-                                -->
-                                <successCode>1</successCode>
-                              </successCodes>
                         </configuration>
                     </execution>
                 </executions>

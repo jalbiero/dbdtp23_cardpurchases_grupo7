@@ -1,6 +1,7 @@
 services:
   MongoDB:
     image: mongo:6-jammy
+    container_name: tp-final-mongo
     environment:
       - MONGO_INITDB_ROOT_USERNAME=admin
       - MONGO_INITDB_ROOT_PASSWORD=root
