@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.tpdbd.cardpurchases.dto.RequestDTO;
 import com.tpdbd.cardpurchases.dto.ResponseDTO;
-import com.tpdbd.cardpurchases.errors.BadRequestException;
 import com.tpdbd.cardpurchases.services.CardPurchasesService;
 
 // Note: Number in the documentation of each endpoint is correlated with
@@ -27,93 +26,86 @@ public class CardPurchasesController {
     private CardPurchasesService service;
 
     /***
-     * Endpoint to check if the application is up and running 
-     * 
+     * Endpoint to check if the application is up and running
+     *
      * URL:
      *      GET /
-     * 
+     *
      * Return:
      *      The name of the application
-     * 
+     *
      */
     @GetMapping("/")
     String index() {
         return "Card Purchases application";
     }
 
-    /** 
-     * 01 - Adds a new Discount promotion to the specified bank 
-     * 
-     * URL: 
+    /**
+     * 01 - Adds a new Discount promotion to the specified bank
+     *
+     * URL:
      *      POST /banks/{id}/addDiscountPromotion
-     * 
-     * ContentType: 
+     *
+     * ContentType:
      *      application/json
-     * 
+     *
      * Params:
      *      - URL: {id} bank identifier
      *      - Body:
      *          {
      *              "code":               "Promotion code",
-     *              "promotionTitle":     "Promotion title", 
-     *              "nameStore":          "Store name", 
+     *              "promotionTitle":     "Promotion title",
+     *              "nameStore":          "Store name",
      *              "cuitStore":          "Store CUIT",
      *              "validityStartDate":  "2020/10/10",
-     *              "validityEndDate":    "2023/12/31", 
-     *              "comments":           "Some extra comments", 
-     *              "discountPercentage": 10.5, 
-     *              "priceCap":           10000.0, 
+     *              "validityEndDate":    "2023/12/31",
+     *              "comments":           "Some extra comments",
+     *              "discountPercentage": 10.5,
+     *              "priceCap":           10000.0,
      *              "onlyCash":           true
      *          }
      */
     @PostMapping("/banks/{id}/addDiscountPromotion")
-    void banksAddDiscountPromotion(@PathVariable String id, 
-                                   @RequestBody RequestDTO.Discount discount) 
+    void banksAddDiscountPromotion(@PathVariable String id,
+                                   @RequestBody RequestDTO.Discount discount)
     {
         this.service.banksAddDiscountPromotion(id, discount);
     }
 
     /**
-     * 02 - Update the dates of the specified payment 
-     * 
-     * URL: 
+     * 02 - Update the dates of the specified payment
+     *
+     * URL:
      *      PUT /payments/{id}/updateDates
-     * 
-     * ContentType: 
+     *
+     * ContentType:
      *      application/json
-     * 
+     *
      * Params:
      *      - URL: {id} payment identifier
      *      - Body:
      *          {
-     *              "firstExpiration": "2023/10/31", 
+     *              "firstExpiration": "2023/10/31",
      *              "secondExpiration": "2023/11/15"
      *          }
-     */    
+     */
     @PutMapping("/payments/{id}/updateDates")
-    void paymentsUpdateDates(@PathVariable String id, 
-                             @RequestBody RequestDTO.PaymentsUpdateDatesBody body) 
+    void paymentsUpdateDates(@PathVariable String id,
+                             @RequestBody RequestDTO.PaymentsUpdateDatesBody body)
     {
-        if (body.firstExpiration().isAfter(body.secondExpiration())) {
-            throw new BadRequestException(
-                "Second expiration date (%s) must be grater than the first one (%s)", 
-                body.secondExpiration(), 
-                body.firstExpiration());
-        }
-        
         this.service.paymentsUpdateDates(id, body.firstExpiration(), body.secondExpiration());
     }
 
     /**
      * 03 - Get card monthly payment with its purchases
-     * 
-     * URL: 
+     *
+     * URL:
      *      PUT /cards/{id}/monthlyPayment?year={someYear}&month={someMonth}
-     * 
+     *
      * Params:
      *      - URL: {someYear} the specified year
      *             {someMonth} the specified month
-     * 
+     *
      * Return:
      *      {
      *          "id": "64cfd297ae28e32a53e9705b",
@@ -148,8 +140,8 @@ public class CardPurchasesController {
      *      }
      */
     @GetMapping("/cards/{id}/monthlyPayment")
-    ResponseDTO.MonthlyPayment cardsGetMonthtlyPayment(@PathVariable String id, 
-                                                       @RequestParam int year, 
+    ResponseDTO.MonthlyPayment cardsGetMonthtlyPayment(@PathVariable String id,
+                                                       @RequestParam int year,
                                                        @RequestParam int month)
     {
         return this.service.cardsGetMonthtlyPayment(id, year, month);
@@ -157,22 +149,22 @@ public class CardPurchasesController {
 
     /**
      * 04 - Lists cards that expire in the following days (by default 30 days starting
-     *      from the moment of calling this endpoint if the days and the date are not 
+     *      from the moment of calling this endpoint if the days and the date are not
      *      specified)
-     * 
-     * URL: 
+     *
+     * URL:
      *      GET /cards/soonToExpire?baseDate={baseDate}&daysFromBaseDate={daysFromBaseDate}
-     * 
-     * ContentType: 
+     *
+     * ContentType:
      *      application/json
-     * 
+     *
      * Params:
      *      - URL: [Optional] {baseDate} the starting date to look up. Default = now(), (format: 'yyyy-MM-dd')
      *             [Optional] {daysFromBaseDate}: default = 30 (days)
-     * 
+     *
      * Return:
      *      A list of Cards:
-     * 
+     *
      *      [
      *          {
      *              "id": "64cfd297ae28e32a53e9705b",
@@ -181,8 +173,8 @@ public class CardPurchasesController {
      *              "cardholderNameInCard": "Juan Perez",
      *              "since": "2023/01/01",
      *              "expirationDate": "2026/01/01",
-     *              "bankCuit": "23-1231231231-9", 
-     *              "userDni": "30123978"          
+     *              "bankCuit": "23-1231231231-9",
+     *              "userDni": "30123978"
      *          },
      *          ...
      *      ]
@@ -199,19 +191,19 @@ public class CardPurchasesController {
 
     /**
      * 05 - Gets information about the specified purchase
-     * 
-     * URL: 
+     *
+     * URL:
      *      GET /purchases/{id}
-     * 
-     * ContentType: 
+     *
+     * ContentType:
      *      application/json
-     * 
+     *
      * Params:
      *      - URL: {id} the purchase id
-     * 
+     *
      * Return:
      *      The purchase information:
-     * 
+     *
      *      {
      *          "id": "64ded297ae28e32a53e9705b",
      *          "type": "CashPurchase" | "CreditPurchase",
@@ -226,11 +218,11 @@ public class CardPurchasesController {
      *          "numberOfQuotas": 5,          << Only available when type = "CreditPurchase"
      *          "quotas: [                    << Only one quota when type = "CashPurchase"
      *              {
-     *                  "number": 1, 
-     *                  "price": 450.50, 
-     *                  "month": 10, 
-     *                  "year": 2023, 
-     *                  "store": "The name of the store",  
+     *                  "number": 1,
+     *                  "price": 450.50,
+     *                  "month": 10,
+     *                  "year": 2023,
+     *                  "store": "The name of the store",
      *                  "cardNumber": "1123123123123"
      *              },
      *              ...
@@ -244,16 +236,16 @@ public class CardPurchasesController {
 
     /**
      * 06 - Delete a specified promotion
-     * 
-     * URL: 
+     *
+     * URL:
      *      DELETE /promotions/{code}
      *
      * Params:
      *      - URL: {code} Promotion code
-     * 
+     *
      * Return:
-     *      404 if promotion code could not be found  
-     * 
+     *      404 if promotion code could not be found
+     *
      */
     @DeleteMapping("/promotions/{code}")
     void promotionsDelete(@PathVariable String code) {
@@ -262,26 +254,26 @@ public class CardPurchasesController {
 
     /**
      * 07 - Gets the total price of the specified purchase
-     * 
-     * URL: 
+     *
+     * URL:
      *      GET /purchases/{id}/creditTotalPrice
-     * 
-     * ContentType: 
+     *
+     * ContentType:
      *      application/json
-     * 
+     *
      * Params:
      *      - URL: {id} the purchase id
-     * 
+     *
      * Return:
      *      - The totalPrice (finalAmount) of the specified credit purchase:
-     * 
+     *
      *          {
      *              "id": "64cfd297ae28e32a53e9705b",
      *              "totalPrice": 1023.50
      *          }
-     * 
+     *
      *      - 404 if the specified credit purchase could not be found
-     */ 
+     */
     @GetMapping("/purchases/{id}/creditTotalPrice")
     ResponseDTO.CreditPurchaseTotalPrice purchasesCreditGetTotalPrice(@PathVariable String id) {
         return this.service.purchasesCreditGetTotalPrice(id);
@@ -289,17 +281,17 @@ public class CardPurchasesController {
 
     /**
      * 08 - List promotions for the specified store in the specified date range
-     * 
-     * URL: 
+     *
+     * URL:
      *      GET /stores/{cuit}/availablePromotions?from={from}&to={to}
-     * 
+     *
      * Params:
      *      - URL: {from} the specified 'from' date (format: 'yyyy-MM-dd')
      *             {to} the specified 'to' date (format: 'yyyy-MM-dd')
-     * 
+     *
      * Return:
      *      A list of store promotions:
-     * 
+     *
      *      [
      *          {
      *              "code": "promo114",
@@ -318,7 +310,7 @@ public class CardPurchasesController {
      *
      */
     @GetMapping("/stores/{cuit}/availablePromotions")
-    List<ResponseDTO.Promotion> storesGetAvailablePromotions(@PathVariable String cuit, 
+    List<ResponseDTO.Promotion> storesGetAvailablePromotions(@PathVariable String cuit,
                                                              @RequestParam LocalDate from,
                                                              @RequestParam LocalDate to)
     {
@@ -327,13 +319,13 @@ public class CardPurchasesController {
 
     /**
      * 09 - Gets the top 10 cards (and their respective owners) with more purchases
-     * 
-     * URL: 
+     *
+     * URL:
      *      GET /cards/getTop10Purchasers
-     * 
+     *
      * Return:
      *      The top 10 list sorted by numOfPurchases in descending order:
-     * 
+     *
      *      [
      *          {
      *              "cardHolderName": "Nanci Gonzalez Zamora",
@@ -354,11 +346,11 @@ public class CardPurchasesController {
     }
 
     /**
-     * 10 - Gets the most used promotion across all purchases. 
-     * 
-     * URL: 
+     * 10 - Gets the most used promotion across all purchases.
+     *
+     * URL:
      *      GET /promotions/theMostUsed
-     * 
+     *
      * Return:
      *      {
      *          "code": "promo129",
@@ -381,18 +373,18 @@ public class CardPurchasesController {
 
     /**
      * 11 - Returns the best seller store for the speficied year and month
-     * 
-     * URL: 
+     *
+     * URL:
      *      GET /stores/bestSeller?year={someYear}&month={someMonth}
-     * 
+     *
      * URL params:
      *      - URL: {someYear} the specified year
      *             {someMonth} the specified month
-     * 
+     *
      * Return:
      *      The store found (name, cuit and profit for the specified year and month)
      *      or 404 otherwise
-     * 
+     *
      *      {
      *          "name":"Roman Caro e Hijos",
      *          "cuit":"30",
@@ -407,10 +399,10 @@ public class CardPurchasesController {
 
     /**
      * 12 - Gets the bank with most payment values in its cards
-     * 
-     * URL: 
+     *
+     * URL:
      *      GET /banks/theOneWithMostPaymentValues
-     * 
+     *
      * Return:
      *      {
      *          "name": "Gonzalez Ocampo S.R.L.",
