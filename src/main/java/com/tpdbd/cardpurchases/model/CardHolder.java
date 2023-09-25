@@ -37,16 +37,23 @@ public class CardHolder {
         inverseJoinColumns=@JoinColumn(name="id"))
     private List<Card> cards;
 
+    @ManyToMany
+    @JoinTable(
+        name="banks_card_holders",
+        joinColumns=@JoinColumn( name="card_holder_id"),
+        inverseJoinColumns=@JoinColumn(name="bank_id"))
+    private List<Bank> banks;
+
     public CardHolder() {
     }
 
     public CardHolder(
-        String completeName, 
-        String dni, 
-        String cuil, 
-        String address, 
-        String telephone, 
-        LocalDate entry) 
+        String completeName,
+        String dni,
+        String cuil,
+        String address,
+        String telephone,
+        LocalDate entry)
     {
         this.completeName = completeName;
         this.dni = dni;
@@ -55,6 +62,7 @@ public class CardHolder {
         this.telephone = telephone;
         this.entry = entry;
         this.cards = new ArrayList<Card>();
+        this.banks = new ArrayList<Bank>();
     }
 
     public Long getId() {
@@ -111,5 +119,13 @@ public class CardHolder {
 
     public List<Card> getCards() {
         return this.cards;
+    }
+
+    public List<Bank> getBanks() {
+        return this.banks;
+    }
+
+    public void setBanks(List<Bank> banks) {
+        this.banks = banks;
     }
 }
