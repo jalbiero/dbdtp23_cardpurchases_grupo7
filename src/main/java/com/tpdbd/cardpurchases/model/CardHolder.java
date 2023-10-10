@@ -37,7 +37,7 @@ public class CardHolder {
     @ManyToMany
     @JoinTable(
         name="banks_card_holders",
-        joinColumns=@JoinColumn( name="card_holder_id"),
+        joinColumns=@JoinColumn(name="card_holder_id"),
         inverseJoinColumns=@JoinColumn(name="bank_id"))
     private List<Bank> banks;
 
