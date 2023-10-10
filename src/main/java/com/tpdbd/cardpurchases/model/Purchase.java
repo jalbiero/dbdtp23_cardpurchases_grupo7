@@ -9,14 +9,15 @@ import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 
 @Entity
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)  
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public abstract class Purchase {
     @Id
     @GeneratedValue
+    @Column(name = "purchase_id")
     private Long id;
 
     @ManyToOne
-    @JoinColumn(nullable = false)
+    @JoinColumn(name = "card_id", nullable = false)
     private Card card;
 
     @Column(nullable = true)
@@ -34,23 +35,23 @@ public abstract class Purchase {
     @Column(nullable = false)
     private float finalAmount;
 
-    @OneToMany 
-    @JoinTable(
-        name="quota",
-        joinColumns=@JoinColumn(name="purchase_id"),
-        inverseJoinColumns=@JoinColumn(name="id"))
+    @OneToMany(mappedBy = "purchase")
+    // @JoinTable(
+    //     name="quota",
+    //     joinColumns=@JoinColumn(name="purchase_id"),
+    //     inverseJoinColumns=@JoinColumn(name="id"))
     private List<Quota> quotas;
 
     public Purchase() {
     }
 
     public Purchase(
-        Card card, 
-        @Nullable String paymentVoucher, 
-        String store, 
-        String cuitStore, 
-        float amount, 
-        float finalAmount) 
+        Card card,
+        @Nullable String paymentVoucher,
+        String store,
+        String cuitStore,
+        float amount,
+        float finalAmount)
     {
         this.card = card;
         this.paymentVoucher = paymentVoucher;

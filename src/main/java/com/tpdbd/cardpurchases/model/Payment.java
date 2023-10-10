@@ -10,6 +10,7 @@ import jakarta.persistence.*;
 public class Payment {
     @Id
     @GeneratedValue
+    @Column(name = "payment_id")
     private Long id;
 
     @Column(length = 50, nullable = false)
@@ -28,36 +29,33 @@ public class Payment {
     private LocalDate secondExpiration;
 
     @Column(nullable = false)
-    private float surcharge; 
+    private float surcharge;
 
     @Column(nullable = false)
     private float totalPrice;
 
-    @OneToMany
-    @JoinTable(
-        name="quota",
-        joinColumns=@JoinColumn(name="payment_id"),
-        inverseJoinColumns=@JoinColumn(name="id"))
+    @OneToMany(mappedBy = "payment")
     private List<Quota> quotas;
 
     // This allows an easy navigation to the card used in the payment (another
-    // complex way it is to use one of the associated quotas in order to reach 
+    // complex way it is to use one of the associated quotas in order to reach
     // the Purchase and then the Card)
     @ManyToOne
+    @JoinColumn(name = "card_id", nullable = false)
     private Card card;
-    
+
     public Payment() {
     }
 
     public Payment(
-        String code, 
-        int month, 
-        int year, 
-        LocalDate firstExpiration, 
+        String code,
+        int month,
+        int year,
+        LocalDate firstExpiration,
         LocalDate secondExpiration,
-        float surcharge, 
-        float totalPrice, 
-        Card card) 
+        float surcharge,
+        float totalPrice,
+        Card card)
     {
         this.code = code;
         this.month = month;
@@ -73,7 +71,7 @@ public class Payment {
     public Long getId() {
         return this.id;
     }
-    
+
     public String getCode() {
         return this.code;
     }

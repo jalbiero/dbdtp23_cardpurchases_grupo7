@@ -9,10 +9,11 @@ import jakarta.persistence.*;
 public class Quota {
     @Id
     @GeneratedValue
+    @Column(name = "quota_id")
     private Long id;
 
     @ManyToOne
-    @JoinColumn(nullable = false)
+    @JoinColumn(name = "purchase_id", nullable = false)
     private Purchase purchase;
 
     @Column(nullable = false)
@@ -28,8 +29,8 @@ public class Quota {
     private int year;
 
     @ManyToOne
-    @JoinColumn(nullable = true)
     @Nullable
+    @JoinColumn(name = "payment_id", nullable = true)
     private Payment payment;
 
     public Quota() {
@@ -41,10 +42,10 @@ public class Quota {
 
     public Quota(
         Purchase purchase,
-        int number, 
-        float price, 
-        int month, 
-        int year, 
+        int number,
+        float price,
+        int month,
+        int year,
         Payment payment)
     {
         this.purchase = purchase;
