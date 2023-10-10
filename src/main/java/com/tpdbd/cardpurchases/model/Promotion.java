@@ -7,14 +7,15 @@ import org.hibernate.annotations.Where;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@Where(clause = "deleted = false") // Note: SQL specific, Mongo version will need another solution 
+@Where(clause = "deleted = false") // Note: SQL specific, Mongo version will need another solution
 public abstract class Promotion {
     @Id
     @GeneratedValue
+    @Column(name = "promotion_id")
     private Long id;
 
     @ManyToOne
-    @JoinColumn(nullable = false)
+    @JoinColumn(name = "bank_id", nullable = false)
     private Bank bank;
 
     @Column(unique = true, length = 50, nullable = false)
@@ -38,23 +39,23 @@ public abstract class Promotion {
     @Column(length = 200, nullable = false)
     private String comments;
 
-    // Implements a logical delete with the help of @Where annotation (see 
+    // Implements a logical delete with the help of @Where annotation (see
     // PromotionRepository.deleteByCode for more information about its usage
     @SuppressWarnings("unused")
-    private Boolean deleted; 
+    private Boolean deleted;
 
     public Promotion() {
     }
 
     public Promotion(
-        Bank bank, 
-        String code, 
-        String promotionTitle, 
-        String nameStore, 
-        String cuitStore, 
-        LocalDate validityStartDate, 
-        LocalDate validityEndDate, 
-        String comments) 
+        Bank bank,
+        String code,
+        String promotionTitle,
+        String nameStore,
+        String cuitStore,
+        LocalDate validityStartDate,
+        LocalDate validityEndDate,
+        String comments)
     {
         this.bank = bank;
         this.code = code;

@@ -6,18 +6,19 @@ import java.util.List;
 
 import jakarta.persistence.*;
 
-@Entity 
+@Entity
 public class Card {
     @Id
     @GeneratedValue
+    @Column(name = "card_id")
     private Long id;
 
     @ManyToOne
-    @JoinColumn(nullable = false)
+    @JoinColumn(name = "bank_id", nullable = false)
     private Bank bank;
 
-    @ManyToOne 
-    @JoinColumn(nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "card_holder_id", nullable = false)
     private CardHolder cardHolder;
 
     @Column(unique = true, length = 20, nullable = false)
@@ -35,11 +36,7 @@ public class Card {
     @Column(nullable = false)
     private LocalDate expirationDate;
 
-    @OneToMany 
-    @JoinTable(
-        name="purchase",
-        joinColumns=@JoinColumn(name="card_id"),
-        inverseJoinColumns=@JoinColumn(name="id"))
+    @OneToMany(mappedBy = "card")
     private List<Purchase> purchases;
 
     public Card() {
@@ -47,11 +44,11 @@ public class Card {
 
     public Card(
         Bank bank,
-        CardHolder cardHolder, 
-        String number, 
-        String ccv, 
+        CardHolder cardHolder,
+        String number,
+        String ccv,
         LocalDate since,
-        LocalDate expirationDate) 
+        LocalDate expirationDate)
     {
         this.bank = bank;
         this.cardHolder = cardHolder;

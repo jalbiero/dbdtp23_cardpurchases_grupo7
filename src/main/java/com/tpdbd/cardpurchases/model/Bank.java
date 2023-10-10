@@ -9,6 +9,7 @@ import jakarta.persistence.*;
 public class Bank {
     @Id
     @GeneratedValue
+    @Column(name = "bank_id")
     private Long id;
 
     @Column(length = 50, nullable = false)
@@ -23,18 +24,10 @@ public class Bank {
     @Column(length = 20, nullable = false)
     private String telephone;
 
-    @OneToMany
-    @JoinTable(
-        name="promotion",
-        joinColumns=@JoinColumn(name="bank_id"),
-        inverseJoinColumns=@JoinColumn(name="id"))
+    @OneToMany(mappedBy = "bank")
     private List<Promotion> promotions;
 
-    @OneToMany
-    @JoinTable(
-        name="card",
-        joinColumns=@JoinColumn(name="bank_id"),
-        inverseJoinColumns=@JoinColumn(name="id"))
+    @OneToMany(mappedBy = "bank")
     private List<Card> cards;
 
     @ManyToMany(mappedBy = "banks")

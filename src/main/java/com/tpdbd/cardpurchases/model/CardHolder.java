@@ -10,6 +10,7 @@ import jakarta.persistence.*;
 public class CardHolder {
     @Id
     @GeneratedValue
+    @Column(name = "card_holder_id")
     private Long id;
 
     @Column(length = 50, nullable = false)
@@ -30,11 +31,7 @@ public class CardHolder {
     @Column(nullable = false)
     private LocalDate entry;
 
-    @OneToMany
-    @JoinTable(
-        name="card",
-        joinColumns=@JoinColumn(name="card_holder_id"),
-        inverseJoinColumns=@JoinColumn(name="id"))
+    @OneToMany(mappedBy = "cardHolder")
     private List<Card> cards;
 
     @ManyToMany
