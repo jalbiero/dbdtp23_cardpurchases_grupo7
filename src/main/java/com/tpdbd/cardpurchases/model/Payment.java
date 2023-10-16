@@ -37,6 +37,9 @@ public class Payment {
     @OneToMany(mappedBy = "payment")
     private List<Quota> quotas;
 
+    @OneToMany(mappedBy = "payment")
+    private List<CashPurchase> cashPurchases;
+
     // This allows an easy navigation to the card used in the payment (another
     // complex way it is to use one of the associated quotas in order to reach
     // the Purchase and then the Card)
