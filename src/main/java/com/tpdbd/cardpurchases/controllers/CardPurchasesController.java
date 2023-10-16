@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.tpdbd.cardpurchases.dto.RequestDTO;
 import com.tpdbd.cardpurchases.dto.ResponseDTO;
-import com.tpdbd.cardpurchases.errors.BadRequestException;
 import com.tpdbd.cardpurchases.services.CardPurchasesService;
 
 // Note: Number in the documentation of each endpoint is correlated with
