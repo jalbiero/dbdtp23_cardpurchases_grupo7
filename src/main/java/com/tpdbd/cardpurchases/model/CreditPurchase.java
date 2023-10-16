@@ -1,8 +1,11 @@
 package com.tpdbd.cardpurchases.model;
 
-import jakarta.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.OneToMany;
 
 @Entity
 public class CreditPurchase extends Purchase {
@@ -13,22 +16,26 @@ public class CreditPurchase extends Purchase {
     @Column(nullable = true) // 'true' due to @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
     private int numberOfQuotas;
 
+    @OneToMany(mappedBy = "purchase")
+    private List<Quota> quotas;
+
     public CreditPurchase() {
     }
 
     public CreditPurchase(
-        Card card, 
-        @Nullable String paymentVoucher, 
-        String store, 
-        String cuitStore, 
+        Card card,
+        String paymentVoucher,
+        String store,
+        String cuitStore,
         float amount,
-        float finalAmount, 
+        float finalAmount,
         float interest,
         int numberOfQuotas)
     {
         super(card, paymentVoucher, store, cuitStore, amount, finalAmount);
         this.interest = interest;
         this.numberOfQuotas = numberOfQuotas;
+        this.quotas = new ArrayList<Quota>();
     }
 
     public float getInterest() {
@@ -43,18 +50,17 @@ public class CreditPurchase extends Purchase {
         return this.numberOfQuotas;
     }
 
-    @Override
-    public boolean addQuota(Quota quota) {
-        if (getQuotas().size() < this.numberOfQuotas)
-            return super.addQuota(quota);
+    // TODO Just for now, the number of quotas cannot be changed, because if the number is less
+    //      than getQuotas().size() it will be necessary to remove some quotas, which ones?
+    // public void setNumberOfQuotas(int numberOfQuotas) {
+    //     this.numberOfQuotas = numberOfQuotas;
+    // }
 
-        return false;
+    public List<Quota> getQuotas() {
+        return this.quotas;
     }
 
-    // TODO Just for now, the number of quotas cannot be changed, because if the
-    // number is less than getQuotas().size() it will be necessary to remove some
-    // quotas, which ones?
-    // public void setNumberOfQuotas(int numberOfQuotas) {
-    // this.numberOfQuotas = numberOfQuotas;
-    // }
+    public void setQuotas(List<Quota> quotas) {
+        this.quotas = quotas;
+    }
 }
