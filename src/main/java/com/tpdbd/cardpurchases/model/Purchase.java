@@ -1,11 +1,5 @@
 package com.tpdbd.cardpurchases.model;
 
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 
 @Entity
@@ -20,7 +14,7 @@ public abstract class Purchase {
     @JoinColumn(name = "card_id", nullable = false)
     private Card card;
 
-    @Column(nullable = true)
+    @Column(nullable = false)
     private String paymentVoucher;
 
     @Column(length = 50, nullable = false)
@@ -35,19 +29,12 @@ public abstract class Purchase {
     @Column(nullable = false)
     private float finalAmount;
 
-    @OneToMany(mappedBy = "purchase")
-    // @JoinTable(
-    //     name="quota",
-    //     joinColumns=@JoinColumn(name="purchase_id"),
-    //     inverseJoinColumns=@JoinColumn(name="id"))
-    private List<Quota> quotas;
-
     public Purchase() {
     }
 
     public Purchase(
         Card card,
-        @Nullable String paymentVoucher,
+        String paymentVoucher,
         String store,
         String cuitStore,
         float amount,
@@ -59,7 +46,6 @@ public abstract class Purchase {
         this.cuitStore = cuitStore;
         this.amount = amount;
         this.finalAmount = finalAmount;
-        this.quotas = new ArrayList<Quota>();
     }
 
     public long getId() {
@@ -74,8 +60,8 @@ public abstract class Purchase {
         this.card = card;
     }
 
-    public Optional<String> getPaymentVoucher() {
-        return Optional.ofNullable(this.paymentVoucher);
+    public String getPaymentVoucher() {
+        return this.paymentVoucher;
     }
 
     public void setPaymentVoucher(String paymentVoucher) {
@@ -113,16 +99,4 @@ public abstract class Purchase {
     public void setFinalAmount(float finalAmount) {
         this.finalAmount = finalAmount;
     }
-
-    public List<Quota> getQuotas() {
-        return this.quotas;
-    }
-
-    public boolean addQuota(Quota quota) {
-        return this.quotas.add(quota);
-    }
-
-    // public boolean removeQuota(Quota quota) {
-    //     return this.quotas.remove(quota);
-    //}
 }
