@@ -43,6 +43,7 @@ public class CashPurchase extends Purchase {
     {
         super(card, paymentVoucher, store, cuitStore, amount, finalAmount);
         this.storeDiscount = storeDiscount;
+        this.payment = payment;
         this.month = month;
         this.year = year;
     }

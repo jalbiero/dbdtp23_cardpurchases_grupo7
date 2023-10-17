@@ -130,10 +130,6 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
                 System.out.println(">> Generating credit purchases");
                 generateCreditPurchases(this.stores, cards, em);
 
-                System.out.println(">> Generating cash quotas");
-                var cashPurchases = this.cashRepository.findAll();
-                generateQuotasTo(cashPurchases);
-
                 System.out.println(">> Generating credit quotas");
                 var creditPurchases = this.creditRepository.findAll();
                 generateQuotasTo(creditPurchases);
@@ -556,22 +552,15 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
     }
 
     /**
-     * Generates quotas to each purchase in the specified list of them
-     * @param <T>
+     * Generates quotas to each credit purchase in the specified list of them
      * @param purchases
      */
-    private <T extends Purchase>
-        void generateQuotasTo(Iterable<T> purchases)
+    private void generateQuotasTo(Iterable<CreditPurchase> purchases)
     {
         var quotas = new ArrayList<Quota>();
 
         purchases.forEach(purchase -> {
-            var numOfQuotas = switch (purchase) {
-                case CreditPurchase d -> d.getNumberOfQuotas();
-                case CashPurchase f -> 1;
-                default -> throw new IllegalArgumentException("Unknown type of Purchase");
-            };
-
+            var numOfQuotas = purchase.getNumberOfQuotas();
             var shopDate = getFakeDate(purchase.getCard().getSince());
             var amountPerQuota = purchase.getFinalAmount() / numOfQuotas;
 
@@ -685,7 +674,7 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
 
                             final var savedPayment = this.paymentRepository.save(payment);
 
-                            // Set the bi-directional relationship with quotas and cash purchases
+                            // Set the bi-directional relationship between payments and quotas and cash purchases
                             entries.forEach(entry -> {
                                 var paymentData = entry.getValue();
                                 paymentData.paymentSource().forEach(entity -> {

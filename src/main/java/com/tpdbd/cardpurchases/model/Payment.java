@@ -68,6 +68,7 @@ public class Payment {
         this.surcharge = surcharge;
         this.totalPrice = totalPrice;
         this.quotas = new ArrayList<Quota>();
+        this.cashPurchases = new ArrayList<CashPurchase>();
         this.card = card;
     }
 
@@ -133,6 +134,10 @@ public class Payment {
 
     public List<Quota> getQuotas() {
         return this.quotas;
+    }
+    
+    public List<CashPurchase> getCashPurchases() {
+        return this.cashPurchases;
     }
 
     public Card getCard() {
