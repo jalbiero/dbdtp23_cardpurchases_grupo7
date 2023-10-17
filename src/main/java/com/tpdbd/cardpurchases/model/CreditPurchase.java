@@ -3,8 +3,6 @@ package com.tpdbd.cardpurchases.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.annotation.Nullable;
-
 import org.springframework.data.annotation.TypeAlias;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.DocumentReference;
