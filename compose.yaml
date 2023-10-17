@@ -13,4 +13,4 @@ services:
       timeout: 30s
       retries: 10
     volumes:
-      - ./mongodb:/data/db
+      - /tmp/tp-final-mongo:/data/db
