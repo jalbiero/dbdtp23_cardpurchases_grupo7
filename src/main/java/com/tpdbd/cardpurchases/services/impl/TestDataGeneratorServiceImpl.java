@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Random;
 import java.util.TreeSet;
 import java.util.function.Function;
@@ -61,6 +62,13 @@ record Store(String name, String cuit) {
  */
 record PaymentPeriod(Integer month, Integer year) {
 }
+
+/**
+ * paymentSource = quotas | cashPayments
+ */
+record PaymentData<T>(Float totalPrice, List<T> paymentSource) {
+}
+
 
 @Service
 public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
@@ -121,10 +129,6 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
 
                 System.out.println(">> Generating credit purchases");
                 generateCreditPurchases(this.stores, cards, em);
-
-                System.out.println(">> Generating cash quotas");
-                var cashPurchases = this.cashRepository.findAll();
-                generateQuotasTo(cashPurchases);
 
                 System.out.println(">> Generating credit quotas");
                 var creditPurchases = this.creditRepository.findAll();
@@ -393,7 +397,8 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
                     .map(p -> Discount.class.cast(p))
                     .findAny();
 
-                var voucher = promo.map(Discount::getCode).orElse(null);
+                //var voucher = promo.map(Discount::getCode).orElse(null);
+                var voucher = faker.simpsons().character();
                 var priceCap = promo.map(Discount::getPriceCap).orElse(0.f);
                 var promoDiscount = promo.map(Discount::getDiscountPercentage).orElse(0.f);
                 var storeDiscount = faker.number().numberBetween(1, getIntParam("maxDiscount")) / 100.f;
@@ -405,16 +410,18 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
 
                 var finalAmount = amount * (1 - finalDiscount);
 
-                var purchase = new CashPurchase(
+                var shopDate = getFakeDate(card.getSince());
+
+                return new CashPurchase(
                     card,
                     voucher,
                     store.name(),
                     store.cuit(),
                     amount,
                     finalAmount,
-                    storeDiscount);
-
-                return purchase;
+                    storeDiscount,
+                    shopDate.getMonthValue(),
+                    shopDate.getYear());
             });
 
         this.cashRepository.saveAll(purchases);
@@ -467,9 +474,10 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
                     .map(p -> Financing.class.cast(p))
                     .findAny();
 
-                @Nullable var finVoucher = financialPromo
-                    .map(Financing::getCode)
-                    .orElse(null); // No promotion
+                // @Nullable var finVoucher = financialPromo
+                //     .map(Financing::getCode)
+                //     .orElse(null); // No promotion
+                var voucher = faker.simpsons().character();
 
                 var finInterest = financialPromo
                     .map(Financing::getInterest)
@@ -486,7 +494,7 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
 
                 var purchase = new CreditPurchase(
                     card,
-                    finVoucher,
+                    voucher,
                     store.name(),
                     store.cuit(),
                     amount,
@@ -541,22 +549,15 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
     }
 
     /**
-     * Generates quotas to each purchase in the specified list of them
-     * @param <T>
+     * Generates quotas to each credit purchase in the specified list of them
      * @param purchases
      */
-    private <T extends Purchase>
-        void generateQuotasTo(Iterable<T> purchases)
+    private void generateQuotasTo(Iterable<CreditPurchase> purchases)
     {
         var quotas = new ArrayList<Quota>();
 
         purchases.forEach(purchase -> {
-            var numOfQuotas = switch (purchase) {
-                case CreditPurchase d -> d.getNumberOfQuotas();
-                case CashPurchase f -> 1;
-                default -> throw new IllegalArgumentException("Unknown type of Purchase");
-            };
-
+            var numOfQuotas = purchase.getNumberOfQuotas();
             var shopDate = getFakeDate(purchase.getCard().getSince());
             var amountPerQuota = purchase.getFinalAmount() / numOfQuotas;
 
@@ -564,7 +565,7 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
             var monthsForExpiration = ChronoUnit.MONTHS.between(purchase.getCard().getExpirationDate(), shopDate);
             var finalNumOfQuotas = numOfQuotas > monthsForExpiration ? monthsForExpiration : numOfQuotas;
 
-            for (int i=1; i <= finalNumOfQuotas; i++) {
+            for (int i = 1; i <= finalNumOfQuotas; i++) {
                 // Each quota is set to the following month of the previous one
                 var paymentDate = shopDate.plusMonths(i);
 
@@ -581,9 +582,13 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
     }
 
     /**
-     * Generates monthly payments for all purchases, grouping quotas of the same card for the
-     * same period of time (one payment for them)
+     * Generates monthly payments for all purchases, grouping quotas and cash payments of the same card
+     * for the same period of time (one payment for them).
+     *
      * @param purchases
+     * @param entityManager
+     *
+     * TODO This method is really nasty, it must be refactored, but, for sure, it will require a data model refactoring
      */
     private void generatePaymentsFor(Stream<Purchase> purchases, EntityManager entityManager) {
         var paymentsUntil = getDateParam("generatePaymentsUntil");
@@ -593,7 +598,9 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
             .collect(Collectors.groupingBy(Purchase::getCard))
             .values()
             .forEach((purchasesByCard) -> {
-                purchasesByCard.stream()
+                var creditPaymentsPerPeriod = purchasesByCard.stream()
+                    .filter(purchase -> CreditPurchase.class.isInstance(purchase))
+                    .map(purchase -> CreditPurchase.class.cast(purchase))
                     .flatMap(purchase -> purchase.getQuotas().stream())
                     .filter(quota -> {
                         // Quota doesn't have the day, just use the first one
@@ -602,34 +609,82 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
                     })
                     .collect(Collectors.groupingBy(quota ->
                         new PaymentPeriod(quota.getMonth(), quota.getYear())))
-                    .forEach((period, quotas) -> {
+                    .entrySet().stream()
+                    // Convert Map<PaymentPeriod, List<Quota>> into Map<PaymentPeriod, Sum(price of al quotas)>
+                    .collect(Collectors.toMap(Map.Entry::getKey, entry -> {
+                        var quotas = entry.getValue();
                         var totalPrice = quotas.stream()
                             .map(Quota::getPrice)
                             .reduce(0.f, (accum, price) -> accum + price);
 
-                        // All quotas belong to purchases made with the same card,
-                        // so just use one of them to get the card
-                        var card = quotas.get(0).getPurchase().getCard();
+                        return new PaymentData<Quota>(totalPrice, quotas);
+                    }));
 
-                        var payment = new Payment(
-                            this.paymentCode.getNextValue(),
-                            period.month(),
-                            period.year(),
-                            LocalDate.of(period.year(), period.month(), 15),
-                            LocalDate.of(period.year(), period.month(), 25),
-                            totalPrice * 0.5f, // TODO Surcharfe of 5% is harcoded
-                            totalPrice,
-                            card);
+                var cashPaymentsPerPeriod = purchasesByCard.stream()
+                    .filter(purchase -> CashPurchase.class.isInstance(purchase))
+                    .map(purchase -> CashPurchase.class.cast(purchase))
+                    .filter(purchase -> {
+                        // Cash purchase doesn't have the day, just use the first one
+                        var purchaseDate = LocalDate.of(purchase.getYear(), purchase.getMonth(), 1);
+                        return purchaseDate.isBefore(paymentsUntil);
+                    })
+                    .collect(Collectors.groupingBy(purchase ->
+                        new PaymentPeriod(purchase.getMonth(), purchase.getYear())))
+                    .entrySet().stream()
+                    // Convert Map<PaymentPeriod, List<CashPayments>> into Map<PaymentPeriod, Sum(price of cash payments)>
+                    .collect(Collectors.toMap(Map.Entry::getKey, entry -> {
+                        var cashPurchases = entry.getValue();
+                        var totalPrice = cashPurchases.stream()
+                            .map(CashPurchase::getFinalAmount)
+                            .reduce(0.f, (accum, price) -> accum + price);
 
-                        final var savedPayment = this.paymentRepository.save(payment);
+                        return new PaymentData<CashPurchase>(totalPrice, cashPurchases);
+                    }));
 
-                        // Set the bi-directional relationship
-                        quotas.forEach(quota -> {
-                            quota.setPayment(savedPayment);
+                    //
+                    // Groups cash purchases and credit quotas to generate the final payment per period
+                    //
+
+                    var periodsAndTotalPrices = Stream.concat(
+                        StreamSupport.stream(creditPaymentsPerPeriod.entrySet().spliterator(), false),
+                        StreamSupport.stream(cashPaymentsPerPeriod.entrySet().spliterator(), false));
+
+                    periodsAndTotalPrices
+                        .collect(Collectors.groupingBy(Map.Entry::getKey)) // groups by payment period
+                        .forEach((period, entries) -> {
+                            var totalPaymentPrice = entries.stream()
+                                .map(entry -> entry.getValue().totalPrice())
+                                .reduce(0.f, (accum, price) -> accum + price);
+
+                            // Due to groupping by card, all purchases available here were made with the same card
+                            var card = purchasesByCard.get(0).getCard();
+
+                            var payment = new Payment(
+                                this.paymentCode.getNextValue(),
+                                period.month(),
+                                period.year(),
+                                LocalDate.of(period.year(), period.month(), 15),
+                                LocalDate.of(period.year(), period.month(), 25),
+                                totalPaymentPrice * 0.5f, // TODO Surcharge of 5% is harcoded
+                                totalPaymentPrice,
+                                card);
+
+                            final var savedPayment = this.paymentRepository.save(payment);
+
+                            // Set the bi-directional relationship between payments and quotas and cash purchases
+                            entries.forEach(entry -> {
+                                var paymentData = entry.getValue();
+                                paymentData.paymentSource().forEach(entity -> {
+                                    switch(entity) {
+                                        case Quota quota -> quota.setPayment(savedPayment);
+                                        case CashPurchase purchase -> purchase.setPayment(savedPayment);
+                                        default -> throw new IllegalArgumentException(
+                                            "Unknown type of entity (only Quota or CashPayment allowed");
+
+                                    }
+                                });
+                            });
                         });
-
-                        this.quotaRespository.saveAll(quotas);
-                    });
             });
     }
 }

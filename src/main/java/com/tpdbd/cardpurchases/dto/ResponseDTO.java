@@ -28,13 +28,13 @@ public interface ResponseDTO {
         }
 
         public static Bank fromModel(com.tpdbd.cardpurchases.model.Bank bank,
-                                     float totalPaymentValueFromItsCards) 
+                                     float totalPaymentValueFromItsCards)
         {
             return fromModel(bank, Optional.of(totalPaymentValueFromItsCards));
         }
 
-        private static Bank fromModel(com.tpdbd.cardpurchases.model.Bank bank, 
-                                      Optional<Float> totalPaymentValueFromItsCards) 
+        private static Bank fromModel(com.tpdbd.cardpurchases.model.Bank bank,
+                                      Optional<Float> totalPaymentValueFromItsCards)
         {
             return new Bank(
                 bank.getId(),
@@ -63,9 +63,9 @@ public interface ResponseDTO {
         public static Card fromModel(com.tpdbd.cardpurchases.model.Card card) {
             return new Card(
                 card.getId(),
-                card.getNumber(), 
-                card.getCcv(), 
-                card.getCardholderNameInCard(), 
+                card.getNumber(),
+                card.getCcv(),
+                card.getCardholderNameInCard(),
                 card.getSince(),
                 card.getExpirationDate(),
                 card.getBank().getId(),
@@ -91,9 +91,9 @@ public interface ResponseDTO {
                 payment.getCode(),
                 payment.getMonth(),
                 payment.getYear(),
-                payment.getFirstExpiration(), 
-                payment.getSecondExpiration(), 
-                payment.getSurcharge(), 
+                payment.getFirstExpiration(),
+                payment.getSecondExpiration(),
+                payment.getSurcharge(),
                 payment.getTotalPrice(),
                 payment.getQuotas().stream()
                     .map(Quota::fromModel)
@@ -102,7 +102,7 @@ public interface ResponseDTO {
     }
 
     ////////////////////////////////////////////////////////
-    @JsonInclude(JsonInclude.Include.NON_ABSENT) 
+    @JsonInclude(JsonInclude.Include.NON_ABSENT)
     interface Promotion {
         String getType();
 
@@ -122,7 +122,7 @@ public interface ResponseDTO {
             };
         }
     }
-    
+
     record Discount(
         String code,
         String promotionTitle,
@@ -138,17 +138,17 @@ public interface ResponseDTO {
     {
         public static Discount fromModel(com.tpdbd.cardpurchases.model.Discount discount, Optional<Integer> numOfPurchases) {
             return new Discount(
-                discount.getCode(), 
-                discount.getPromotionTitle(), 
-                discount.getNameStore(), 
-                discount.getCuitStore(), 
+                discount.getCode(),
+                discount.getPromotionTitle(),
+                discount.getNameStore(),
+                discount.getCuitStore(),
                 discount.getValidityStartDate(),
                 discount.getValidityEndDate(),
                 discount.getComments(),
                 discount.getDiscountPercentage(),
                 discount.getPriceCap(),
                 numOfPurchases);
-        } 
+        }
 
         @Override
         public String getType() {
@@ -166,15 +166,15 @@ public interface ResponseDTO {
         String comments,
         int numberOfQuotas,
         float interest,
-        Optional<Integer> numOfPurchases) 
+        Optional<Integer> numOfPurchases)
         implements Promotion
     {
         public static Financing fromModel(com.tpdbd.cardpurchases.model.Financing financing, Optional<Integer> numOfPurchases) {
             return new Financing(
-                financing.getCode(), 
-                financing.getPromotionTitle(), 
-                financing.getNameStore(), 
-                financing.getCuitStore(), 
+                financing.getCode(),
+                financing.getPromotionTitle(),
+                financing.getNameStore(),
+                financing.getCuitStore(),
                 financing.getValidityStartDate(),
                 financing.getValidityEndDate(),
                 financing.getComments(),
@@ -205,26 +205,28 @@ public interface ResponseDTO {
     record CashPurchase(
         long id,
         String cardNumber,
-        Optional<String> PaymentVoucher,
+        String PaymentVoucher,
         String store,
         String cuitStore,
         float ammount,
         float finalAmount,
-        List<Quota> quotas,
-        float storeDiscount)
-        implements Purchase 
+        float storeDiscount,
+        int month,
+        int year)
+        implements Purchase
     {
         public static CashPurchase fromModel(com.tpdbd.cardpurchases.model.CashPurchase cashPurchase) {
             return new CashPurchase(
                 cashPurchase.getId(),
-                cashPurchase.getCard().getNumber(), 
-                cashPurchase.getPaymentVoucher(), 
+                cashPurchase.getCard().getNumber(),
+                cashPurchase.getPaymentVoucher(),
                 cashPurchase.getStore(),
-                cashPurchase.getCuitStore(), 
+                cashPurchase.getCuitStore(),
                 cashPurchase.getAmount(),
                 cashPurchase.getFinalAmount(),
-                cashPurchase.getQuotas().stream().map(Quota::fromModel).toList(),
-                cashPurchase.getStoreDiscount());
+                cashPurchase.getStoreDiscount(),
+                cashPurchase.getMonth(),
+                cashPurchase.getYear());
         }
 
         @Override
@@ -236,23 +238,23 @@ public interface ResponseDTO {
     record CreditPurchase(
         long id,
         String cardNumber,
-        Optional<String> PaymentVoucher,
+        String PaymentVoucher,
         String store,
         String cuitStore,
         float ammount,
         float finalAmount,
         List<Quota> quotas,
-        float interest, 
+        float interest,
         int numberOfQuotas)
-        implements Purchase  
+        implements Purchase
     {
         public static CreditPurchase fromModel(com.tpdbd.cardpurchases.model.CreditPurchase creditPurchase) {
             return new CreditPurchase(
                 creditPurchase.getId(),
-                creditPurchase.getCard().getNumber(), 
-                creditPurchase.getPaymentVoucher(), 
+                creditPurchase.getCard().getNumber(),
+                creditPurchase.getPaymentVoucher(),
                 creditPurchase.getStore(),
-                creditPurchase.getCuitStore(), 
+                creditPurchase.getCuitStore(),
                 creditPurchase.getAmount(),
                 creditPurchase.getFinalAmount(),
                 creditPurchase.getQuotas().stream().map(Quota::fromModel).toList(),
@@ -268,18 +270,18 @@ public interface ResponseDTO {
 
     ////////////////////////////////////////////////////////
     record Quota(
-        int number, 
-        float price, 
-        int month, 
-        int year, 
+        int number,
+        float price,
+        int month,
+        int year,
         String store,
         String cardNumber)
     {
         public static Quota fromModel(com.tpdbd.cardpurchases.model.Quota quota) {
             return new Quota(
-                quota.getNumber(), 
-                quota.getPrice(), 
-                quota.getMonth(), 
+                quota.getNumber(),
+                quota.getPrice(),
+                quota.getMonth(),
                 quota.getYear(),
                 quota.getPurchase().getStore(),
                 quota.getPurchase().getCard().getNumber());
@@ -288,31 +290,31 @@ public interface ResponseDTO {
 
     ////////////////////////////////////////////////////////
     record Store(
-        String name, 
-        String cuit, 
-        float profit) 
+        String name,
+        String cuit,
+        float profit)
     {}
 
     ////////////////////////////////////////////////////////
     record MonthlyPayment(
         long cardId,
         String cardNumber,
-        int year, 
-        int month, 
+        int year,
+        int month,
         float totalPrice,
-        List<Purchase> purchases) 
+        List<Purchase> purchases)
     {
         public static MonthlyPayment fromModel(com.tpdbd.cardpurchases.model.Payment payment) {
             List<Purchase> purchases = payment.getQuotas().stream()
                 .map(quota -> Purchase.fromModel(quota.getPurchase()))
                 .collect(Collectors.toList());
-            
+
             // TODO: It is not clear how "Payment.surcharge", "Payment.firstExpiration" and
             //       "Payment.secondExpiration" must be used. Is the Payment class a "payment order"
             //       or a "payment record"? Sometimes seems to be the 1st one, sometimes the 2nd one.
             //       Having said that, and for the sake of simplicity, I will ignore the "Payment.surcharge"
             //       using only the "Payment.totalPrice" to represents the amount of money that
-            //       a Card holder has payed in the given period (year and month)            
+            //       a Card holder has payed in the given period (year and month)
 
             return new MonthlyPayment(
                 payment.getCard().getId(),
