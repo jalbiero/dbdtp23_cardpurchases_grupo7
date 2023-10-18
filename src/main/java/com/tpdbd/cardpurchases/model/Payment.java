@@ -41,7 +41,7 @@ public class Payment {
     private List<CashPurchase> cashPurchases;
 
     // This allows an easy navigation to the card used in the payment (another
-    // complex way it is to use one of the associated quotas in order to reach
+    // complex way for credit purchases it is to use one of the associated quotas in order to reach
     // the Purchase and then the Card)
     @ManyToOne
     @JoinColumn(name = "card_id", nullable = false)
@@ -67,9 +67,9 @@ public class Payment {
         this.secondExpiration = secondExpiration;
         this.surcharge = surcharge;
         this.totalPrice = totalPrice;
+        this.card = card;
         this.quotas = new ArrayList<Quota>();
         this.cashPurchases = new ArrayList<CashPurchase>();
-        this.card = card;
     }
 
     public Long getId() {

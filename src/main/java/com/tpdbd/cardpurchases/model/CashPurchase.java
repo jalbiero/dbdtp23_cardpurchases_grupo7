@@ -13,10 +13,9 @@ public class CashPurchase extends Purchase {
     @Column(nullable = true) // 'true' due to @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
     private float storeDiscount;
 
-    // Note: Payment is nullable because the chicken and egg problem:
-    //    1st: the purchase is made, 2nd: the payment is made 
-    @ManyToOne
+    // Payment is nullable because purchases (of any kind) are created first
     @Nullable
+    @ManyToOne
     @JoinColumn(name = "payment_id", nullable = true)
     private Payment payment;
 
@@ -37,15 +36,14 @@ public class CashPurchase extends Purchase {
         float amount,
         float finalAmount,
         float storeDiscount,
-        @Nullable Payment payment,
         int month,
         int year)
     {
         super(card, paymentVoucher, store, cuitStore, amount, finalAmount);
         this.storeDiscount = storeDiscount;
-        this.payment = payment;
         this.month = month;
         this.year = year;
+        this.payment = null; // no associated payment yet
     }
 
     public float getStoreDiscount() {

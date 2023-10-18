@@ -412,7 +412,7 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
 
                 var shopDate = getFakeDate(card.getSince());
 
-                var purchase = new CashPurchase(
+                return new CashPurchase(
                     card,
                     voucher,
                     store.name(),
@@ -420,11 +420,8 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
                     amount,
                     finalAmount,
                     storeDiscount,
-                    null,// Payment will be set later
                     shopDate.getMonthValue(),
                     shopDate.getYear());
-
-                return purchase;
             });
 
         this.cashRepository.saveAll(purchases);
@@ -568,7 +565,7 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
             var monthsForExpiration = ChronoUnit.MONTHS.between(purchase.getCard().getExpirationDate(), shopDate);
             var finalNumOfQuotas = numOfQuotas > monthsForExpiration ? monthsForExpiration : numOfQuotas;
 
-            for (int i=1; i <= finalNumOfQuotas; i++) {
+            for (int i = 1; i <= finalNumOfQuotas; i++) {
                 // Each quota is set to the following month of the previous one
                 var paymentDate = shopDate.plusMonths(i);
 

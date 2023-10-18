@@ -28,16 +28,13 @@ public class Quota {
     @Column(nullable = false)
     private int year;
 
-    @ManyToOne
+    // Payment is nullable because purchases (of any kind) and their quotas are created first
     @Nullable
+    @ManyToOne
     @JoinColumn(name = "payment_id", nullable = true)
     private Payment payment;
 
     public Quota() {
-    }
-
-    public Quota(Purchase purchase, int number, float price, int month, int year) {
-        this(purchase, number, price, month, year, null);
     }
 
     public Quota(
@@ -45,15 +42,14 @@ public class Quota {
         int number,
         float price,
         int month,
-        int year,
-        Payment payment)
+        int year)
     {
         this.purchase = purchase;
         this.number = number;
         this.price = price;
         this.month = month;
         this.year = year;
-        this.payment = payment;
+        this.payment = null; // no associated payment yet
     }
 
     public Purchase getPurchase() {
