@@ -412,7 +412,6 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
                     amount,
                     finalAmount,
                     storeDiscount,
-                    null,
                     shopDate.getMonthValue(),
                     shopDate.getYear()));
 

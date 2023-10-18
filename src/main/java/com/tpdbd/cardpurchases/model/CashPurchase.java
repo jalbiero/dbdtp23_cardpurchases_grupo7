@@ -13,8 +13,7 @@ public class CashPurchase extends Purchase {
 
     private float storeDiscount;
 
-    // Note: Payment is nullable because the chicken and egg problem:
-    //       1st: the purchase is made, 2nd: the payment is made
+    // Payment is nullable because purchases (of any kind) are created first
     @Nullable
     private Payment payment;
 
@@ -27,21 +26,20 @@ public class CashPurchase extends Purchase {
 
     public CashPurchase(
         Card card,
-        @Nullable String paymentVoucher,
+        String paymentVoucher,
         String store,
         String cuitStore,
         float amount,
         float finalAmount,
         float storeDiscount,
-        @Nullable Payment payment,
         int month,
         int year)
     {
         super(card, paymentVoucher, store, cuitStore, amount, finalAmount);
         this.storeDiscount = storeDiscount;
-        this.payment = payment;
         this.month = month;
         this.year = year;
+        this.payment = null; // no associated payment yet
     }
 
     public float getStoreDiscount() {

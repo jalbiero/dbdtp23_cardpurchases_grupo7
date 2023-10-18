@@ -34,8 +34,8 @@ public class Payment {
     private List<CashPurchase> cashPurchases;
 
     // - This allows an easy navigation to the card used in the payment (another
-    //   complex way it is to use one of the associated quotas in order to reach
-    //   the Purchase and then the Card)
+    //   complex way for credit purchases it is to use one of the associated quotas
+    //   in order to reach the Purchase and then the Card)
     // - Embedded to simplify queries (see PaymentRepository)
     private Card card;
 
@@ -50,9 +50,7 @@ public class Payment {
         LocalDate secondExpiration,
         float surcharge,
         float totalPrice,
-        Card card,
-        List<Quota> quotas,
-        List<CashPurchase> cashPurchases)
+        Card card)
     {
         this.code = code;
         this.month = month;
@@ -62,31 +60,8 @@ public class Payment {
         this.surcharge = surcharge;
         this.totalPrice = totalPrice;
         this.card = card;
-        this.quotas = quotas;
-        this.cashPurchases = cashPurchases;
-    }
-
-    public Payment(
-        String code,
-        int month,
-        int year,
-        LocalDate firstExpiration,
-        LocalDate secondExpiration,
-        float surcharge,
-        float totalPrice,
-        Card card)
-    {
-        this(
-            code,
-            month,
-            year,
-            firstExpiration,
-            secondExpiration,
-            surcharge,
-            totalPrice,
-            card,
-            new ArrayList<Quota>(),
-            new ArrayList<CashPurchase>());
+        this.quotas = new ArrayList<Quota>();
+        this.cashPurchases = new ArrayList<CashPurchase>();
     }
 
     public String getId() {

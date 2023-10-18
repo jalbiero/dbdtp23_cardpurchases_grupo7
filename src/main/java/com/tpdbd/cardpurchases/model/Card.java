@@ -14,10 +14,10 @@ public class Card {
     @Id
     private String id;
 
-    @DocumentReference //(lazy = true)
+    @DocumentReference
     private Bank bank;
 
-    @DocumentReference //(lazy = true)
+    @DocumentReference
     private CardHolder cardHolder;
 
     @Indexed(unique = true)
@@ -39,11 +39,11 @@ public class Card {
 
     public Card(
         Bank bank,
-        CardHolder cardHolder, 
-        String number, 
-        String ccv, 
+        CardHolder cardHolder,
+        String number,
+        String ccv,
         LocalDate since,
-        LocalDate expirationDate) 
+        LocalDate expirationDate)
     {
         this.bank = bank;
         this.cardHolder = cardHolder;
