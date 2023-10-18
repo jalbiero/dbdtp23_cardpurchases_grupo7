@@ -1,5 +1,7 @@
 package com.tpdbd.cardpurchases.model;
 
+import java.util.Optional;
+
 import jakarta.annotation.Nullable;
 
 import org.springframework.data.annotation.TypeAlias;
@@ -11,29 +13,33 @@ public class CashPurchase extends Purchase {
 
     private float storeDiscount;
 
+    // Payment is nullable because purchases (of any kind) are created first
+    @Nullable
+    private Payment payment;
+
+    private int month;
+
+    private int year;
+
     public CashPurchase() {
     }
 
     public CashPurchase(
-        Card card, 
-        @Nullable String paymentVoucher, 
-        String store, 
-        String cuitStore, 
-        float amount, 
+        Card card,
+        String paymentVoucher,
+        String store,
+        String cuitStore,
+        float amount,
         float finalAmount,
-        float storeDiscount) 
+        float storeDiscount,
+        int month,
+        int year)
     {
         super(card, paymentVoucher, store, cuitStore, amount, finalAmount);
         this.storeDiscount = storeDiscount;
-    }
-
-    @Override
-    public boolean addQuota(Quota quota) {
-        // Cash purchases only have 1 quota
-        if (getQuotas().size() == 0)
-            return super.addQuota(quota);
-
-        return false;
+        this.month = month;
+        this.year = year;
+        this.payment = null; // no associated payment yet
     }
 
     public float getStoreDiscount() {
@@ -44,4 +50,27 @@ public class CashPurchase extends Purchase {
         this.storeDiscount = storeDiscount;
     }
 
+    public Optional<Payment> getPayment() {
+        return Optional.of(this.payment);
+    }
+
+    public void setPayment(Payment payment) {
+        this.payment = payment;
+    }
+
+    public int getMonth() {
+        return this.month;
+    }
+
+    public void setMonth(int month) {
+        this.month = month;
+    }
+
+    public int getYear() {
+        return this.year;
+    }
+
+    public void setYear(int year) {
+        this.year = year;
+    }
 }

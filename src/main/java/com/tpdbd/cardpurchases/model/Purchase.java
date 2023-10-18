@@ -1,14 +1,7 @@
 package com.tpdbd.cardpurchases.model;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import jakarta.annotation.Nullable;
-
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.DocumentReference;
 
 @Document
 public abstract class Purchase {
@@ -28,19 +21,16 @@ public abstract class Purchase {
 
     private float finalAmount;
 
-    @DocumentReference(lazy = true)
-    private List<Quota> quotas;
-
     public Purchase() {
     }
 
     public Purchase(
-        Card card, 
-        @Nullable String paymentVoucher, 
-        String store, 
-        String cuitStore, 
-        float amount, 
-        float finalAmount) 
+        Card card,
+        String paymentVoucher,
+        String store,
+        String cuitStore,
+        float amount,
+        float finalAmount)
     {
         this.card = card;
         this.paymentVoucher = paymentVoucher;
@@ -48,7 +38,6 @@ public abstract class Purchase {
         this.cuitStore = cuitStore;
         this.amount = amount;
         this.finalAmount = finalAmount;
-        this.quotas = new ArrayList<Quota>();
     }
 
     public String getId() {
@@ -63,8 +52,8 @@ public abstract class Purchase {
         this.card = card;
     }
 
-    public Optional<String> getPaymentVoucher() {
-        return Optional.ofNullable(this.paymentVoucher);
+    public String getPaymentVoucher() {
+        return this.paymentVoucher;
     }
 
     public void setPaymentVoucher(String paymentVoucher) {
@@ -102,16 +91,4 @@ public abstract class Purchase {
     public void setFinalAmount(float finalAmount) {
         this.finalAmount = finalAmount;
     }
-
-    public List<Quota> getQuotas() {
-        return this.quotas;
-    }
-
-    public boolean addQuota(Quota quota) {
-        return this.quotas.add(quota);
-    }
-
-    // public boolean removeQuota(Quota quota) {
-    //     return this.quotas.remove(quota);
-    //}
 }

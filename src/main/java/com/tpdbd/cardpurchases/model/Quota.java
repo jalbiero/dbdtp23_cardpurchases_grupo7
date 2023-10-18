@@ -24,6 +24,7 @@ public class Quota {
 
     private int year;
 
+    // Payment is nullable because purchases (of any kind) and their quotas are created first
     @Nullable
     @DocumentReference
     private Payment payment;
@@ -31,24 +32,19 @@ public class Quota {
     public Quota() {
     }
 
-    public Quota(Purchase purchase, int number, float price, int month, int year) {
-        this(purchase, number, price, month, year, null);
-    }
-
     public Quota(
         Purchase purchase,
-        int number, 
-        float price, 
-        int month, 
-        int year, 
-        Payment payment)
+        int number,
+        float price,
+        int month,
+        int year)
     {
         this.purchase = purchase;
         this.number = number;
         this.price = price;
         this.month = month;
         this.year = year;
-        this.payment = payment;
+        this.payment = null; // no associated payment yet
     }
 
     public Purchase getPurchase() {

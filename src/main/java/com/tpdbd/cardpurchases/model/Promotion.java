@@ -16,7 +16,7 @@ public abstract class Promotion {
     private Bank bank;
 
     @Indexed(unique = true)
-    private String code; // aka 'paymentVoucher' (in Purchase class)
+    private String code;
 
     private String promotionTitle;
 
@@ -33,20 +33,20 @@ public abstract class Promotion {
     // Implements a logical delete with the help of the repository (see
     // PromotionRepository.deleteByCode for more information about its usage)
     @SuppressWarnings("unused")
-    private Boolean deleted; 
+    private Boolean deleted;
 
     public Promotion() {
     }
 
     public Promotion(
-        Bank bank, 
-        String code, 
-        String promotionTitle, 
-        String nameStore, 
-        String cuitStore, 
-        LocalDate validityStartDate, 
-        LocalDate validityEndDate, 
-        String comments) 
+        Bank bank,
+        String code,
+        String promotionTitle,
+        String nameStore,
+        String cuitStore,
+        LocalDate validityStartDate,
+        LocalDate validityEndDate,
+        String comments)
     {
         this.bank = bank;
         this.code = code;

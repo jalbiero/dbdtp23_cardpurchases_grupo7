@@ -23,32 +23,34 @@ public class Payment {
 
     private LocalDate secondExpiration;
 
-    private float surcharge; 
+    private float surcharge;
 
     private float totalPrice;
 
     @DocumentReference(lazy = true)
     private List<Quota> quotas;
 
+    @DocumentReference(lazy = true)
+    private List<CashPurchase> cashPurchases;
+
     // - This allows an easy navigation to the card used in the payment (another
-    //   complex way it is to use one of the associated quotas in order to reach 
-    //   the Purchase and then the Card)
+    //   complex way for credit purchases it is to use one of the associated quotas
+    //   in order to reach the Purchase and then the Card)
     // - Embedded to simplify queries (see PaymentRepository)
     private Card card;
-    
+
     public Payment() {
     }
 
     public Payment(
-        String code, 
-        int month, 
-        int year, 
-        LocalDate firstExpiration, 
+        String code,
+        int month,
+        int year,
+        LocalDate firstExpiration,
         LocalDate secondExpiration,
-        float surcharge, 
-        float totalPrice, 
-        Card card,
-        List<Quota> quotas) 
+        float surcharge,
+        float totalPrice,
+        Card card)
     {
         this.code = code;
         this.month = month;
@@ -58,27 +60,14 @@ public class Payment {
         this.surcharge = surcharge;
         this.totalPrice = totalPrice;
         this.card = card;
-        this.quotas = quotas;
-    }
-
-    public Payment(
-        String code, 
-        int month, 
-        int year, 
-        LocalDate firstExpiration, 
-        LocalDate secondExpiration,
-        float surcharge, 
-        float totalPrice, 
-        Card card) 
-    {
-        this(code, month, year, firstExpiration, 
-        secondExpiration, surcharge, totalPrice, card, new ArrayList<Quota>());
+        this.quotas = new ArrayList<Quota>();
+        this.cashPurchases = new ArrayList<CashPurchase>();
     }
 
     public String getId() {
         return this.id;
     }
-    
+
     public String getCode() {
         return this.code;
     }
@@ -137,6 +126,10 @@ public class Payment {
 
     public List<Quota> getQuotas() {
         return this.quotas;
+    }
+
+    public List<CashPurchase> getCashPurchases() {
+        return this.cashPurchases;
     }
 
     public Card getCard() {
