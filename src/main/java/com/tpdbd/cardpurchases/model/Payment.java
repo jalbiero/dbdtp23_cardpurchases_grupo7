@@ -135,9 +135,17 @@ public class Payment {
     public List<Quota> getQuotas() {
         return this.quotas;
     }
-    
+
+    public void setQuotas(List<Quota> quotas) {
+        this.quotas = quotas;
+    }
+
     public List<CashPurchase> getCashPurchases() {
         return this.cashPurchases;
+    }
+
+    public void setCashPurchases(List<CashPurchase> purchases) {
+        this.cashPurchases = purchases;
     }
 
     public Card getCard() {

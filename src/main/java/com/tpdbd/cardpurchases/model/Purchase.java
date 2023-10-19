@@ -1,5 +1,8 @@
 package com.tpdbd.cardpurchases.model;
 
+import java.util.Optional;
+
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 
 @Entity
@@ -29,6 +32,11 @@ public abstract class Purchase {
     @Column(nullable = false)
     private float finalAmount;
 
+    @Nullable
+    @ManyToOne
+    @JoinColumn(name = "promotion_id", nullable = true)
+    private Promotion validPromotion;
+
     public Purchase() {
     }
 
@@ -38,7 +46,8 @@ public abstract class Purchase {
         String store,
         String cuitStore,
         float amount,
-        float finalAmount)
+        float finalAmount,
+        @Nullable Promotion validPromotion)
     {
         this.card = card;
         this.paymentVoucher = paymentVoucher;
@@ -46,6 +55,7 @@ public abstract class Purchase {
         this.cuitStore = cuitStore;
         this.amount = amount;
         this.finalAmount = finalAmount;
+        this.validPromotion = validPromotion;
     }
 
     public long getId() {
@@ -98,5 +108,13 @@ public abstract class Purchase {
 
     public void setFinalAmount(float finalAmount) {
         this.finalAmount = finalAmount;
+    }
+
+    public Optional<Promotion> getValidPromotion() {
+        return Optional.of(this.validPromotion);
+    }
+
+    public void setValidPromotion(Promotion validPromotion) {
+        this.validPromotion = validPromotion;
     }
 }

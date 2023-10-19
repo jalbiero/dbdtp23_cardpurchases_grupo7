@@ -37,9 +37,10 @@ public class CashPurchase extends Purchase {
         float finalAmount,
         float storeDiscount,
         int month,
-        int year)
+        int year,
+        @Nullable Promotion validPromotion)
     {
-        super(card, paymentVoucher, store, cuitStore, amount, finalAmount);
+        super(card, paymentVoucher, store, cuitStore, amount, finalAmount, validPromotion);
         this.storeDiscount = storeDiscount;
         this.month = month;
         this.year = year;

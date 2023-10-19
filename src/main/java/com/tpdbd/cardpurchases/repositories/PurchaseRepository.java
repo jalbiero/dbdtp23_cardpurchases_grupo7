@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
 import com.tpdbd.cardpurchases.model.Purchase;
-import com.tpdbd.cardpurchases.repositories.projections.MostUsedVoucher;
+import com.tpdbd.cardpurchases.repositories.projections.MostUsedPromotion;
 import com.tpdbd.cardpurchases.repositories.projections.NumOfPurchasesByCard;
 
 public interface PurchaseRepository<T extends Purchase> extends CrudRepository<T, Long> {
@@ -19,15 +19,13 @@ public interface PurchaseRepository<T extends Purchase> extends CrudRepository<T
         "ORDER BY numOfPurchases DESC")
     Page<NumOfPurchasesByCard> findTopPurchaserCards(Pageable pageable);
 
-    // TODO This method will be moved to PromotionRepository when the missing
-    //      relationship Promotion <-1--n-> Purchase will be added
     @Query(
         "SELECT " +
         "   COUNT(p) AS numOfPurchases, " +
-        "   p.paymentVoucher AS code " +
+        "   p.validPromotion AS promotion " +
         "FROM Purchase p " +
-        "WHERE p.paymentVoucher IS NOT NULL " +
-        "GROUP BY p.paymentVoucher " +
+        "WHERE p.validPromotion IS NOT NULL " +
+        "GROUP BY p.validPromotion " +
         "ORDER BY numOfPurchases DESC")
-    Page<MostUsedVoucher> findTheMostUsedVouchers(Pageable pageable);
+    Page<MostUsedPromotion> findTheMostUsedPromotions(Pageable pageable);
 }
