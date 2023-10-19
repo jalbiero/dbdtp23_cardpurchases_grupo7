@@ -86,9 +86,18 @@ public class Bank {
         return this.promotions;
     }
 
+    public void setPromotions(List<Promotion> promotions) {
+        this.promotions = promotions;
+    }
+
     public List<Card> getCards() {
         return this.cards;
     }
+
+    public void setCards(List<Card> cards) {
+        this.cards = cards;
+    }
+
 
     public List<CardHolder> getCardHolders() {
         return this.cardHolders;
