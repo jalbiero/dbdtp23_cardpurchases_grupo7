@@ -19,8 +19,6 @@ public interface PurchaseRepository<T extends Purchase> extends CrudRepository<T
         "ORDER BY numOfPurchases DESC")
     Page<NumOfPurchasesByCard> findTopPurchaserCards(Pageable pageable);
 
-    // TODO This method will be moved to PromotionRepository when the missing
-    //      relationship Promotion <-1--n-> Purchase will be added
     @Query(
         "SELECT " +
         "   COUNT(p) AS numOfPurchases, " +
