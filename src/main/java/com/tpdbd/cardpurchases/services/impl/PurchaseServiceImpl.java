@@ -11,7 +11,7 @@ import com.tpdbd.cardpurchases.errors.PurchaseNotFoundException;
 import com.tpdbd.cardpurchases.model.Purchase;
 import com.tpdbd.cardpurchases.repositories.CreditPurchaseRepository;
 import com.tpdbd.cardpurchases.repositories.PurchaseRepository;
-import com.tpdbd.cardpurchases.repositories.projections.MostUsedVoucher;
+import com.tpdbd.cardpurchases.repositories.projections.MostUsedPromotion;
 import com.tpdbd.cardpurchases.repositories.projections.NumOfPurchasesByCard;
 import com.tpdbd.cardpurchases.services.PurchaseService;
 import com.tpdbd.cardpurchases.util.StreamHelpers;
@@ -22,7 +22,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     private PurchaseRepository<Purchase> purchaseRepository; // For general use regarding the purchase type
 
     @Autowired
-    private CreditPurchaseRepository creditPurchaseRepository; 
+    private CreditPurchaseRepository creditPurchaseRepository;
 
     @Override
     public List<String> findAllIds() {
@@ -49,7 +49,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     public Purchase findCreditById(String purchaseId) {
         return this.creditPurchaseRepository
             .findById(purchaseId)
-            .orElseThrow(() -> new CreditPurchaseNotFoundException(purchaseId));    
+            .orElseThrow(() -> new CreditPurchaseNotFoundException(purchaseId));
 }
 
     @Override
@@ -59,8 +59,8 @@ public class PurchaseServiceImpl implements PurchaseService {
     }
 
     @Override
-    public List<MostUsedVoucher> findTheMostUsedVouchers(int count) {
-        var mostUsedVouchers = this.purchaseRepository.findTheMostUsedVouchers(PageRequest.of(0, count));
-        return mostUsedVouchers.get().toList();
+    public List<MostUsedPromotion> findTheMostUsedPromotions(int count) {
+        var mostUsedPromotions = this.purchaseRepository.findTheMostUsedPromotions(PageRequest.of(0, count));
+        return mostUsedPromotions.get().toList();
     }
 }

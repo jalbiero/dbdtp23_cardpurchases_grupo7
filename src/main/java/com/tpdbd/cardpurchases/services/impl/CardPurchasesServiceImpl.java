@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.tpdbd.cardpurchases.dto.RequestDTO;
 import com.tpdbd.cardpurchases.dto.ResponseDTO;
@@ -40,7 +39,6 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
     private PurchaseService purchaseService;
 
     @Override
-    @Transactional
     public void banksAddDiscountPromotion(String id, RequestDTO.Discount discount) {
         var bank = this.bankService.find(id);
         var promo = RequestDTO.Discount.toModel(discount, bank);
@@ -50,7 +48,6 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
     }
 
     @Override
-    @Transactional
     public void paymentsUpdateDates(String id, LocalDate firstExpiration, LocalDate secondExpiration) {
         if (firstExpiration.isAfter(secondExpiration)) {
             throw new BadRequestException(
@@ -118,28 +115,25 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
     }
 
     @Override
-    @Transactional
     public ResponseDTO.Promotion promotionsGetTheMostUsed() {
         // For debugging purposes: Set a greater value and uncomment the
         // logging code a few lines below
-        final var NUM_OF_VOUCHERS = 1;
+        final var NUM_OF_PROMOTIONS = 1;
 
-        var mostUsedVouchers = this.purchaseService.findTheMostUsedVouchers(NUM_OF_VOUCHERS);
+        var mostUsedPromotions = this.purchaseService.findTheMostUsedPromotions(NUM_OF_PROMOTIONS);
 
-        if (mostUsedVouchers.isEmpty())
+        if (mostUsedPromotions.isEmpty())
             throw new NotFoundException("No promotions used in all purchases");
 
         // TODO Add a propper logger instead of the console output
-        // mostUsedVouchers.forEach(voucher -> {
+        // mostUsedPromotions.forEach(mostUsedPromotion -> {
         //     System.out.println(
-        //         "Voucher: " + voucher.getCode() +
-        //         ", # of purchases: " + voucher.getNumOfPurchases());
+        //         "Promotion: " + mostUsedPromotion.getPromotion().getCode() +
+        //         ", # of purchases: " + mostUsedPromotion.getNumOfPurchases());
         // });
 
-        var voucher = mostUsedVouchers.get(0);
-        var promotion = this.promotionService.findByCode(voucher.getCode());
-
-        return ResponseDTO.Promotion.fromModel(promotion, voucher.getNumOfPurchases());
+        var mostUsedPromotion = mostUsedPromotions.get(0);
+        return ResponseDTO.Promotion.fromModel(mostUsedPromotion.getPromotion(), mostUsedPromotion.getNumOfPurchases());
     }
 
     @Override

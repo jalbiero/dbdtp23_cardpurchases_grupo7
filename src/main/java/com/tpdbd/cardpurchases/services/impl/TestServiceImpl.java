@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.tpdbd.cardpurchases.dto.RequestDTO;
 import com.tpdbd.cardpurchases.model.Bank;
@@ -18,26 +17,24 @@ import com.tpdbd.cardpurchases.services.PromotionService;
 import com.tpdbd.cardpurchases.services.PurchaseService;
 import com.tpdbd.cardpurchases.services.TestService;
 
-//import jakarta.transaction.Transactional;
-
 @Service
 public class TestServiceImpl implements TestService {
-    @Autowired 
+    @Autowired
     BankService bankService;
 
-    @Autowired 
+    @Autowired
     CardService cardService;
 
-    @Autowired 
+    @Autowired
     CardHolderService cardHolderService;
 
-    @Autowired 
+    @Autowired
     PaymentService paymentService;
 
     @Autowired
     PromotionService promotionService;
 
-    @Autowired 
+    @Autowired
     PurchaseService purchaseService;
 
 
@@ -63,7 +60,6 @@ public class TestServiceImpl implements TestService {
     }
 
     @Override
-    @Transactional
     public String addCard(RequestDTO.Card card) {
         var bank = this.bankService.find(card.bankId());
         var cardHolder = this.cardHolderService.find(card.cardHolderId());
