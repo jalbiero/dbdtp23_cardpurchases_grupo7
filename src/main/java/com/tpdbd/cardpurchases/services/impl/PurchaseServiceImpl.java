@@ -13,7 +13,7 @@ import com.tpdbd.cardpurchases.model.CreditPurchase;
 import com.tpdbd.cardpurchases.model.Purchase;
 import com.tpdbd.cardpurchases.repositories.CreditPurchaseRepository;
 import com.tpdbd.cardpurchases.repositories.PurchaseRepository;
-import com.tpdbd.cardpurchases.repositories.projections.MostUsedVoucher;
+import com.tpdbd.cardpurchases.repositories.projections.MostUsedPromotion;
 import com.tpdbd.cardpurchases.repositories.projections.NumOfPurchasesByCard;
 import com.tpdbd.cardpurchases.services.PurchaseService;
 import com.tpdbd.cardpurchases.util.StreamHelpers;
@@ -21,7 +21,7 @@ import com.tpdbd.cardpurchases.util.StreamHelpers;
 @Service
 public class PurchaseServiceImpl implements PurchaseService {
     @Autowired
-    private PurchaseRepository<Purchase> purchaseRepository; 
+    private PurchaseRepository<Purchase> purchaseRepository;
 
     @Autowired
     private CreditPurchaseRepository creditPurchaseRepository;
@@ -53,11 +53,11 @@ public class PurchaseServiceImpl implements PurchaseService {
     @Override
     @Transactional(readOnly = true)
     public Purchase findCreditTotalPrice(long purchaseId) {
-        return this.purchaseRepository 
+        return this.purchaseRepository
             .findById(purchaseId)
             .filter(p -> CreditPurchase.class.isInstance(p))
             .map(p -> CreditPurchase.class.cast(p))
-            .orElseThrow(() -> new CreditPurchaseNotFoundException(purchaseId));    
+            .orElseThrow(() -> new CreditPurchaseNotFoundException(purchaseId));
     }
 
     @Override
@@ -69,8 +69,8 @@ public class PurchaseServiceImpl implements PurchaseService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<MostUsedVoucher> findTheMostUsedVouchers(int count) {
-        var mostUsedVouchers = this.purchaseRepository.findTheMostUsedVouchers(PageRequest.of(0, count));
-        return mostUsedVouchers.get().toList();
+    public List<MostUsedPromotion> findTheMostUsedPromotions(int count) {
+        var mostUsedPromotions = this.purchaseRepository.findTheMostUsedPromotions(PageRequest.of(0, count));
+        return mostUsedPromotions.get().toList();
     }
 }

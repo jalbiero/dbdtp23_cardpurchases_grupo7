@@ -339,8 +339,7 @@ public class CardPurchasesControllerTests {
         }
     }
 
-    // TODO Disabled until the missing relationship Promotion <-1--n-> Purchase will be added
-    //@Test
+    @Test
     void testPromotionsGetTheMostUsed() {
         given()
             .when()

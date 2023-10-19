@@ -3,6 +3,7 @@ package com.tpdbd.cardpurchases.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
@@ -30,9 +31,10 @@ public class CreditPurchase extends Purchase {
         float amount,
         float finalAmount,
         float interest,
-        int numberOfQuotas)
+        int numberOfQuotas,
+        @Nullable Promotion validPromotion)
     {
-        super(card, paymentVoucher, store, cuitStore, amount, finalAmount);
+        super(card, paymentVoucher, store, cuitStore, amount, finalAmount, validPromotion);
         this.interest = interest;
         this.numberOfQuotas = numberOfQuotas;
         this.quotas = new ArrayList<Quota>();

@@ -1,6 +1,8 @@
 package com.tpdbd.cardpurchases.repositories.projections;
 
-public interface MostUsedVoucher {
-    int getNumOfPurchases();  
-    String getCode();
+import com.tpdbd.cardpurchases.model.Promotion;
+
+public interface MostUsedPromotion {
+    int getNumOfPurchases();
+    Promotion getPromotion();
 }

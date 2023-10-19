@@ -421,7 +421,8 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
                     finalAmount,
                     storeDiscount,
                     shopDate.getMonthValue(),
-                    shopDate.getYear());
+                    shopDate.getYear(),
+                    promo.orElse(null));
             });
 
         this.cashRepository.saveAll(purchases);
@@ -474,9 +475,6 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
                     .map(p -> Financing.class.cast(p))
                     .findAny();
 
-                // @Nullable var finVoucher = financialPromo
-                //     .map(Financing::getCode)
-                //     .orElse(null); // No promotion
                 var voucher = faker.simpsons().character();
 
                 var finInterest = financialPromo
@@ -500,7 +498,8 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
                     amount,
                     finalAmount,
                     finInterest,
-                    finNumOfQuotas);
+                    finNumOfQuotas,
+                    discountPromo.orElse(null));
 
                 return purchase;
             });
