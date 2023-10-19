@@ -1,13 +1,15 @@
 package com.tpdbd.cardpurchases.repositories.projections;
 
-// Mongo projections don't work with interfaces, this record replaces the interface
-public record MostUsedVoucher(String code, int numOfPurchases) {
+import com.tpdbd.cardpurchases.model.Promotion;
 
-    // Provides compatibility with the SQL version based on the 
+// Mongo projections don't work with interfaces, this record replaces the interface
+public record MostUsedVoucher(Promotion promotion, int numOfPurchases) {
+
+    // Provides compatibility with the SQL version based on the
     // old MostUsedVoucher interface
 
-    public String getCode() {
-        return this.code;
+    public Promotion getPromotion() {
+        return this.promotion;
     }
 
     public int getNumOfPurchases() {
