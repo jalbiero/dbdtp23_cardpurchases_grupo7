@@ -1,6 +1,8 @@
 package com.tpdbd.cardpurchases.model;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -35,6 +37,9 @@ public abstract class Promotion {
     @SuppressWarnings("unused")
     private Boolean deleted;
 
+    @DocumentReference(lazy =  true)
+    private List<Purchase> purchases;
+
     public Promotion() {
     }
 
@@ -57,6 +62,7 @@ public abstract class Promotion {
         this.validityEndDate = validityEndDate;
         this.comments = comments;
         this.deleted = false;
+        this.purchases = new ArrayList<Purchase>();
     }
 
     public String getId() {
@@ -125,5 +131,13 @@ public abstract class Promotion {
 
     public void setComments(String comments) {
         this.comments = comments;
+    }
+
+    public List<Purchase> getPurchases() {
+        return this.purchases;
+    }
+
+    public void setPurchases(List<Purchase> purchases) {
+        this.purchases = purchases;
     }
 }

@@ -404,16 +404,18 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
 
                 var shopDate = getFakeDate(card.getSince());
 
-                var purchase = this.cashPurchaseRepository.save(new CashPurchase(
-                    card,
-                    voucher,
-                    store.name(),
-                    store.cuit(),
-                    amount,
-                    finalAmount,
-                    storeDiscount,
-                    shopDate.getMonthValue(),
-                    shopDate.getYear()));
+                var purchase = this.cashPurchaseRepository.save(
+                    new CashPurchase(
+                        card,
+                        voucher,
+                        store.name(),
+                        store.cuit(),
+                        amount,
+                        finalAmount,
+                        storeDiscount,
+                        shopDate.getMonthValue(),
+                        shopDate.getYear(),
+                        promo.orElse(null)));
 
                 card.getPurchases().add(purchase);
                 this.cardRepository.save(card);
@@ -472,9 +474,7 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
                     .map(p -> Financing.class.cast(p))
                     .findAny();
 
-                @Nullable var finVoucher = financialPromo
-                    .map(Financing::getCode)
-                    .orElse(null); // No promotion
+                var voucher = faker.simpsons().character();
 
                 var finInterest = financialPromo
                     .map(Financing::getInterest)
@@ -489,15 +489,17 @@ public class TestDataGeneratorServiceImpl implements TestDataGeneratorService {
                 ///////////////////////////////////
                 // Purchase part
 
-                var purchase = this.creditPurchaseRepository.save(new CreditPurchase(
-                    card,
-                    finVoucher,
-                    store.name(),
-                    store.cuit(),
-                    amount,
-                    finalAmount,
-                    finInterest,
-                    finNumOfQuotas));
+                var purchase = this.creditPurchaseRepository.save(
+                    new CreditPurchase(
+                        card,
+                        voucher,
+                        store.name(),
+                        store.cuit(),
+                        amount,
+                        finalAmount,
+                        finInterest,
+                        finNumOfQuotas,
+                        discountPromo.orElse(null)));
 
                 card.getPurchases().add(purchase);
                 this.cardRepository.save(card);

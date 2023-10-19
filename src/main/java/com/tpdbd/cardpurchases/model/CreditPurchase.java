@@ -7,6 +7,8 @@ import org.springframework.data.annotation.TypeAlias;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.DocumentReference;
 
+import jakarta.annotation.Nullable;
+
 @Document(collection = "purchase")
 @TypeAlias("CreditPurchase") // Simplifies name for queries (see CreditPurchaseRepository)
 public class CreditPurchase extends Purchase {
@@ -29,9 +31,10 @@ public class CreditPurchase extends Purchase {
         float amount,
         float finalAmount,
         float interest,
-        int numberOfQuotas)
+        int numberOfQuotas,
+        @Nullable Promotion validPromotion)
     {
-        super(card, paymentVoucher, store, cuitStore, amount, finalAmount);
+        super(card, paymentVoucher, store, cuitStore, amount, finalAmount, validPromotion);
         this.interest = interest;
         this.numberOfQuotas = numberOfQuotas;
         this.quotas = new ArrayList<Quota>();

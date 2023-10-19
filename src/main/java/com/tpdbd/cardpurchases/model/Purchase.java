@@ -1,7 +1,11 @@
 package com.tpdbd.cardpurchases.model;
 
+import java.util.Optional;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import jakarta.annotation.Nullable;
 
 @Document
 public abstract class Purchase {
@@ -21,6 +25,9 @@ public abstract class Purchase {
 
     private float finalAmount;
 
+    @Nullable
+    private Promotion validPromotion;
+
     public Purchase() {
     }
 
@@ -30,7 +37,8 @@ public abstract class Purchase {
         String store,
         String cuitStore,
         float amount,
-        float finalAmount)
+        float finalAmount,
+        @Nullable Promotion validPromotion)
     {
         this.card = card;
         this.paymentVoucher = paymentVoucher;
@@ -38,6 +46,7 @@ public abstract class Purchase {
         this.cuitStore = cuitStore;
         this.amount = amount;
         this.finalAmount = finalAmount;
+        this.validPromotion = validPromotion;
     }
 
     public String getId() {
@@ -90,5 +99,13 @@ public abstract class Purchase {
 
     public void setFinalAmount(float finalAmount) {
         this.finalAmount = finalAmount;
+    }
+
+    public Optional<Promotion> getValidPromotion() {
+        return Optional.of(this.validPromotion);
+    }
+
+    public void setValidPromotion(Promotion validPromotion) {
+        this.validPromotion = validPromotion;
     }
 }

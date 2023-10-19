@@ -119,4 +119,8 @@ public class Card {
     public List<Purchase> getPurchases() {
         return this.purchases;
     }
+
+    public void setPurchases(List<Purchase> purchases) {
+        this.purchases = purchases;
+    }
 }

@@ -111,6 +111,10 @@ public class CardHolder {
         return this.cards;
     }
 
+    public void setCards(List<Card> cards) {
+        this.cards = cards;
+    }
+
     public List<Bank> getBanks() {
         return this.banks;
     }

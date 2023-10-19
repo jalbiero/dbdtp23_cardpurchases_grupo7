@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.tpdbd.cardpurchases.errors.CardNotFoundException;
 import com.tpdbd.cardpurchases.model.Card;
@@ -13,19 +12,17 @@ import com.tpdbd.cardpurchases.repositories.CardRepository;
 import com.tpdbd.cardpurchases.services.CardService;
 import com.tpdbd.cardpurchases.util.StreamHelpers;
 
-//import jakarta.transaction.Transactional;
-
 @Service
 public class CardServiceImpl implements CardService {
     @Autowired
     private CardRepository cardRepository;
-    
+
     @Override
     public List<Card> findSoonToExpire(LocalDate baseDate, Integer daysFromBaseDate) {
         var finalDate = baseDate.plusDays(daysFromBaseDate);
         return this.cardRepository
             .findByExpirationDateBetweenOrderByExpirationDate(baseDate, finalDate);
-    }    
+    }
 
     @Override
     public List<String> findAllIds() {
@@ -47,7 +44,6 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
-    @Transactional
     public void delete(String id) {
         this.cardRepository.deleteById(id);
     }
