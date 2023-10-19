@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.tpdbd.cardpurchases.dto.RequestDTO;
 import com.tpdbd.cardpurchases.dto.ResponseDTO;
@@ -39,6 +40,7 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
     private PurchaseService purchaseService;
 
     @Override
+    @Transactional
     public void banksAddDiscountPromotion(String id, RequestDTO.Discount discount) {
         var bank = this.bankService.find(id);
         var promo = RequestDTO.Discount.toModel(discount, bank);
@@ -48,6 +50,7 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
     }
 
     @Override
+    @Transactional
     public void paymentsUpdateDates(String id, LocalDate firstExpiration, LocalDate secondExpiration) {
         if (firstExpiration.isAfter(secondExpiration)) {
             throw new BadRequestException(
@@ -147,6 +150,7 @@ public class CardPurchasesServiceImpl implements CardPurchasesService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ResponseDTO.Bank banksGetTheOneWithMostPaymentValues() {
         // For debugging purposes: Set a greater value and uncomment the
         // logging code a few lines below

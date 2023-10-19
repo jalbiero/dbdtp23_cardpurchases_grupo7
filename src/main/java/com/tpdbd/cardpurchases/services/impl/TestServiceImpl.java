@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.tpdbd.cardpurchases.dto.RequestDTO;
 import com.tpdbd.cardpurchases.model.Bank;
@@ -41,7 +42,6 @@ public class TestServiceImpl implements TestService {
     @Override
     public List<String> getBankIds() {
         return this.bankService.findAllIds();
-
     }
 
     @Override
@@ -60,6 +60,7 @@ public class TestServiceImpl implements TestService {
     }
 
     @Override
+    @Transactional
     public String addCard(RequestDTO.Card card) {
         var bank = this.bankService.find(card.bankId());
         var cardHolder = this.cardHolderService.find(card.cardHolderId());
