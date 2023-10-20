@@ -1,6 +1,8 @@
 # dbd_tp2022-23
 
-Trabajo final de Diseño de Bases de Datos 2022/23 - **GRUPO 7**
+Trabajo final de Diseño de Bases de Datos 2022/23 - **GRUPO 7** (versión SQL)
+
+Para la versión Mongo de este documento haga clic [acá](https://github.com/jalbiero/dbdtp23_cardpurchases_grupo7/tree/mongo_version#readme)
 
 - [dbd_tp2022-23](#dbd_tp2022-23)
   - [Introducción](#introducción)
@@ -15,7 +17,7 @@ Trabajo final de Diseño de Bases de Datos 2022/23 - **GRUPO 7**
     - [Modelo](#modelo)
     - [Otros](#otros)
   - [Conclusión](#conclusión)
-
+  
 ## Introducción
 
 Esta es una aplicación que expone funcionalidad mediante una API REST, la misma puede ser accedida mediante algún cliente de prueba tal como [Postman](https://www.postman.com/), [JMeter](https://jmeter.apache.org/) o la misma interfaz gráfica expuesta por la aplicación, lo cual se recomienda (ver la sección de [documentación y prueba](#documentación-y-prueba-manual-de-los-endpoints-implementados) para más detalles). La base de datos usada es MySQL 8.0
@@ -32,7 +34,9 @@ Para simplificar el desarrollo los tests unitarios son de integración es decir 
 
 El desarrollo se hizo bajo Linux (openSUSE 15.4), no se probó en otras plataformas (macOS, Windows), pero debería funcionar sin problemas en ambas.
 
-Nota: En el archivo [pom.xml](pom.xml) se agregó una tarea (ver `Start-up dependant services`) que automáticamente levanta el docker de SQL mediante `docker compose` tanto al ejecutar la aplicación como al ejecutar sus tests unitarios. Todo es automático.
+Nota: En el archivo [pom.xml](pom.xml) se agregó una tarea:
+
+- `Start-up dependant services`: Automáticamente levanta el docker de SQL mediante `docker compose` tanto al ejecutar la aplicación como al ejecutar sus tests unitarios.
 
 ## Instalación y ejecución
 
@@ -81,7 +85,7 @@ Para las pruebas (tanto manuales con la aplicación funcionando, como para los _
    1. Era muy dependiente de la estructura de datos generada por JPA (un cambio en las anotaciones y la estructura difiere)
    2. Iba a ser necesario tener un archivo similar para Mongo.
 
-En conclusión: El código del servicio trabaja con las entidades del modelo por lo cual es independiente de la base de datos subyacente.
+En conclusión: El código del servicio trabaja con las entidades del modelo por lo cual es casi independiente de la base de datos subyacente ("casi" ya que hay algunas pequeñas diferencias).
 
 La generación de datos se controla mediante el [archivo de propiedades de la aplicación](src/main/resources/application.properties). Por simplicidad, sobre todo para ciertos tests, y a menos que esas propiedades sean modificadas, los datos generados en cada corrida de la aplicación, o de los _test_ unitarios, van a ser siempre los mismos.
 
@@ -91,7 +95,7 @@ Los _tests_ unitarios se ejecutan con:
 $ mvn test
 ```
 
-### Modelo
+### Modelo (SQL)
 
 En el modelo se tomaron las siguientes decisiones:
 
@@ -100,15 +104,16 @@ En el modelo se tomaron las siguientes decisiones:
   - Longitud máxima de caracteres en caso de las cadenas.
   - Unicidad en los que se requiera (DNI, CUIT, etc)
 - En el caso de colecciones que se mapean a tablas:
-  -  se usó `@JoinTable` (además de por ejemplo `@OneToMany`) para simplificar la generación del modelo en la base. Sin `@JoinTable` se generan tablas extras intermedias que no son óptimas desde el punto de vista del rendimiento.
+  -  En la mayoría de las colecciones se usó `@JoinColumn` (en una minoría, para un control más fino, `@JoinTable`) junto con `@OneToMany` o `@ManyToMany`; esto para simplificar la generación del modelo en la base. Sin `@JoinColumn` (`@JoinTable`) se generan tablas extras intermedias que no son óptimas desde el punto de vista del rendimiento.
   -  Se usó además el valor por defecto para el _fetch_ (LAZY) y para las operaciones de cascada (desabilitado) ya que no se tuvo necesidad de activar las mismas.
 - En cuanto a la herencia: Hay 2 grupos de clases que las usan, `Purchase` con _CashPurchase_ y _CreditPurchase_, y `Promotion` con _Financing_ y _Discount_. En ambos caso se decidió usar una estrategia de tipo `InheritanceType.SINGLE_TABLE`, ya que es la que mayor rendimiento tiene. Su único punto en contra es que en las clases derivadas los atributos deben ser _nullable_.
 
 ### Otros
 
-- En la clase `Quota`, por conveniencia, se cambiaron los tipos de datos de los attributos `month`y `year`, ambos originalmente `String` a `int`
+- En la clase `Quota`, por conveniencia, se cambiaron los tipos de datos de los attributos `month`y `year`, ambos originalmente `String` a `int`.
+- En la clase `CashPurchase` se agregaron los attributos `month`y `year` para poder agrupar las compras bajo un mismo pago (al igual que las cuotas).
 - Con respecto a los DTO:
-  - El _mapper_ más simple y directo de usar es en mi opinión "modelmapper", pero lamentablemente no soporta objetos DTO basados en _records_ (los cuales son muy sencillos de definir y usar)
+  - El _mapper_ más simple y directo de usar es, en mi opinión, "modelmapper", pero lamentablemente no soporta objetos DTO basados en _records_ (los cuales son muy sencillos de definir y usar)
   -  Por lo dicho anteriomente, opté por hacer el mapeo de los objetos basados en entidades a DTO de manera manual (agregando un par de métodos estáticos a los DTO para la conversión entre y hace entidades del modelo).
   -  Hay mucha discusión sobre en qué capa usar los DTOs, muchos a favor (y con cierta razón) que los mismos deben usarse en la capa de transporte, es decir en la de los controladores. El problema es que en esa capa muchas veces no se cuenta con datos que el servicio posee para generar correctamente el DTO. Por lo anterior tomé la decisión de que la capa de servicio devuelva resultados directamente en DTO para la capa de controladores.
 
@@ -122,7 +127,7 @@ Uno de mis últimos trabajos fue una aplicación de citas (que todavía sigue en
 
 Originalmente se empezó con una base de datos relacional (MySQL). Hasta el día de hoy dicha base contiene toda la información de los usuarios. La misma está estructurada en una serie de tablas donde lo importante es la consistencia y validación de los datos. Inicialmente la aplicación funcionaba bien (en lo que a velocidad respecta) debido a la poca cantidad de usuarios, así como también a cierta funcionalidad limitada.
 
-Con el paso del tiempo, los usuarios fueron aumentando junto con las nuevas características ideadas por el área de _marketing_ y las relevadas por el aŕea de investigación de mercado. Dichas características incluían filtrar usuarios por todo tipo de atributos, tener filtros reversos (evitar que ciertos usuarios vean "mi" perfil), bloquear usuarios en particular, ranquear a los usuarios que se visualizan en un perfil en base a muchas condiciones tales como tiempo de conexión, completitud del perfil, ubicación geográfica, etc, etc. Todo lo anterior terminaba siendo implementado en consultas SQL que crecían en tamaño y complejidad (eran complicadas de mantener o mejorar), y además, como si fuera poco, se iban haciendo cada vez más lentas (hay que tener en cuenta que en una aplicación móvil el usuario tiene la adictiva opción, que la usa todo el tiempo, de refrescar los datos que ve en pantalla con un simple gesto ([_pull to refresh_](https://en.wikipedia.org/wiki/Pull-to-refresh)) por lo tanto dicha falta de velocidad era cada vez más notable.
+Con el paso del tiempo, los usuarios fueron aumentando junto con las nuevas características ideadas por el área de _marketing_ y las relevadas por el área de investigación de mercado. Dichas características incluían filtrar usuarios por todo tipo de atributos, tener filtros reversos (evitar que ciertos usuarios vean "mi" perfil), bloquear usuarios en particular, ranquear a los usuarios que se visualizan en un perfil en base a muchas condiciones tales como tiempo de conexión, completitud del perfil, ubicación geográfica, etc, etc. Todo lo anterior terminaba siendo implementado en consultas SQL que crecían en tamaño y complejidad (eran complicadas de mantener o mejorar), y además, como si fuera poco, se iban haciendo cada vez más lentas (hay que tener en cuenta que en una aplicación móvil el usuario tiene la adictiva opción, que la usa todo el tiempo, de refrescar los datos que ve en pantalla con un simple gesto ([_pull to refresh_](https://en.wikipedia.org/wiki/Pull-to-refresh)) por lo tanto dicha falta de velocidad era cada vez más notoria.
 
 Ante esta situación se optó en un momento dado por mantener una vista materializada del perfil de cada usuario en una base de datos NoSQL (Elasticsearch para ser más exacto). Dicha vista era una simple colección de atributos del usuario, tanto reales como meta datos asociados para simplificar las consultas. Esto mejoró notablemente la velocidad, además de simplificar las consultas en si. Por supuesto que aparecieron escenarios de consistencia eventual, pero no fueron un problema en absoluto. Ej: un típico caso es aquel en donde un usuario actualiza su perfil en la base SQL. Esta actualización dispara un proceso que inyecta dichos datos actualizados en Elasticsearch además de generar una reindexación de los mismos. Esto lleva tiempo, por lo cual otros usuarios pueden ver el perfil "desactualizado" por cierto lapso, lo cual no es un problema ya que no saben cuando el otro usuario realmente cambió sus datos. Es como ver un evento deportivo "en vivo", pero por _streaming_, mientras no haya otra fuente de verdad sobre el "vivo", el _delay_ del _streaming_ no es percibido; lo mismo pasa en la aplicación.
 
